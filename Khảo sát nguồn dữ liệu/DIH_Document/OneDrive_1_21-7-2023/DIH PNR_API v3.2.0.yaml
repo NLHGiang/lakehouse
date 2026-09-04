@@ -1,0 +1,5270 @@
+swagger: '2.0'
+################################################################################
+#                              API Information                                 #
+################################################################################
+info:
+  version: 3.2.0
+  title: Dynamic Intelligence Hub Data Model - PassengerNameRecord
+  description: >-
+    This document describes DIH output for PassengerNameRecord Data Push Feed
+
+################################################################################
+#                                    Paths                                     #
+################################################################################
+paths:
+  ########## DIH PNR feeds definition ##########
+  /reservation/pnr-feed:
+    post:
+      tags:
+        - FEED
+      summary: PNR DataPush Feed
+      description: PNR feed pushed by Amadeus DIH. Please note this is NOT a POST API - this section is only used to specify the data model pushed.
+      responses:
+        default:
+          description: PNR Data Push Feed
+          schema:
+            $ref: '#/definitions/PnrPushFeed'
+  /reservation/pnr-correlations-feed:
+    post:
+      tags:
+        - FEED
+      summary: PNR Correlations DataPush Feed
+      description: PNR correlations feed pushed by Amadeus DIH. Please note this is NOT a POST API - this section is only used to specify the data model pushed.
+      responses:
+        default:
+          description: PNR Correlations Data Push Feed
+          schema:
+            $ref: '#/definitions/PnrCorrelationsPushFeed'
+
+################################################################################
+#                                 Definitions                                  #
+################################################################################
+definitions:
+  ########## Payloads ##########
+  PnrPushFeed:
+    properties:
+      meta:
+        $ref: '#/definitions/Meta'
+      processedPnr:
+        $ref: '#/definitions/PnrFeedData'
+      previousRecord:
+        description: List of JSON Patches as defined by RFC 6902 (see https://tools.ietf.org/html/rfc6902) to apply to processedPnr [latest PNR version] in order to obtain the actual JSON of the previous PNR version.
+        type: array
+        items:
+          $ref: '#/definitions/PatchOperation'
+      events:
+        $ref: '#/definitions/Events'
+    example:
+      meta:
+        triggerEventLog:
+          id: '429074ef1bd011e3-e63dfe23f4a0adc'
+          triggerEventName: 'DATA_INIT'
+        version: '3.2.0'
+      processedPnr:
+        type: 'pnr'
+        id: 'ZAY091-2019-10-05'
+        reference: ZAY091
+        version: '1'
+        owner:
+          office:
+            id: 'NCE6X08AA'
+            iataNumber: '15398195'
+            systemCode: '6X'
+            agentType: AIRLINE
+          login:
+            numericSign: '0001'
+            initials: 'JF'
+            dutyCode: 'SU'
+            currencyCode: 'EUR'
+            countryCode: 'FR'
+            cityCode: 'NCE'
+        creation:
+          dateTime: '2019-10-05T10:00:00Z'
+          pointOfSale:
+            office:
+              id: 'NCE6X08AA'
+              iataNumber: '15398195'
+              systemCode: '6X'
+              agentType: AIRLINE
+            login:
+              numericSign: '0001'
+              initials: 'JF'
+              dutyCode: 'SU'
+              currencyCode: 'EUR'
+              countryCode: 'FR'
+              cityCode: 'NCE'
+          comment: '6X ONLINE BOOKING'
+        lastModification:
+          dateTime: '2019-10-05T10:00:00Z'
+          pointOfSale:
+            office:
+              id: 'NCE6X08AA'
+              iataNumber: '15398195'
+              systemCode: '6X'
+              agentType: AIRLINE
+            login:
+              numericSign: '0001'
+              initials: 'JF'
+              dutyCode: 'SU'
+              currencyCode: 'EUR'
+              countryCode: 'FR'
+              cityCode: 'NCE'
+          comment: '6X ONLINE BOOKING'
+        pnrProperties:
+          - CODESHARE_PNR
+        queuingOffice:
+          id: 'NCE6X08AA'
+          iataNumber: '15398195'
+          systemCode: '6X'
+          agentType: AIRLINE
+        nip: 1
+        associatedPnrs:
+          - reference: 'JKL789'
+            associationType: 'SPLIT'
+            direction: 'CHILD'
+            creation:
+              dateTime: '2019-10-05T10:00:00Z'
+              pointOfSale:
+                office:
+                  systemCode: '1A'
+        travelers:
+          - type: stakeholder
+            id: 'ZAY091-2019-10-05-PT-1'
+            reference: '2501ADE0000001'
+            passengerTypeCode: 'ADT'
+            names:
+              - firstName: 'JAMES'
+                lastName: 'CARTER'
+                title: 'MR'
+            dateOfBirth: '1978-10-05'
+            age: 40
+            staffType: BOOKABLE
+            identificationCode: 'ID10152307'
+            identityDocuments:
+              - type: service
+                id: 'ZAY091-2019-05-04-OT-5'
+                code: 'DOCS'
+                subType: SPECIAL_SERVICE_REQUEST
+                serviceProvider:
+                  code: '6X'
+                status: 'HK'
+                nip: 1
+                creation:
+                  dateTime: '2019-10-05T10:00:00Z'
+                  pointOfSale:
+                    office:
+                      id: 'NCE6X08AA'
+                document:
+                  documentType: PASSPORT
+                  number: '15FR1234'
+                  issuanceDate: '2019-10-05'
+                  expiryDate: '2025-10-05'
+                  issuanceCountry: 'FRA'
+                  issuanceLocation: 'PARIS OFFICE'
+                  nationality: 'FRA'
+                  gender: 'MALE'
+                  name:
+                    fullName: 'JAMES JUNIOR CARTER'
+                    firstName: 'JAMES'
+                    lastName: 'CARTER'
+                  birthDate: '1978-10-05'
+                  birthPlace: 'PARIS'
+                text: 'P-FRA-15FR1234-FRA-05OCT15-M-05OCT25-CARTER-JAMES-H'
+                products:
+                  - type: product
+                    id: 'ZAY091-2019-10-05-ST-5'
+                    ref: 'processedPnr.products'
+            contacts:
+              - type: contact
+                id: 'ZAY091-2019-10-05-OT-47'
+                ref: 'processedPnr.contacts'
+            loyaltyAccruals:
+              - type: service
+                id: 'ZAY091-2019-10-05-OT-7'
+                ref: 'processedPnr.loyaltyRequests'
+            loyaltyServicing:
+              - type: service
+                id: 'ZAY091-2019-10-05-OT-8'
+                ref: 'processedPnr.loyaltyRequests'
+            corporateRecognitions:
+              - type: service
+                id: 'ZAY091-2019-10-05-OT-9'
+                ref: 'processedPnr.loyaltyRequests'
+            infant:
+              type: stakeholder
+              id: 'ZAY091-2019-10-05-PT-1-INF'
+              ref: 'processedPnr.travelers'
+            passenger:
+              specialSeat: 'CBBG'
+              uniqueIdentifier: '2501ADE0000001'
+              exst:
+                type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+              cbbg:
+                type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+              owner:
+                type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+        products:
+          - type: product
+            subType: AIR
+            id: 'ZAY091-2019-10-05-ST-5'
+            airSegment:
+              departure:
+                iataCode: 'NCE'
+                terminal: '1'
+                localDateTime: '2019-10-25T09:00:00'
+                checkInEndTime: '07:45'
+              arrival:
+                iataCode: 'CDG'
+                terminal: '2'
+                localDateTime: '2019-10-25T10:25:00'
+              aircraft:
+                aircraftType: '789'
+              marketing:
+                flightDesignator:
+                  carrierCode: '6X'
+                  flightNumber: '123'
+                  operationalSuffix: 'A'
+                isOpenNumber: false
+                bookingClass:
+                  code: 'I'
+                  cabin:
+                    code: 'F'
+              operating:
+                flightDesignator:
+                  carrierCode: '8X'
+                  flightNumber: '789'
+                  operationalSuffix: 'A'
+                bookingClass:
+                  code: 'C'
+                  cabin:
+                    code: 'B'
+                    bidPrice':
+                      amount: '50'
+                      currency: 'CAD'
+                      elementaryPriceType: 'BID_PRICE'
+                  subClass:
+                    code: 1
+                    pointOfSale:
+                      office:
+                        systemCode: '8X'
+                      login:
+                        countryCode: 'FR'
+                    yields:
+                      - amount: '55'
+                        currency: 'CAD'
+                        elementaryPriceType: 'ADJUSTED_YIELD'
+                      - amount: '5'
+                        currency: 'CAD'
+                        elementaryPriceType: 'EFFECTIVE_YIELD'
+                overBookingReason: 'FORCE_BOOKING'
+                codeshareAgreement: 'FREEFLOW'
+              creation:
+                dateTime: '2019-10-05T10:00:00Z'
+              bookingStatusCode: 'HK'
+              isInformational: false
+              isDominantInMarriage: true
+            products:
+              - type: product
+                id: 'ZAY091-2019-10-05-OT-5'
+                ref: 'processedPnr.products'
+              - type: product
+                id: 'ZAY091-2019-10-05-OT-10'
+                ref: 'processedPnr.products'
+            travelers:
+              - type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+              - type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-2'
+                ref: 'processedPnr.travelers'
+          - type: product
+            subType: SERVICE
+            id: 'ZAY091-2019-10-05-OT-5'
+            service:
+              code: 'FQTU'
+              subType: SPECIAL_SERVICE_REQUEST
+              serviceProvider:
+                code: '6X'
+              status: 'HK'
+              nip: 1
+              creation:
+                dateTime: '2019-10-05T10:00:00Z'
+                pointOfSale:
+                  office:
+                    id: 'NCE6X08AA'
+              membership:
+                id: '1234567890'
+                membershipType: INDIVIDUAL
+                activeTier:
+                  code: 'HGOLD'
+                  name: 'HONORARY GOLD'
+                  priorityCode: '1'
+                  customerValue: 5000
+                  companyCode: '6X'
+                allianceTier:
+                  code: 'G'
+                  name: 'GOLD'
+                  priorityCode: '5'
+                  companyCode: 'SA'
+              priceCategory:
+                code: 'A'
+                subCode: 'A04'
+              text: '6X1234567890 HGOLD/CN-CCWFXSR0175///Y'
+            products:
+              - type: product
+                id: 'ZAY091-2019-10-05-ST-5'
+                ref: 'processedPnr.products'
+            travelers:
+              - type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+          - type: product
+            subType: SEATING
+            id: 'ZAY091-2019-10-05-OT-10'
+            seating:
+              code: 'RQST'
+              subType: SPECIAL_SERVICE_REQUEST
+              serviceProvider:
+                code: '6X'
+              status: 'HK'
+              nip: 1
+              creation:
+                dateTime: '2019-10-05T10:00:00Z'
+                pointOfSale:
+                  office:
+                    id: 'NCE6X08AA'
+              seats:
+                - number: '05A'
+                  characteristicCodes:
+                    - 'CH'
+                    - 'W'
+                  traveler:
+                    type: stakeholder
+                    id: 'ZAY091-2019-10-05-PT-1'
+                    ref: 'processedPnr.travelers'
+                - number: '05B'
+                  characteristicCodes:
+                    - 'CH'
+                  traveler:
+                    type: stakeholder
+                    id: 'ZAY091-2019-10-05-PT-2'
+                    ref: 'processedPnr.travelers'
+              priceCategory:
+                code: 'A'
+                subCode: 'A01'
+              text: 'CDGNCE/05A,P1/05B,P2'
+            products:
+              - type: product
+                id: 'ZAY091-2019-10-05-ST-5'
+                ref: 'processedPnr.products'
+            travelers:
+              - type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+              - type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-2'
+                ref: 'processedPnr.travelers'
+        flightItinerary:
+          type: 'CUSTOMER_TRANSACTION_DATA_BOUND'
+          originIataCode: 'NCE'
+          destinationIataCode: 'ORD'
+          yield:
+            value: 60
+          flights:
+            - connectedFlights:
+                connectionTimeDuration: '2h'
+                connectionType: MARRIAGE
+                flightSegments:
+                  - type: 'product'
+                    id: 'ZAY091-2019-10-05-ST-1'
+                    ref: 'processedPnr.products'
+                  - type: 'product'
+                    id: 'ZAY091-2019-10-05-ST-2'
+                    ref: 'processedPnr.products'
+              flightSegment:
+                type: 'product'
+                id: 'ZAY091-2019-10-05-ST-1'
+                ref: 'processedPnr.products'
+            - flightSegment:
+              type: 'product'
+              id: 'ZAY091-2019-10-05-ST-3'
+              ref: 'processedPnr.products'
+        ticketingReferences:
+          - type: ticketing-reference
+            id: 'ZAY091-2019-10-05-OT-20'
+            referenceTypeCode: FA
+            documents:
+              - documentType: ETICKET
+                documentNumber: '1721234567891'
+                status: ISSUED
+                numberOfBooklets: 2
+                creation:
+                  dateTime: '2019-10-05T00:00:00Z'
+                  pointOfSale:
+                    office:
+                      id: 'NCE6X08AA'
+                      iataNumber: '15398195'
+                      systemCode: '6X'
+                price:
+                  total: '5000.50'
+                  currency: 'CAD'
+                coupons:
+                  - number: 1
+                    product:
+                      type: 'product'
+                      id: 'ZAY091-2019-10-05-ST-5'
+                      ref: 'processedPnr.products'
+                  - number: 2
+                    product:
+                      type: 'product'
+                      id: 'ZAY091-2019-10-05-ST-6'
+                      ref: 'processedPnr.products'
+            text: '172-1234567890/RCI-FDF1610O0001 MB01/ETAF/EUR3000.00/05OCT19/NCE6X08AA/20494795'
+            isInfant: false
+            traveler:
+              type: stakeholder
+              id: 'ZAY091-2019-10-05-PT-1'
+              ref: 'processedPnr.travelers'
+            products:
+              - type: 'product'
+                id: 'ZAY091-2019-10-05-ST-5'
+                ref: 'processedPnr.products'
+              - type: 'product'
+                id: 'ZAY091-2019-10-05-ST-6'
+                ref: 'processedPnr.products'
+        loyaltyRequests:
+          - type: service
+            id: 'ZAY091-2019-05-04-OT-5'
+            code: 'FQTV'
+            subType: SPECIAL_SERVICE_REQUEST
+            serviceProvider:
+              code: '6X'
+            status: 'HK'
+            nip: 1
+            creation:
+              dateTime: '2019-10-05T10:00:00Z'
+              pointOfSale:
+                office:
+                  id: 'NCE6X08AA'
+                  iataNumber: '15398195'
+                  systemCode: '6X'
+                  agentType: AIRLINE
+                login:
+                  numericSign: '0001'
+                  initials: 'JF'
+                  dutyCode: 'SU'
+                  currencyCode: 'EUR'
+                  countryCode: 'FR'
+                  cityCode: 'NCE'
+              comment: '6X online BOOKING'
+            membership:
+              id: '1234567890'
+              membershipType: INDIVIDUAL
+              activeTier:
+                code: 'HGOLD'
+                name: 'HONORARY GOLD'
+                priorityCode: '1'
+                customerValue: 5000
+                companyCode: '6X'
+              allianceTier:
+                code: 'HGOLD'
+                name: 'HONORARY GOLD'
+                priorityCode: '1'
+                customerValue: 5000
+                companyCode: '6X'
+            text: '6X1234567890 GOLD'
+            travelers:
+              - type: 'stakeholder'
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+            products:
+              - type: 'product'
+                id: 'ZAY091-2019-10-05-ST-1'
+                ref: 'processedPnr.travelers'
+        keywords:
+          - type: service
+            id: 'ZAY091-2019-05-04-OT-5'
+            code: 'CKIN'
+            subType: SPECIAL_KEYWORD
+            serviceProvider:
+              code: '6X'
+            status: 'HK'
+            nip: 1
+            creation:
+              dateTime: '2019-10-05T10:00:00Z'
+              pointOfSale:
+                office:
+                  id: 'NCE6X08AA'
+            text: 'PLEASE CHECK PASSPORT'
+            travelers:
+              - type: 'stakeholder'
+                id: 'ZAY091-2019-10-05-PT-5'
+                ref: 'processedPnr.travelers'
+        remarks:
+          - type: remark
+            id: 'ZAY091-2019-10-05-OT-36'
+            subType: 'RM'
+            category: 'C'
+            content: 'NOTIFY PASSENGER PRIOR TO TICKET PURCHASE & CHECK-IN: FEDERAL LAWS FORBID THE CARRIAGE OF HAZARDOUS MATERIALS - GGAMAUSHAZ'
+            travelers:
+              - type: 'stakeholder'
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+            products:
+              - type: 'product'
+                id: 'ZAY091-2019-10-05-ST-5'
+                ref: 'processedPnr.products'
+        contacts:
+          - type: contact
+            id: 'ZAY091-2019-10-05-OT-14'
+            addresseeName:
+              fullName: 'JAMES CARTER'
+            phone:
+              category: PERSONAL
+              deviceType: MOBILE
+              number: '0033612345678'
+            address:
+              category: DESTINATION
+              lines:
+                - '10 RUE DES CANETTES'
+              postalCode: '75006'
+              countryCode: 'FRA'
+              cityName: 'PARIS'
+              stateCode: 'NY'
+              postalBox: 'BP 12345'
+            email:
+              address: 'james.carter@gmail.com'
+            language: 'FR'
+            purpose: NOTIFICATION
+            freeFlowFormat: 'D/JAP/10 RUE DES CANETTES/PARIS-ARRONDISSEMENT6/75006'
+            travelerRefs:
+              - type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+        automatedProcesses:
+          - type: automated-process
+            id: 'ZAY091-2019-10-05-OT-37'
+            code: TL
+            dateTime: '2019-10-10T10:00:00'
+            office:
+              id: 'NCE6X08AA'
+            queue:
+              number: 10
+              category: 1
+            documentDeliveryOptions: 'TTP/TTM/ED/ITR'
+            text: '25OCT/NCE6X08AA/Q10C1//TTP/INV/ED/ITR'
+            applicableCarrierCode: '6X'
+            isApplicableToInfants: false
+            products:
+              - type: 'product'
+                id: 'ZAY091-2019-10-05-ST-5'
+                ref: 'processedPnr.products'
+            travelers:
+              - type: 'stakeholder'
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+        paymentMethods:
+          - type: payment-method
+            id: 'ZAY091-2019-10-05-OT-17'
+            code: FP
+            formsOfPayment:
+              - code: FFR
+                fopIndicator: NEW
+                freeText: 'FFR6X1234567890-M50000*A'
+                paymentLoyalty:
+                  membership:
+                    id: '1234567890'
+                    membershipType: INDIVIDUAL
+                    activeTier:
+                      code: HGOLD
+                      name: 'HONORARY GOLD'
+                      priorityCode: 1
+                      customerValue: 5000
+                      companyCode: 6X
+                    allianceTier:
+                      code: G
+                      name: GOLD
+                      priorityCode: 5
+                      companyCode: SA
+                  certificateNumber: '12345'
+                authorization:
+                  approvalCode: '12345678'
+              - code: CC
+                fopIndicator: NEW
+                freeText: 'CCVI************5555/0523*CVA/CAD1500/AAPS1OK/HCARTER JAMES'
+                paymentCard:
+                  maskedCardNumber: '************5555'
+                  vendorCode: VI
+                  expiryDate: 0523
+                authorization:
+                  approvalCode: AAPS1OK
+            isInfant: false
+            travelers:
+              - type: 'stakeholder'
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+            products:
+              - type: 'product'
+                id: 'ZAY091-2019-10-05-ST-5'
+                ref: 'processedPnr.products'
+        fareElements:
+          - type: fare-element
+            id: 'ZAY091-2019-10-05-OT-37'
+            code: FM
+            commissions:
+              controls:
+                - ATO_CTO
+                - AUTOMATIC
+              values:
+                - commissionType: NEW
+                  collectingAgency:
+                    iataNumber: '15398195'
+                  amount:
+                    amount: '90.70'
+                    currency: 'CAD'
+                - commissionType: VAT_ON_NEW
+                  percentage: '19.60'
+                - commissionType: OLD
+                  amount:
+                    amount: '50.89'
+                    currency: 'CAD'
+                - commissionType: VAT_ON_OLD
+                  percentage: '19.60'
+                - commissionType: SECONDARY
+                  percentage: '10.50'
+                  collectingAgency:
+                    iataNumber: '15398195'
+                  dealNumber: '1234567'
+            text: '*AM*90.70V19.60/XO/30.89AV19.60/B10.50/D1234567'
+            isInfant: false
+            travelers:
+              - type: 'stakeholder'
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+            products:
+              - type: 'product'
+                id: 'ZAY091-2019-10-05-ST-5'
+                ref: 'processedPnr.products'
+          - type: fare-element
+            id: 'ZAY091-2019-10-05-OT-41'
+            code: AI
+            accounting:
+              accountNumber: '123456'
+              costCenter: '1234567890123456789'
+              iataCompanyCode: '123ADC01'
+              clientReference: '123456789'
+            isInfant: false
+            travelers:
+              - type: 'stakeholder'
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+            products:
+              - type: 'product'
+                id: 'ZAY091-2019-10-05-ST-5'
+                ref: 'processedPnr.products'
+        quotations:
+          - type: quotation-record
+            id: 'ZAY091-2019-01-15-QT-1'
+            subType: TST
+            isManual: false
+            documentType: ETICKET
+            issuanceType: FIRST_ISSUE
+            flags:
+              - CONFIDENTIAL
+              - PNR_CHANGED
+            creation:
+              dateTime: '2019-01-15T00:00:00Z'
+              pointOfSale:
+                office:
+                  id: 'NCE6X0001'
+            lastModification:
+              dateTime: '2019-01-19T00:00:00Z'
+              pointOfSale:
+                office:
+                  id: 'NCE6X0001'
+            lastTicketingDate: '2019-01-25'
+            originCityIataCode: 'NCE'
+            destinationCityIataCode: 'CDG'
+            pricingConditions:
+              flags:
+                - FARE_BASIS_OVERRIDE
+              fareCalculation:
+                pricingIndicator: 3
+                text: 'PAR 6X YTO289.85SKWI5LGT 6X PAR289.85SKWI5LGT NUC579.70END ROE0.862490'
+                isManual: false
+              isInternationalSale: true
+              paymentRestriction:
+                restriction: 'NO VISA PAYMENT ON INDIAN MARKET'
+            price:
+              detailedPrices:
+                - amount: '1315'
+                  currency: 'CAD'
+                  elementaryPriceType: GRAND_TOTAL
+                - amount: '500'
+                  currency: 'EUR'
+                  elementaryPriceType: BASE_FARE
+                - amount: '740'
+                  currency: 'CAD'
+                  elementaryPriceType: EQUIVALENT_FARE
+                - amount: '1300'
+                  currency: 'CAD'
+                  elementaryPriceType: TOTAL
+              taxes:
+                - amount: '300'
+                  currency: 'CAD'
+                  code: 'YQ'
+                  nature: 'AD'
+                  category: 'NEW'
+                - amount: '130'
+                  currency: 'CAD'
+                  code: 'CA'
+                  nature: 'AE'
+                  category: 'NEW'
+                - amount: '130'
+                  currency: 'CAD'
+                  code: 'FR'
+                  nature: 'SE'
+                  category: 'NEW'
+              fees:
+                - code: 'OB'
+                  subCode: 'T01'
+                  amount: '15'
+                  currency: 'CAD'
+                  exempted: false
+                  taxIncluded: true
+                  description: 'MASTERCARD FEE'
+                  taxes:
+                    - amount: '3'
+                      currency: 'CAD'
+                      percentage: '20'
+                      included: true
+                      exempted: false
+                      description: 'VAT'
+            currencyConversionLookupRates:
+              rate: '1.14'
+              target: 'EUR'
+            coupons:
+              - fareBasis:
+                  fareBasisCode: BYM3M
+                  primaryCode: TTI
+                  ticketDesignatorCode: CD10
+                isNonRefundable: true
+                isNonExchangeable: true
+                isNonInterlineable: true
+                isFromConnection: false
+                isFromStopOver: false
+                validityDates:
+                  notValidBeforeDate: '2019-01-15'
+                  notValidAfterDate: '2019-01-25'
+                baggageAllowance:
+                  weight:
+                    value: 10
+                    unit: KILOGRAMS
+                  quantity: 1
+                product:
+                  type: product
+                  id: 'ZAY091-2019-10-05-ST-5'
+                  ref: 'processedPnr.products'
+            paymentMethods:
+              - type: payment-method
+                id: 'ZAY091-2019-10-05-OT-17'
+                ref: 'processedPnr.paymentMethods'
+            travelers:
+              - type: stakeholder
+                id: 'ZAY091-2019-10-05-PT-1'
+                ref: 'processedPnr.travelers'
+        flightTransfer:
+          type: 'flight-disruption-transfer'
+          id: '55555555'
+          subType: TRAVEL_READY_REACCOMODATION
+          travelers:
+            - type: 'stakeholder'
+              id: 'ZAY091-2019-10-05-PT-1'
+              ref: 'processedPnr.travelers'
+          fromSegments:
+            - departure:
+                iataCode: 'NCE'
+                terminal: '1'
+                localDateTime: '2019-10-25T09:00:00'
+                checkInEndTime: '07:45'
+              arrival:
+                iataCode: 'CDG'
+                terminal: '2'
+                localDateTime: '2019-10-25T10:25:00'
+              aircraft:
+                aircraftType
+              marketing:
+                flightDesignator:
+                  carrierCode: '6X'
+                  flightNumber: '123'
+                  operationalSuffix: 'A'
+                bookingClass:
+                  code: 'I'
+                  cabin:
+                    code: 'F'
+          toSegments:
+            - type: product
+              id: 'ZAY091-2019-10-05-ST-5'
+              ref: 'processedPnr.products'
+      previousRecord:
+        - op: replace
+          path: '/products/0/airSegment/bookingStatusCode'
+          value: 'KL'
+      events:
+        recordDomain: 'PNR'
+        recordId: 'ZAY091-2019-10-05'
+        originFeedTimeStamp: '2019-10-25T10:00:00Z'
+        events:
+          - origin: 'COMPARISON'
+            eventType: UPDATED
+            currentPath: '/products/0/airSegment/bookingStatusCode'
+            previousPath: '/products/0/airSegment/bookingStatusCode'
+  PnrCorrelationsPushFeed:
+    properties:
+      meta:
+        $ref: '#/definitions/Meta'
+      pnrCorrelations:
+        $ref: '#/definitions/PnrCorrelationsFeedData'
+      events:
+        $ref: '#/definitions/Events'
+    example:
+      meta:
+        triggerEventLog:
+          id: '429074ef1bd011e3-e63dfe23f4a0adc'
+          triggerEventName: 'DATA_INIT'
+        version: '3.2.0'
+      pnrCorrelations:
+        correlationPnrTicket:
+          pnrId: 'ZAY091-2019-10-05'
+          ticketIds:
+            - '1721234567890-2019-10-05'
+            - '1721234509876-2019-10-05'
+          correlatedData:
+            - '1721234567890-2019-10-05':
+                - ticketCouponId: '1721234567890-2019-10-05-1'
+                  pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+                  pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-10'
+                - ticketCouponId: '1721234567890-2019-10-05-2'
+                  pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+                  pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-10'
+            - '1721234509876-2019-10-05':
+                - ticketCouponId: '1721234509876-2019-10-05-1'
+                  pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+                  pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-12'
+                - ticketCouponId: '1721234509876-2019-10-05-2'
+                  pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+                  pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-12'
+        correlationPnrEmd:
+          pnrId: 'ZAY091-2019-10-05'
+          emdIds:
+            - '1729999999999-2019-10-05'
+            - '1725555555555-2019-10-05'
+          correlatedData:
+            - '1729999999999-2019-10-05':
+                - emdCouponId: '1729999999999-2019-10-05-1'
+                  pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+                  pnrServiceId: 'ZAY091-2019-10-05-OT-5'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+                  pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-19'
+            - '1725555555555-2019-10-05':
+                - emdCouponId: '1725555555555-2019-10-05-1'
+                  pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+                  pnrServiceId: 'ZAY091-2019-10-05-OT-6'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+                  pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-19'
+        correlationPnrDcsPassenger:
+          pnrId: 'ZAY091-2019-10-05'
+          dcsPassengerIds:
+            - '2501ADE0000001'
+            - '2501ADE0000005'
+          correlatedData:
+            - '2501ADE0000001':
+                - pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+                  dcsPassengerSegmentDeliveryId: '2401CA1011111OID'
+                - pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+                  dcsPassengerSegmentDeliveryId: '2401CA1033333OID'
+            - '2501ADE0000005':
+                - pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+                  dcsPassengerSegmentDeliveryId: '2401CA1055555OID'
+                - pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+                  pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+                  dcsPassengerSegmentDeliveryId: '2401CA1099999OID'
+        correlationPnrSchedule:
+          pnrId: 'ZAY091-2019-10-05'
+          scheduleIds:
+            - '6X-123-2019-10-15'
+            - '6X-789-2019-10-25'
+          correlatedData:
+            - '6X-123-2019-10-15':
+                - pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+                  scheduleSegmentId: '2019-10-15-NCE-CDG'
+            - '6X-789-2019-10-25':
+                - pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+                  scheduleSegmentId: '2019-10-25-CDG-NCE'
+                  schedulePartnershipId: '6X-567-2019-10-25'
+        correlationPnrInventory:
+          pnrId: 'ZAY091-2019-10-05'
+          inventoryIds:
+            - '6X-123-2019-10-15'
+            - '6X-789-2019-10-25'
+          correlatedData:
+            - '6X-123-2019-10-15':
+                - pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+                  inventorySegmentId: '2019-10-15-NCE-CDG'
+            - '6X-789-2019-10-25':
+                - pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+                  inventorySegmentId: '2019-10-25-CDG-NCE'
+        correlationPnrBagsGroup:
+          pnrId: 'ZAY091-2018-10-19'
+          bagsGroupIds:
+            - 'AA42BA1395020102'
+          correlatedData:
+            'AA42BA1395020102':
+              - pnrTravelerId: 'ZAY091-2018-10-19-PT-1'
+                bagId: '1101CA1100003431'
+                bagLegCorrelations:
+                  - pnrAirSegmentId: 'ZAY091-2018-10-19-ST-1'
+                    bagLegDeliveryId: '1101CA1100003431-ORY'
+              - pnrTravelerId: 'ZAY091-2018-10-19-PT-2'
+                bagId: '5550CA1100003555'
+                bagLegCorrelations:
+                  - pnrAirSegmentId: 'ZAY091-2018-10-19-ST-1'
+                    bagLegDeliveryId: '5550CA1100003555-ORY'
+        correlationPnrMembership:
+          pnrId: 'ZAY091-2018-10-19'
+          membershipIds:
+            - '6X-1234567890'
+            - '6X-1234567891'
+          correlatedData:
+            '6X-1234567890':
+              - pnrProductId: 'ZAY091-2018-10-19-OT-7'
+              - pnrLoyaltyRequestId: 'ZAY091-2018-10-19-OT-9'
+            '6X-1234567891':
+              - pnrLoyaltyRequestId: 'ZAY091-2018-10-19-OT-15'
+        dictionaries:
+          pnrs:
+            'ZAY091-2019-10-05':
+              type: 'pnr'
+              id: 'ZAY091-2019-10-05'
+              version: '1'
+          tickets:
+            '1721234567890-2019-10-05':
+              type: 'air-travel-document'
+              id: '1721234567890-2019-10-05'
+              version: '1'
+          emds:
+            '1725555555555-2019-10-05':
+              type: 'air-travel-document'
+              id: '1725555555555-2019-10-05'
+              version: '1'
+          dcsPassengers:
+            '2501ADE0000001':
+              type: 'dcs-passenger'
+              id: '2501ADE0000001'
+              version: '1609937279'
+          schedules:
+            '6X-123-2019-10-15':
+              type: 'dated-flight'
+              id: '6X-123-2019-10-15'
+              version: '1536835243'
+          inventories:
+            '6X-123-2019-10-15':
+              type: 'dated-flight'
+              id: '6X-123-2019-10-15'
+              version: '1536835243'
+          bagsGroups:
+            'AA42BA1395020102':
+              type: 'bags-group'
+              id: 'AA42BA1395020102'
+              version: '1609937279'
+          memberships:
+            '6X-1234567890':
+              type: 'membership'
+              id: '6X-1234567890'
+              version: '1'
+      events:
+        recordDomain: 'PNR_TICKET'
+        recordId: 'ZAY091-2019-10-05'
+        events:
+          - origin: 'COMPARISON'
+            eventType: DELETED
+            previousPath: '/correlationPnrTicket/correlatedData/1721111111111-2019-05-10'
+          - origin: 'COMPARISON'
+            eventType: CREATED
+            currentPath: '/correlationPnrTicket/correlatedData/1721234567890-2019-10-05'
+  ########## Data models ##########
+  PnrFeedData:
+    allOf:
+      - $ref: '#/definitions/PnrHeader'
+      - properties:
+          travelers:
+            type: array
+            items:
+              $ref: '#/definitions/Stakeholder'
+          products:
+            type: array
+            description: A product is either a flight segment or a service booked in reservation
+            items:
+              $ref: '#/definitions/Product'
+          flightItinerary:
+            $ref: '#/definitions/FlightBounds'
+          ticketingReferences:
+            type: array
+            description: Travel document references contained in reservation
+            items:
+              $ref: '#/definitions/TicketingReference'
+          loyaltyRequests:
+            type: array
+            description: Loyalty elements for Frequent Flyers & Corporate Program users
+            items:
+              $ref: '#/definitions/Service'
+          keywords:
+            type: array
+            description: Special Keywords, Other Service Information
+            items:
+              $ref: '#/definitions/Service'
+          remarks:
+            type: array
+            items:
+              $ref: '#/definitions/Remark'
+          contacts:
+            type: array
+            description: global contacts i.e. non-related to a particular traveler
+            items:
+              $ref: '#/definitions/Contact'
+          automatedProcesses:
+            type: array
+            description: Ticketing arrangements & Amadeus Time Limit
+            items:
+              $ref: '#/definitions/AutomatedProcess'
+          paymentMethods:
+            type: array
+            description: FOPs i.e. FP lines contained in reservation.
+            items:
+              $ref: '#/definitions/FareElement'
+          fareElements:
+            type: array
+            description: Elements in reservation related to pricing
+            items:
+              $ref: '#/definitions/FareElement'
+          quotations:
+            type: array
+            description: Pricing records stored in reservation
+            items:
+              $ref: '#/definitions/QuotationRecord'
+          flightTransfer:
+            $ref: '#/definitions/FlightTransfer'
+  PnrCorrelationsFeedData:
+    properties:
+      correlationPnrTicket:
+        $ref: '#/definitions/CorrelationPnrTicket'
+      correlationPnrEmd:
+        $ref: '#/definitions/CorrelationPnrEmd'
+      correlationPnrDcsPassenger:
+        $ref: '#/definitions/CorrelationPnrDcsPassenger'
+      correlationPnrSchedule:
+        $ref: '#/definitions/CorrelationPnrSchedule'
+      correlationPnrInventory:
+        $ref: '#/definitions/CorrelationPnrInventory'
+      correlationPnrBagsGroup:
+        $ref: '#/definitions/CorrelationPnrBagsGroup'
+      correlationPnrMembership:
+        $ref: '#/definitions/CorrelationPnrMembership'
+      dictionaries:
+        $ref: '#/definitions/Dictionaries'
+  CorrelationReferences:
+    type: object
+    properties:
+      correlations:
+        type: object
+        description: >-
+          Correlation resources are defined in the "IncludedResources" node.
+          This node provides links to all correlations resources associated with the current processed-pnr resource.
+        properties:
+          PnrTicket:
+            $ref: '#/definitions/Relationship'
+          PnrEmd:
+            $ref: '#/definitions/Relationship'
+          PnrDcsPassenger:
+            $ref: '#/definitions/Relationship'
+          PnrSchedule:
+            $ref: '#/definitions/Relationship'
+          PnrInventory:
+            $ref: '#/definitions/Relationship'
+          PnrBagsGroup:
+            $ref: '#/definitions/Relationship'
+          PnrMembership:
+            $ref: '#/definitions/Relationship'
+        example:
+          PnrTicket:
+            ref: 'included/correlationPnrTicket/ZAY091-2019-10-05'
+          PnrEmd:
+            ref: 'included/correlationPnrEmd/ZAY091-2019-10-05'
+          PnrDcsPassenger:
+            ref: 'included/correlationPnrDcsPassenger/ZAY091-2019-10-05'
+          PnrSchedule:
+            ref: 'included/correlationPnrSchedule/ZAY091-2019-10-05'
+          PnrInventory:
+            ref: 'included/correlationPnrInventory/ZAY091-2019-10-05'
+          PnrBagsGroup:
+            ref: 'included/correlationPnrBagsGroup/ZAY091-2019-10-05'
+          PnrMembership:
+            ref: 'included/correlationPnrMembership/ZAY091-2019-10-05'
+  IncludedResources:
+    type: object
+    properties:
+      correlationPnrTicket:
+        type: object
+        description: Correlation resource - Pnr correlation with Ticket
+        additionalProperties:
+          $ref: '#/definitions/CorrelationPnrTicket'
+      correlationPnrEmd:
+        type: object
+        description: Correlation resource - Pnr correlation with Ticket Electronic Miscellaneous Document
+        additionalProperties:
+          $ref: '#/definitions/CorrelationPnrEmd'
+      correlationPnrDcsPassenger:
+        type: object
+        description: Correlation resource - Pnr correlation with DCS Passenger
+        additionalProperties:
+          $ref: '#/definitions/CorrelationPnrDcsPassenger'
+      correlationPnrSchedule:
+        type: object
+        description: Correlation resource - Pnr correlation with Schedule
+        additionalProperties:
+          $ref: '#/definitions/CorrelationPnrSchedule'
+      correlationPnrInventory:
+        type: object
+        description: >-
+          Correlation resource - Pnr correlation with Inventory
+        additionalProperties:
+          $ref: '#/definitions/CorrelationPnrInventory'
+      correlationPnrBagsGroup:
+        type: object
+        description: >-
+          Correlation resource - Pnr correlation with DCS Baggage
+        additionalProperties:
+          $ref: '#/definitions/CorrelationPnrBagsGroup'
+      correlationPnrMembership:
+        type: object
+        description: >-
+          Correlation resource - Pnr correlation with Loyalty Membership
+        additionalProperties:
+          $ref: '#/definitions/CorrelationPnrMembership'
+
+  Dictionaries:
+    type: object
+    properties:
+      currencyConversionLookupRates:
+        type: object
+        description: |
+          - Multiple base (many to one)
+          - Used to define rate conversion when multiple currency possible
+          - origin_amount = reverse_rate x target_amount
+          - target_amount = rate x origin_amount
+          - Example:
+                  currencyConversionLookupRates: {
+                      USD: {
+                          rate: "0.80",
+                          target: EUR
+                      },
+                      GBP: {
+                          rate: "1.14",
+                          target: EUR
+                      }
+                  }
+        additionalProperties:
+          $ref: '#/definitions/CurrencyConversionLookupRates'
+      pnrs:
+        type: object
+        description: >-
+          Set of key/value pairs with pnrId as key i.e. record locator + PNR creation date - key example 'ZAY091-2019-10-05'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      tickets:
+        type: object
+        description: >-
+          Set of key/value pairs with ticketId as key i.e. primary ticket number + issuance date - key example '1721234567890-2018-05-15'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      emds:
+        type: object
+        description: >-
+          Set of key/value pairs with emdId as key i.e. primary EMD number + issuance date - key example '1721234567891-2018-05-15'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      dcsPassengers:
+        type: object
+        description: >-
+          Set of key/value pairs with dcsPassengerId as key i.e. CPR UCI - key example '2501ADE0000001'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      schedules:
+        type: object
+        description: >-
+          Set of key/value pairs with scheduleId as key i.e. carrier code + flight number + flight date + operational suffix - key example '6X-123-2018-10-05-A'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      inventories:
+        type: object
+        description: >-
+          Set of key/value pairs with inventoryId as key [generated] - key example '6X12355515101900000NULL'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      bagsGroups:
+        type: object
+        description: >-
+          Set of key/value pairs with bagsGroupId as key i.e. DCS Baggage Group Identifier - key example 'AA42BA1395020102'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      memberships:
+        type: object
+        description: >-
+          Set of key/value pairs with membershipId as key i.e. carrier code + frequent flyer id - key example '6X-1234567890'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+  Meta:
+    type: object
+    description: Technical information related to the feed
+    properties:
+      triggerEventLog:
+        description: information related to the initial event that trigger the process
+        $ref: '#/definitions/EventLog'
+      version:
+        description: Version of the JSON feed produced
+        type: string
+    example:
+      triggerEventLog:
+        id: '429074ef1bd011e3-e63dfe23f4a0adc'
+        triggerEventName: 'DATA_INIT'
+      version: '3.2.0'
+  PnrHeader:
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: ['pnr']
+        example: 'pnr'
+      id:
+        type: string
+        description: id of Passenger name record
+        example: 'ZAY091-2019-10-05'
+      reference:
+        type: string
+        description: Unique identifier for the order
+        example: 'ZAY091'
+      version:
+        type: string
+        description: Current envelope number
+        example: '1'
+      owner:
+        $ref: '#/definitions/PointOfSale'
+        example:
+          office:
+            id: 'NCE6X08AA'
+            iataNumber: '57398195'
+            systemCode: '6X'
+            agentType: 'AIRLINE'
+          login:
+            numericSign: '0001'
+            initials: 'JF'
+            dutyCode: 'SU'
+            currencyCode: 'EUR'
+            countryCode: 'FR'
+            cityCode: 'NCE'
+      creation:
+        $ref: '#/definitions/EventLog'
+        example:
+          dateTime: '2019-10-05T10:00:00Z'
+          pointOfSale:
+            office:
+              id: 'NCE6X08AA'
+              iataNumber: '57398195'
+              systemCode: '6X'
+              agentType: 'AIRLINE'
+            login:
+              numericSign: '0001'
+              initials: 'JF'
+              dutyCode: 'SU'
+              currencyCode: 'EUR'
+              countryCode: 'FR'
+              cityCode: 'NCE'
+      lastModification:
+        $ref: '#/definitions/EventLog'
+        example:
+          dateTime: '2019-10-10T10:00:00Z'
+          pointOfSale:
+            office:
+              id: 'NCE6X08AA'
+              iataNumber: '57398195'
+              systemCode: '6X'
+              agentType: 'AIRLINE'
+            login:
+              numericSign: '0001'
+              initials: 'JF'
+              dutyCode: 'SU'
+              currencyCode: 'EUR'
+              countryCode: 'FR'
+              cityCode: 'NCE'
+      pnrProperties:
+        type: array
+        description: PNR header flags
+        items:
+          type: string
+          enum:
+            - CODESHARE
+            - STANDBY_STAFF
+            - BOOKABLE_STAFF
+            - NON_COMMERCIAL
+            - GROUP
+            - OTHER_AIRLINE
+            - HAS_HYBRID
+            - HAS_FEDERAL_AIR_MARSHAL
+            - HAS_CORPORATE
+            - HAS_PREPAID_TICKET_ADVICE
+            - TTY_END_OF_TRANSACTION
+            - EDIFACT_CLAIM
+            - TERMINAL_EMULATOR_CLAIM
+            - OPERATING_DCS
+            - THIRD_PARTY_MIGRATION
+            - HAS_GROUND_HANDLING
+            - MASS_MIGRATED
+            - INTERNATIONAL
+            - DOMESTIC
+          example: 'CODESHARE'
+      queuingOffice:
+        description: Default office onto which PNR is queued - limited to office ID.
+        $ref: '#/definitions/Office'
+        example:
+          id: 'NCE6X08AA'
+      nip:
+        type: integer
+        description: Order Number In Party - number of passengers in the order
+        example: 5
+      group:
+        $ref: '#/definitions/TravelersGroup'
+      associatedPnrs:
+        type: array
+        items:
+          $ref: '#/definitions/AssociatedPnr'
+          example:
+            reference: 'JKL789'
+            associationType: 'SPLIT'
+            direction: 'CHILD'
+            creation:
+              dateTime: '2019-10-05T10:00:00Z'
+              pointOfSale:
+                office:
+                  systemCode: '1S'
+  PatchOperation:
+    description: A single JSON Patch operation as defined by RFC 6902 (see https://tools.ietf.org/html/rfc6902)
+    type: object
+    required:
+      - "op"
+      - "path"
+    properties:
+      op:
+        type: string
+        description: The operation to be performed
+        enum:
+          - "add"
+          - "remove"
+          - "replace"
+          - "move"
+          - "copy"
+          - "test"
+      path:
+        type: string
+        description: A JSON Pointer as defined by RFC 6901 (see https://tools.ietf.org/html/rfc6901)
+      value:
+        type: object
+        description: The value to be used within the operations
+      from:
+        type: string
+        description: A JSON Pointer as defined by RFC 6901 (see https://tools.ietf.org/html/rfc6901)
+
+
+
+  ########## Entities definition ##########
+  Product:
+    type: object
+    description: A product can either be a flight segment, a standalone service, an air service i.e. related to flight segment(s),
+      or a seat request made on a given flight segment. A service can be auxiliary [SVC] or ancillary service i.e. a Special Service Request [SSR].
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: [product]
+        example: 'product'
+      subType:
+        type: string
+        enum:
+          - AIR
+          - SERVICE
+          - SEATING
+        example: 'SERVICE'
+      id:
+        type: string
+        description: item identifier
+        example: 'ZAY091-2019-10-05-ST-1'
+      airSegment:
+        $ref: '#/definitions/FlightSegment'
+      service:
+        $ref: '#/definitions/Service'
+      seating:
+        $ref: '#/definitions/Service'
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+      travelers:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+    example:
+      type: 'product'
+      subType: 'AIR'
+      id: 'ZAY091-2019-10-05-ST-1'
+      airSegment:
+        departure:
+          iataCode: 'NCE'
+          terminal: '1'
+          localDateTime: '2019-10-25T09:00:00'
+          checkInEndTime: '07:45'
+        arrival:
+          iataCode: 'CDG'
+          terminal: '2'
+          localDateTime: '2019-10-25T10:25:00'
+        aircraft:
+          aircraftType
+        marketing:
+          flightDesignator:
+            carrierCode: '6X'
+            flightNumber: '123'
+            operationalSuffix: 'A'
+          isOpenNumber: false
+          cabin:
+            code: 'F'
+          bookingClass:
+            code: 'I'
+        operating:
+          flightDesignator:
+            carrierCode: '8X'
+            flightNumber: '789'
+            operationalSuffix: 'A'
+          cabin:
+            code: 'B'
+            bidPrice':
+              amount: '50'
+              currency: 'CAD'
+              elementaryPriceType: 'BID_PRICE'
+          bookingClass:
+            code: 'C'
+            subClass:
+              code: 1
+              pointOfSale:
+                office:
+                  systemCode: '8X'
+                login:
+                  countryCode: 'FR'
+              yields:
+                - amount: '55'
+                  currency: 'CAD'
+                  elementaryPriceType: 'ADJUSTED_YIELD'
+                - amount: '5'
+                  currency: 'CAD'
+                  elementaryPriceType: 'EFFECTIVE_YIELD'
+          overBookingReason: 'FORCE_BOOKING'
+          codeshareAgreement: 'FREEFLOW'
+        creation:
+          dateTime: '2019-10-05T10:00:00Z'
+        bookingStatusCode: 'HK'
+        isInformational: false
+        isDominantInMarriage: true
+      products:
+        - type: 'product'
+          id: 'ZAY091-2019-10-05-OT-5'
+          ref: 'processedPnr.products'
+        - type: 'product'
+          id: 'ZAY091-2019-10-05-OT-10'
+          ref: 'processedPnr.products'
+      travelers:
+        - type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-1'
+          ref: 'processedPnr.travelers'
+        - type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-2'
+          ref: 'processedPnr.travelers'
+  FlightSegment:
+    type: object
+    description: >-
+      Defining a flight segment, including both Operating and Marketing details when applicable - seats refer to SEATING product(s) & services refer to AIR_SERVICE product(s).
+    properties:
+      departure:
+        $ref: '#/definitions/FlightEndPoint'
+      arrival:
+        $ref: '#/definitions/FlightEndPoint'
+      aircraft:
+        $ref: '#/definitions/AircraftEquipment'
+      marketing:
+        $ref: '#/definitions/MarketingFlight'
+      operating:
+        $ref: '#/definitions/OperatingFlight'
+      creation:
+        $ref: '#/definitions/EventLog'
+        description: Date and time at which the flight segment has been originally sold in PNR
+      isInformational:
+        type: boolean
+        description: >-
+          Indicates an informational flight segment i.e. already booked on another system.
+        example: false
+      isDominantInMarriage:
+        type: boolean
+        description: In case the flight segment is part of a marriage, it indicates whether it has been used to determine the O & D yield. In most cases, the long haul flight of the O & D is dominant.
+        example: false
+      bookingStatusCode:
+        type: string
+        description: >-
+          Status code of the flight sale. For example - HK = confirmed, HL = waitlist, UN = unable to confirm not operating, UC = unable to confirm, HX = have cancelled, NO = no action taken.
+        example: 'HK'
+      seats:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+      services:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+      deliveries:
+        type: array
+        items:
+          $ref: '#/definitions/SegmentDelivery'
+      product:
+        $ref: '#/definitions/Relationship'
+        description: Used by FlightTransfer attributes fromSegments & toSegments
+  FlightDesignator:
+    type: object
+    properties:
+      carrierCode:
+        type: string
+        description: Two letter IATA standard carrier code
+        example: 6X
+      flightNumber:
+        type: string
+        description: 1-4 digit number
+        example: '555'
+      operationalSuffix:
+        type: string
+        description: 1 char as flight number suffix
+        example: A
+  FlightEndPoint:
+    type: object
+    description: Departure or arrival information
+    properties:
+      iataCode:
+        description: IATA Airport code
+        type: string
+        example: 'JFK'
+      terminal:
+        description: Terminal name / number
+        type: string
+        example: '1'
+      localDateTime:
+        description: >-
+          Local date and time with the following format "YYYY-MM-DD'T'HH:mm:ss"
+        type: string
+        example: '2019-10-25T10:00:00'
+      checkInEndTime:
+        type: string
+        description: Time at which the check-in closes for the current flight
+        example: '10:50'
+  MarketingFlight:
+    type: object
+    properties:
+      flightDesignator:
+        $ref: '#/definitions/FlightDesignator'
+      bookingClass:
+        $ref: '#/definitions/BookingClass'
+      overBookingReason:
+        type: string
+        description: Indicates the Inventory origin of overbooking
+        enum:
+          - FORCE_BOOKING
+          - INVENTORY_SYNCHRONIZATION
+        example: FORCE_BOOKING
+      isOpenNumber:
+        type: boolean
+        description: Indicates an open flight segment, for which there is no specific flight number.
+        example: false
+  OperatingFlight:
+    type: object
+    properties:
+      flightDesignator:
+        $ref: '#/definitions/FlightDesignator'
+      bookingClass:
+        $ref: '#/definitions/BookingClass'
+      overBookingReason:
+        type: string
+        description: Indicates the Inventory origin of overbooking
+        enum:
+          - FORCE_BOOKING
+          - INVENTORY_SYNCHRONIZATION
+        example: FORCE_BOOKING
+      codeshareAgreement:
+        type: string
+        description: >-
+          Nature of agreement between the operating & marketing carriers on the given codeshare flight.
+          BLOCKSPACE - Operating carrier has allotted specific seats on its flight for the carrier marketing the codeshare.
+          FREEFLOW - Marketing carrier can sell seats on the codeshare flight as much as wanted, and only stops doing so when the Operating carrier sends a recap to close the class.
+          CAPPED_FREEFLOW - Marketing carrier has been attributed a seating cap for the given codeshare flight, above which it must stop sales.
+        enum:
+          - BLOCKSPACE
+          - FREEFLOW
+          - CAPPED_FREEFLOW
+        example: 'BLOCKSPACE'
+  BookingClass:
+    type: object
+    description: booking class description
+    properties:
+      code:
+        type: string
+        description: code identifying the booking class
+        example: 'C'
+      cabin:
+        $ref: '#/definitions/Cabin'
+        description: inventory cabin the booking class belongs to
+      levelOfService:
+        type: string
+        description: reservation level of service
+        example: 'ECONOMY'
+      subClass:
+        $ref: '#/definitions/SubClass'
+  SubClass:
+    type: object
+    properties:
+      code:
+        type: integer
+        description: inventory identification of the subclass
+      pointOfSale:
+        $ref: '#/definitions/PointOfSale'
+        description: Used to convey office/systemCode & login/countryCode from where the subClass value determination originates
+      yields:
+        type: array
+        items:
+          $ref: '#/definitions/ElementaryPrice'
+          description:  >-
+            Adjusted yield is the average revenue earned by the airline for the sale on the given subclass and it is obtained after strategies and modifiers have been applied.
+            Effective yield provides the spread between the adjusted yield and the bid price.
+            RevenueLoss corresponds to a negative effective yield.
+  Cabin:
+    type: object
+    properties:
+      code:
+        type: string
+        description: cabin code filed in inventory for the sold seat
+        example: 'F'
+      bidPrice:
+        $ref: '#/definitions/ElementaryPrice'
+        description: Minimal revenue expected by the airline for a seat sale in the given cabin
+  AircraftEquipment:
+    type: object
+    description: Information related to the aircraft
+    properties:
+      aircraftType:
+        type: string
+        description: >-
+          Aircraft type
+        pattern: '[a-zA-Z0-9]{3}'
+        example: '319'
+  Stakeholder:
+    type: object
+    description: Definition of PNR travelers. Fields gender, nationality, placeOfBirth, countryOfResidence are only populated for passengerDelivery resources.
+    properties:
+      type:
+        description: resource name
+        type: string
+        enum: [stakeholder]
+        example: 'stakeholder'
+      id:
+        description: item identifier
+        type: string
+        example: 'ZAY091-2019-10-05-PT-1, For Infant ZAY091-2019-10-05-PT-1-INF'
+      passengerTypeCode:
+        description: >-
+          3-characters code defining the passenger type - possible values: ADT, CHD, INS, INF, UNA
+        type: string
+        maxLength: 3
+        example: 'ADT'
+      names:
+        description: >
+          Names of the stakeholder. The concatenation of full name + PTC + staffType + dateOfBirth + specialSeat must remain below 59 characters.
+        type: array
+        minItems: 1
+        maxItems: 5
+        items:
+          $ref: '#/definitions/Name'
+      dateOfBirth:
+        description: The stakeholder's date of birth
+        type: string
+        format: date
+        example: '1978-10-05'
+      age:
+        description: Age of the stakeholder
+        type: integer
+        example: 40
+      gender:
+        description: Gender of the stakeholder
+        type: string
+        enum:
+          - MALE
+          - FEMALE
+          - UNKNOWN
+        example: 'MALE'
+      nationality:
+        description: Nationality of the Stakeholder
+        type: string
+      placeOfBirth:
+        type: string
+        description: The stakeholder's place of birth
+        example: London
+      countryOfResidence:
+        type: string
+        description: The stakeholder's country of residence
+        example: Portugal
+      staffType:
+        description: The type of staff of the stakeholder e.g BKB or SBY
+        type: string
+        enum: [BOOKABLE, STANDBY]
+        example: 'BOOKABLE'
+      identificationCode:
+        description: ID or CR field, must start with ID or CR followed by alphanumeric characters e.g ID10152307, CR1234AA
+        type: string
+        example: 'ID10152307'
+      identityDocuments:
+        description: Advanced Passenger Information - regulatory identity documents - SSR DOCS & DOCO elements
+        type: array
+        items:
+          $ref: '#/definitions/Service'
+      contacts:
+        description: Contacts associated with the traveler
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'contact'
+            id: 'ZAY091-2019-10-05-OT-6'
+            ref: 'processedPnr.contacts'
+      loyaltyAccruals:
+        description: Frequent Flyer profiles used for miles accrual - SSR FQTV elements
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'service'
+            id: 'ZAY091-2019-10-05-OT-15'
+            ref: 'processedPnr.loyaltyRequests'
+      loyaltyServicing:
+        description: Frequent Flyer profiles used for servicing - SSR FQTS elements
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'service'
+            id: 'ZAY091-2019-10-05-OT-17'
+            ref: 'processedPnr.loyaltyRequests'
+      corporateRecognitions:
+        description: Corporate recognition programs used by the traveler - CLID elements
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'service'
+            id: 'ZAY091-2019-10-05-OT-19'
+            ref: 'processedPnr.loyaltyRequests'
+      adult:
+        description: It contains information regarding the adult carrying the infant. This entity will be displayed for a traveler ID representing an infant without seat
+        $ref: '#/definitions/Relationship'
+        example:
+          type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-1'
+          ref: 'processedPnr.travelers'
+      infant:
+        description: It contains information regarding the infant travelling with the adult. This entity will be displayed for a traveler ID representing an adult carrying an infant without seat
+        $ref: '#/definitions/Relationship'
+        example:
+          type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-1-INF'
+          ref: 'processedPnr.travelers'
+      passenger:
+        $ref: '#/definitions/Stakeholder_Passenger'
+  Stakeholder_Passenger:
+    type: object
+    description: Defines attributes related to a Passenger
+    properties:
+      specialSeat:
+        type: string
+        description: CBBG (Cabin Baggage) or EXST (Extra Seat)
+        enum:
+          - CBBG
+          - EXST
+        example: 'CBBG'
+      uniqueIdentifier:
+        description: Unique Customer Identifier reported by PNR
+        type: string
+        example: '2501ADE0000001'
+      exst:
+        description: In case the current traveler is associated with an extra seat [separate NM element in PNR], this field provides the reference to the corresponding Stakeholder.
+        $ref: '#/definitions/Relationship'
+        example:
+          type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-2'
+          ref: 'processedPnr.travelers'
+      cbbg:
+        description: In case the current traveler is associated with a cabin baggage [separate NM element in PNR], this field provides the reference to the corresponding Stakeholder.
+        $ref: '#/definitions/Relationship'
+        example:
+          type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-2'
+          ref: 'processedPnr.travelers'
+      owner:
+        description: In case the current traveler has specialSeat set to EXST or CBBG, this field provides the reference to the Stakeholder owning the extra seat or cabin baggage.
+        $ref: '#/definitions/Relationship'
+        example:
+          type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-2'
+          ref: 'processedPnr.travelers'
+      passengerDeliveries:
+        type: array
+        description: Map of passenger-delivery resources with id as key
+        items:
+          $ref: '#/definitions/PassengerDelivery'
+  Name:
+    type: object
+    description: Description of the name of a physical person.
+    properties:
+      fullName:
+        type: string
+        description: Only populated for passengerDelivery resources
+        example: 'JAMES CARTER'
+      firstName:
+        type: string
+        example: 'JAMES'
+      lastName:
+        type: string
+        example: 'CARTER'
+      title:
+        description: >-
+          Contains any suffixes/prefixes that can be appended to a name - e.g. MR, MISS, PR
+        type: string
+        example: 'MR'
+      transliterationMethod:
+        type: string
+        description: >-
+          The method (if applicated) that was used to transform the name from
+          universal character (e.g. Korean characters) to Latin
+          characters/phonetic transcription/...
+          Possible values are REVISED_KOREAN_ROMANIZATION or MAC_CUNE_REISHAUER
+        example: 'REVISED_KOREAN_ROMANIZATION'
+      referenceNameType:
+        type: string
+        description: >-
+          Type of the reference name. When several name entities exist for a given Name element(e.g. Universal name, both Native names, Romanized name), the notion of reference name (i.e. active/main name) exists. It can be either the Universal name or the Native/Phonetic name.
+        enum:
+          - UNIVERSAL
+          - NATIVE_ROMANIZATION_ASCII
+          - NATIVE_ROMANIZATION_ASCII_EXTENDED
+          - NATIVE_ROMANIZABLE
+          - NATIVE_NON_ROMANIZABLE
+        example: 'UNIVERSAL'
+  Service:
+    type: object
+    description: Service representation
+    properties:
+      type:
+        description: >-
+          Resource name. In case the Service structure is used for a SERVICE/SEATING product, this field is not applicable i.e. already specified in the product.
+        type: string
+        enum: [service]
+        example: 'service'
+      id:
+        description: >-
+          Service identifier. In case the Service structure is used for a SERVICE/SEATING product, this field is not applicable i.e. already specified in the product.
+        type: string
+        example: 'ZAY091-2019-05-04-OT-5'
+      code:
+        description: This code is used to identify the service type
+        type: string
+        maxLength: 4
+        example: 'FQTV'
+      subType:
+        description: This field is used to indicate if we are dealing with an SVC/SSR/SK/OSI element
+        type: string
+        enum:
+          - SPECIAL_SERVICE_REQUEST
+          - MANUAL_AUXILIARY_SEGMENT
+          - SPECIAL_KEYWORD
+          - OTHER_SERVICE_INFORMATION
+        example: 'SPECIAL_SERVICE_REQUEST'
+      serviceProvider:
+        $ref: '#/definitions/ServiceProvider'
+      status:
+        description: >-
+          Status code. For example - HK = confirmed, HL = waitlist, UN = unable
+          to confirm not operating, UC = unable to confirm, HX = have cancelled,
+          NO = no action taken."
+        type: string
+        example: 'HK'
+      nip:
+        description: Number in party
+        type: integer
+        pattern: '[0-9]{1-99}'
+        example: 1
+      creation:
+        description: Original booking datetime & office of the service - office information limited to office ID
+        $ref: "#/definitions/EventLog"
+        example:
+          dateTime: '2019-10-05T10:00:00Z'
+          pointOfSale:
+            office:
+              id: 'NCE6X08AA'
+      document:
+        description: This field is used to structure SSR DOCS identification document or the SSR DOCO visa when possible
+        $ref: "#/definitions/IdentityDocument"
+      seats:
+        type: array
+        description: Used to structure information from seating SSR elements e.g. RQST, NSST
+        items:
+          $ref: "#/definitions/Seat"
+      membership:
+        description: Information on the loyalty profile referenced in Frequent Flyer PNR elements & corporate recognition PNR elements.
+        $ref: '#/definitions/Membership'
+      priceCategory:
+        title: Service_PriceCategory
+        description: Price category
+        type: object
+        properties:
+          code:
+            type: string
+            description: >-
+              The reason for issuance code (RFIC) chargeability indicator
+              defined for the sellable object
+            example: 'A'
+          subCode:
+            type: string
+            description: >-
+              The reason for issuance sub code (RFISC) chargeability indicator
+              defined for the sellable object
+            example: 'A04'
+      text:
+        description: Service full content
+        type: string
+        example: '6X1234567890 GOLD'
+      travelers:
+        description: >-
+          Service association with stakeholder resources. If the Service structure is used for a SERVICE/SEATING product resource, this field is not applicable
+          i.e. already specified in the product. If the Service structure is used for a stakeholder's identity document, this field is not applicable.
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'stakeholder'
+            id: 'ZAY091-2019-10-05-PT-1'
+            ref: 'processedPnr.travelers'
+      products:
+        description: >-
+          Service association with flight segments [AIR products].
+          In case the Service structure is used for a SERVICE/SEATING product resource, this field is not applicable i.e. already specified in the product.
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'product'
+            id: 'ZAY091-2019-10-05-ST-1'
+            ref: 'processedPnr.products'
+  ServiceProvider:
+    type: object
+    description: Carrier details
+    properties:
+      code:
+        type: string
+        description: IATA code of the carrier
+        example: '6X'
+  IdentityDocument:
+    type: object
+    description: The information that are found on an ID document.
+    properties:
+      documentType:
+        type: string
+        description: The nature/type of the document.
+        enum:
+          - PASSPORT
+          - APPROVED_DOCUMENT
+          - CREW_MEMBER_CERTIFICATE
+          - PASSPORT_CARD
+          - VISA
+          - IDENTITY_CARD
+          - REDRESS
+          - OTHER_DOCUMENT
+        example: 'PASSPORT'
+      number:
+        type: string
+        description: The document number (shown on the document) e.g. QFU514563221J
+        example: '15FR1234'
+      issuanceDate:
+        type: string
+        description: Date at which the document has been issued.
+        format: date
+        example: '2019-10-05'
+      expiryDate:
+        type: string
+        description: Date after which the document is not valid anymore.
+        format: date
+        example: '2025-10-05'
+      issuanceCountry:
+        type: string
+        description: ISO code (2-letters) of the country that issued the document.
+        pattern: '[a-zA-Z]{2,3}'
+        example: 'FRA'
+      issuanceLocation:
+        type: string
+        description: >-
+          A more precise information concerning the place where the document has been issued, when available. It may be a country, a state, a city or any other type of location.
+          example: 'PARIS OFFICE'
+      nationality:
+        type: string
+        description: ISO code (2-letters) of the nationality appearing on the document
+        pattern: '[a-zA-Z]{2,3}'
+        example: 'FRA'
+      gender:
+        type: string
+        description: Gender as it appears on the document
+        enum:
+          - MALE
+          - FEMALE
+          - UNKNOWN
+        example: 'MALE'
+      name:
+        description: Only fullName, firstName and lastName
+        $ref: '#/definitions/Name'
+      birthDate:
+        type: string
+        description: Birth date in ISO8601 format.
+        format: date
+        example: '1978-10-05'
+      birthPlace:
+        type: string
+        description: Birth place as indicated on the document
+        example: 'PARIS'
+  Membership:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Identifies the customer profile i.e. either Frequent Flyer Number or Corporate Recognition Number
+        example: '1234567890'
+      membershipType:
+        type: string
+        description: Nature of the membership
+        enum:
+          - INDIVIDUAL
+          - CORPORATE
+        example: 'INDIVIDUAL'
+      activeTier:
+        $ref: '#/definitions/Tier'
+      allianceTier:
+        $ref: '#/definitions/Tier'
+  Tier:
+    type: object
+    description: Description of a Tier in the context of the loyalty program - applicable to both Frequent Flyer profiles & Corporate profiles.
+    properties:
+      code:
+        type: string
+        description: Tier level code
+        example: 'HGOLD'
+      name:
+        type: string
+        description: Tier level description
+        example: 'HONORARY GOLD'
+      priorityCode:
+        type: string
+        description: Priority code used to synchronize with external systems
+        example: '1'
+      customerValue:
+        type: integer
+        description: >-
+          Ranging from 0 to 9999, it measures the value of the customer [frequent flyer/corporation] for the airline depending on its profile, its travel history, potential and other internal factors.
+        example: 5000
+      companyCode:
+        type: string
+        description: Alliance code or airline code of the loyalty program
+        example: '6X'
+  Seat:
+    type: object
+    description: Seat information
+    properties:
+      number:
+        description: Seat number corresponding to the concatenation of the seat row and seat column
+        type: string
+        example: '05A'
+      characteristicCodes:
+        description: >-
+          List of seat characteristics codes (the code corresponds to the dictionary key associated to the corresponding textual value).
+          Example: CH = Chargeable Seat, W = Window Seat, A = Aisle Seat, Q = Seat in a quiet zone, E = Exit Row Seat, ...
+        type: array
+        items:
+          type: string
+        example:
+          - 'CH'
+      traveler:
+        $ref: '#/definitions/Relationship'
+        example:
+          type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-1'
+          ref: 'processedPnr.travelers'
+  TicketingReference:
+    type: object
+    description: Describes a travel document referenced in the current reservation
+    properties:
+      type:
+        description: Resource name
+        type: string
+        enum: [ticketing-reference]
+        example: 'ticketing-reference'
+      id:
+        description: Identifies the element in reservation which references the document
+        type: string
+        example: 'ZAY091-2019-10-05-OT-20'
+      referenceTypeCode:
+        type: string
+        description: Categorizes the element in reservation which references the document
+        enum:
+          - FA
+          - FHE
+          - FHD
+          - FHP
+          - FHA
+          - FHM
+          - FO
+          - TKNE_SSR
+          - TKNE_OSI
+          - TKNA_SSR
+          - TKNA_OSI
+          - TKNM_SSR
+          - TKNM_OSI
+          - TKNO_OSI
+          - ASVC_SSR
+          - SVC
+        example: 'FA'
+      referenceStatusCode:
+        type: string
+        description: Status code of SSR & SVC ticketing references - For example HK [confirmed]
+      documents:
+        type: array
+        items:
+          $ref: '#/definitions/AirTravelDocument'
+      text:
+        type: string
+        description: Used to specify the full reference content in reservation
+        example: '172-1234567890/RCI-FDF1610O0001 MB01/ETAF/EUR3000.00/05OCT19/NCE6X08AA/20494795'
+      creation:
+        description: Insertion datetime & origin office ID for SSR ticketing references
+        $ref: '#/definitions/EventLog'
+      isInfant:
+        type: boolean
+        description: Indicates that the referenced document applies to an infant traveler
+        example: false
+      traveler:
+        description: Links to associated stakeholders
+        $ref: '#/definitions/Relationship'
+        example:
+          type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-1'
+          ref: 'processedPnr.travelers'
+      products:
+        description: Links to associated products
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'product'
+            id: 'ZAY091-2019-10-05-ST-1'
+            ref: 'processedPnr.products'
+    example:
+      type: 'ticketing-reference'
+      id: 'ZAY091-2019-10-05-OT-20'
+      referenceTypeCode: 'FA'
+      documents:
+        - documentType: 'ETICKET'
+          documentNumber: '1721234567891'
+          status: 'ISSUED'
+          numberOfBooklets: 2
+          issuanceLocalDate: '2019-10-05'
+          issuingOriginatorOffice:
+            id: 'NCE6X08AA'
+            iataNumber: '15398195'
+            systemCode: '6X'
+          quotation:
+            totalFare:
+              value: 5000.00
+              currency: CAD
+          coupons:
+            - number: 1
+              product:
+                type: 'product'
+                id: 'ZAY091-2019-10-05-ST-1'
+                ref: 'processedPnr.products'
+            - number: 2
+              product:
+                type: 'product'
+                id: 'ZAY091-2019-10-05-ST-2'
+                ref: 'processedPnr.products'
+      text: '172-1234567890/RCI-FDF1610O0001 MB01/ETAF/EUR3000.00/05OCT19/NCE6X08AA/20494795'
+      isInfant: false
+      traveler:
+        type: 'stakeholder'
+        id: 'ZAY091-2019-10-05-PT-1'
+        ref: 'processedPnr.travelers'
+      products:
+        - type: 'product'
+          id: 'ZAY091-2019-10-05-ST-1'
+          ref: 'processedPnr.products'
+        - type: 'product'
+          id: 'ZAY091-2019-10-05-ST-2'
+          ref: 'processedPnr.products'
+  FlightBounds:
+    type: array
+    description: Convey the Origin & Destination items determined by Inventory Journey Server at availability process - each O & D pointing to a collection of flight segments i.e. product resources.
+    items:
+      properties:
+        type:
+          type: string
+          description: Conveys type of flight bound
+          example: CUSTOMER_TRANSACTION_DATA_BOUND
+        originIataCode:
+          type: string
+          description: Origin location code - IATA airport/city code
+          pattern: '[A-Z]{3}'
+          example: JFK
+        destinationIataCode:
+          type: string
+          description: Destination location code - IATA airport/city code
+          pattern: '[A-Z]{3}'
+          example: JFK
+        pointOfCommencement:
+          type: object
+          properties:
+            subType:
+              type: string
+              description: Location sub-type (e.g. airport, port, rail-station, restaurant, atm...)
+              example: airport
+            name:
+              type: string
+              description: Label associated to the location (e.g. Eiffel Tower, Madison Square)
+              example: Charles De Gaulle
+            timeZoneName:
+              type: string
+              description: Olson format name (TZ) of the location time zone (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+              example: Europe/Paris
+            iataCode:
+              type: string
+              description: IATA location code
+              example: CDG
+            address:
+              $ref: '#/definitions/Address'
+        yield:
+          $ref: '#/definitions/ElementaryPrice'
+          description: >-
+            Yield defined by Revenue Management System at geographical Origin & Destination level
+            elementaryPriceType set to "ORIGIN_AND_DESTINATION_YIELD"
+        flights:
+          type: array
+          items:
+            $ref: '#/definitions/FlightBoundItem'
+  FlightBoundItem:
+    type: object
+    properties:
+      connectedFlights:
+        $ref: '#/definitions/ConnectedFlightSegments'
+      flightSegment:
+        $ref: '#/definitions/Relationship'
+  ConnectedFlightSegments:
+    type: object
+    properties:
+      connectionType:
+        type: string
+        example: 'MARRIAGE'
+        enum:
+          - CONNECTION
+          - MARRIAGE
+          - NEGOCIATED_SPACE_MARRIAGE
+          - INTERACTIVE_MARRIAGE
+          - TRAFFIC_RESTRICTIONS_MARRIAGE
+          - LONG_HAUL_MARRIAGE
+          - ONLINE_MARRIAGE
+      connectionTimeDuration:
+        type: string
+        format: time
+        description: 'Only Hours and minutes,Format: [n]H[n]M example: 10H15M;the time duration between the arrival of the inbound flight and the departure of the outbound flight.'
+      flightSegments:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+  AirTravelDocument:
+    type: object
+    properties:
+      documentType:
+        type: string
+        description: >-
+          Type of the travel document, which can be an electronic ticket, a paper ticket, an Electronic Miscellaneous Document, or a Miscellaneous Charge Order. Fields associationStatus &blacklistCategory are only populated by segmentDelivery resources.
+        enum:
+          - ETICKET
+          - EMD
+          - EMD_STANDALONE
+          - EMD_ASSOCIATED
+          - PAPER_TICKET
+          - PAPER_MD
+          - VIRTUAL_TICKET
+          - VIRTUAL_MD
+          - TICKETLESS_DOCUMENT
+          - TICKET
+          - MD
+        example: 'ETICKET'
+      documentNumber:
+        type: string
+        description: >-
+          Identifier of the travel document prefixed by its owner code [NALC - 3 digits]. Can either be a primary or a conjunctive document number. Necessary for TicketingReference definition.
+        example: '1721234567891'
+      primaryDocumentNumber:
+        type: string
+        description: >-
+          Designates the primary document number when documentNumber refers to a conjunctive document. Necessary for SegmentDelivery definition of ticketing data.
+        example: '1721234567890'
+      status:
+        type: string
+        description: Status of the travel document contained in the fare element
+        enum:
+          - ISSUED
+          - REFUNDED
+          - VOID
+          - PRINTED
+          - ORIGINAL
+          - EXCHANGED
+        example: 'ISSUED'
+      numberOfBooklets:
+        type: integer
+        description: Number of conjunctive documents, for a max of 4
+        example: 4
+      creation:
+        $ref: '#/definitions/EventLog'
+        example:
+          dateTime: '2019-10-05T10:00:00Z'
+          pointOfSale:
+            office:
+              id: 'NCE6X08AA'
+              iataNumber: '57398195'
+              systemCode: '6X'
+      price:
+        $ref: '#/definitions/Price'
+        example:
+          total: 5000.50
+          currency: 'CAD'
+      coupons:
+        type: array
+        description: >-
+          Enables to associate each coupon of the travel document with its corresponding product in PNR. For ORIGINAL & EXCHANGED documents, the product reference is not populated but only 2 coupon numbers, defining the min & max of the coupon numbers range affected by the exchange.
+        items:
+          type: object
+          properties:
+            number:
+              type: integer
+              description: Identifies the coupon within the travel document
+              example: 1
+            sequenceNumber:
+              type: integer
+              description: Coupon sequence number is used as identifier when primaryDocumentNumber is defined [primary document]
+              example: 1
+            reasonForIssuance:
+              $ref: '#/definitions/PriceCategory'
+              description: Used by TicketingReference items of referenceTypeCode ASVC / SVC
+            product:
+              $ref: '#/definitions/Relationship'
+              example:
+                type: 'product'
+                id: 'ZAY091-2019-10-05-ST-1'
+                ref: 'processedPnr.products'
+      associationStatus:
+        type: string
+        description: >-
+          Designates the nature of the relation between the current travel document and the corresponding segmentDelivery.
+        enum:
+          - ASSOCIATED
+          - E_STAPLE
+          - MULTIPLE_ASSOCIATED
+        example: 'ASSOCIATED'
+      blacklistCategory:
+        description: >-
+          Part of the DCS regulatory checks that have to be carried out before a passenger can be accepted on a flight.
+        type: string
+        example: 'STOLEN'
+  FareElement:
+    type: object
+    description: used to describe fare elements contained in PNR
+    properties:
+      type:
+        description: Resource name
+        type: string
+        enum:
+          - fare-element
+          - payment-method
+        example: 'fare-element'
+      id:
+        description: Item identifier
+        type: string
+        example: 'ZAY091-2019-10-05-OT-25'
+      code:
+        type: string
+        description: Fare element code
+          FM - Commissions
+          AI - Accounting Information
+          FP - Forms of Payment
+          FD - Fare Discount
+          FT - Tour Code
+          FE - Endorsement
+          FS - Miscellaneous Ticketing Information on TST
+          FZ - Miscellaneous Information
+          FB - Automatic Amadeus Interface Record Sequence Number
+          FG - Automatic Shadow Amadeus Interface Record Sequence Number
+          FI - Automatic Invoice Number
+          FK - Amadeus Extended Ownership Agreement, FK element Provides List Of Offices For Amadeus Interface Records Sent By The Mirroring Process For Back Office Systems
+          FN - Transmission Control Number
+          FV - Validating Airline
+          FY - Fare Price Override
+        enum:
+          - FM
+          - AI
+          - FP
+          - FD
+          - FE
+          - FS
+          - FZ
+          - FT
+          - FB
+          - FG
+          - FI
+          - FK
+          - FN
+          - FV
+          - FY
+        example: 'FM'
+      commissions:
+        $ref: '#/definitions/Commissions'
+      accounting:
+        $ref: '#/definitions/AccountingElement'
+      formsOfPayment:
+        type: array
+        items:
+          $ref: '#/definitions/DisplayedFormOfPayment'
+      text:
+        type: string
+        description: Used to specify the full content of the fare element - not applicable for Accounting Information
+        example: '*AM*10.12V12.12/C1234567.12/XO/1234567.12AV10.12/XP/1234567.12A/SC1234567.12/B124567A/D1234567/I12345675'
+      isInfant:
+        type: boolean
+        description: Indicates that the fare element applies to an infant passenger
+        example: false
+      travelers:
+        description: Links to associated stakeholders
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'stakeholder'
+            id: 'ZAY091-2019-10-05-PT-1'
+            ref: 'processedPnr.travelers'
+      products:
+        description: Links to associated products
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'product'
+            id: 'ZAY091-2019-10-05-ST-1'
+            ref: 'processedPnr.products'
+    example:
+      - type: 'fareElement'
+        id: 'ZAY091-2019-10-05-OT-17'
+        code: FM
+        commissions:
+          controlCodes:
+            - ACI
+            - CPC
+          values:
+            - commissionType: 'NEW_COMMISSION'
+              collectingAgency:
+                iataNumber: '15398195'
+              amount:
+                value: '90.70'
+                currency: 'CAD'
+            - commissionType: 'VAT_ON_NEW_COMMISSION'
+              percentage: '19.60'
+            - commissionType: 'OLD_COMMISSION'
+              amount:
+                value: '50.89'
+                currency: 'CAD'
+            - commissionType: 'VAT_ON_OLD_COMMISSION'
+              percentage: '19.60'
+            - commissionType: 'SECONDARY_COMMISSION'
+              percentage: '10.50'
+              collectingAgency:
+                iataNumber: '15398195'
+              dealNumber: '1234567'
+        text: '*AM*90.70V19.60/XO/30.89AV19.60/B10.50/D1234567'
+        isInfant: false
+        travelers:
+          - type: 'stakeholder'
+            id: 'ZAY091-2019-10-05-PT-1'
+            ref: 'processedPnr.travelers'
+        products:
+          - type: 'product'
+            id: 'ZAY091-2019-10-05-ST-1'
+            ref: 'processedPnr.products'
+  Commissions:
+    type: object
+    description: This element is used to record commissions earned from the sale of a ticket, which are either entered as percentage or amount. Structure of the FM fare element stored in PNR.
+    properties:
+      controls:
+        type: array
+        items:
+          type: string
+          description: >-
+            Controls are specified in the FM element to indicate the way the commission has been calculated.
+            It notably relies on the CCI attribute set up in the issuing office profile.
+          example: ["ATO_CTO", "AUTOMATIC"]
+          enum:
+            - ATO_CTO
+            - REUSED
+            - AUTOMATIC
+            - MANUAL
+            - VALIDATED_MANUAL
+            - FILED_FOR_DYNAMIC_DISCOUNTED_FARE
+            - FILED_FOR_NEGOCIATED_FARE
+            - COMPUTED_FOR_NEGOCIATED_FARE
+      values:
+        type: array
+        description: Details on each commission contained in the FM entry.
+        items:
+          $ref: '#/definitions/Commission'
+  Commission:
+    type: object
+    properties:
+      commissionType:
+        type: string
+        description: Nature of the commission.
+        example: 'NEW'
+        enum:
+          - NEW
+          - NEW_RATE_ON_NET_FARE
+          - CAP_LIMIT_AMOUNT
+          - SECONDARY
+          - SUPPLEMENTARY_AMOUNT
+          - VAT_ON_NEW
+          - VAT_RATE_ON_OLD
+          - CANCELLATION_PENALTY
+          - OLD
+      amount:
+        $ref: '#/definitions/ElementaryPrice'
+      percentage:
+        type: number
+        description: Percentage in case of a rate commission - can be decimal.
+        example: '20'
+      collectingAgency:
+        type: object
+        description: IATA number identifying the travel agency collecting the commission.
+        properties:
+          office:
+            $ref: '#/definitions/Office'
+      dealNumber:
+        type: string
+        description: Enables the airline to identifies the contract signed by the collecting travel agency.
+        example: '1234567'
+  AccountingElement:
+    type: object
+    description: Accounting Information - AI element usually enables an airline to handle accounting information related to the travel agency that has sold the booking. It is also vital to obtain a good calculation of revenues when many companies are involved in the booking. AI is further conveyed in other reporting documents such as the Back Office AIR document.
+    properties:
+      accountNumber:
+        type: string
+        description: account identifier for the recipient revenue accounting system
+        example: '123456'
+      costCenter:
+        type: string
+        description: Cost center number for which the accounting is being registered - optional use depending on the needs of the travel agency
+        example: '1234567890123456789'
+      iataCompanyCode:
+        type: string
+        description: IATA number of the company for which the accounting is being registered - optional use depending on the needs of the travel agency
+        example: '123ADC01'
+      clientReference:
+        type: string
+        description: Alpha-numerical reference of the client for which accounting information is transmitted - optional use depending on the needs of the travel agency.
+        example: '123456789'
+  DisplayedFormOfPayment:
+    type: object
+    properties:
+      code:
+        type: string
+        description: >-
+          Form Of Payment category as defined in IATA PADIS code list for data element 9888. Examples - CC for Credit Card, CA for Cash, FFR for award redemption, FFR for award upgrade, CK for Check, MS for Miscellaneous, EF for Electronic Funds transfer.
+        example: 'CC'
+      fopIndicator:
+        type: string
+        description: Used to specify what the FOP has been used for, in case of exchanges. In case the PNR has been subject to first-issues only, fopIndicator is NEW. In case of exchanges, the FOPs used to settle the last documents show a fopIndicator set to NEW. For the other FOPs contained in the FP element, fopIndicator is set to OLD.
+        enum:
+          - NEW
+          - OLD
+        example: 'NEW'
+      freeText:
+        type: string
+        description: Free text as entered in FP element
+        example: 'CCVI************9999/0523*CVA/CAD1500/AAPS1OK'
+      paymentCard:
+        $ref: '#/definitions/PaymentCard'
+      paymentLoyalty:
+        description: Loyalty profile used for miles redemption/upgrade when code equals 'FFP'/'FFU'
+        $ref: "#/definitions/PaymentLoyalty"
+      authorization:
+        description: Details on credit card authorization or award authorization [by Airline Loyalty System] in case of miles redemption/upgrade
+        $ref: '#/definitions/Authorization'
+  PaymentLoyalty:
+    type: object
+    properties:
+      membership:
+        $ref: "#/definitions/Membership"
+        description: Loyalty profile used for award payment i.e. miles redemption/upgrade [for FOP codes 'FFP'/'FFU']
+      certificateNumber:
+        type: string
+        description: >-
+          Identifies an optional pool of miles provided by the airline owning the loyalty program
+          that can be requested as input to the redemption request [FQTR/FQTU insertion]
+  PaymentCard:
+    type: object
+    description: Payment card information
+    properties:
+      expiryDate:
+        type: string
+        description: Expiration date of the card - format is month & year - MMYY
+        example: '0318'
+      maskedCardNumber:
+        type: string
+        description: Masked credit card number
+        example: '************9999'
+      vendorCode:
+        type: string
+        description: >-
+          Vendor code in case the FOP is a credit card - designates the card
+          brand. For instance, VI for Visa, CA for MasterCard, etc.
+        example: 'CA'
+      holderName:
+        type: string
+        description: Name of credit card holder.
+        example: 'SMITH'
+  Authorization:
+    type: object
+    description: >-
+      Details on credit card authorization or award authorization [by Airline Loyalty System] in case of miles redemption/upgrade.
+    properties:
+      approvalCode:
+        type: string
+        description: >-
+          In case of card payment, it consists in a series of characters assigned by the applicable credit card
+          company's authorization system to confirm the approval of a credit sale transaction, with a maximum of 8 digits.
+          In case of award payment, it corresponds to the stock control number
+          returned by the airline loyalty system to indicate the validation of the redemption/upgrade request.
+        example: 'AAPS1OK'
+      sourceOfApprovalCode:
+        type: string
+        description: >-
+          Approval source of the authorization when the FOP is a credit card.
+          Can be seen in the corresponding FP elements of the order. Possible
+          values are A - Automatic Approval Code M - Manual Approval Code F -
+          Automatic Capture and Approval Code B - Manual Capture and Approval
+          Code
+        example: 'A'
+      extendedPaymentCode:
+        type: string
+        description: >-
+          A code to indicate the number of months over which the customer wishes
+          to pay where the credit card issuer permits. Can also be a code to
+          indicate extended payment with values- - blank or "00" for immediate
+          payment - "03" or "24" for payment over 3 or 24 months (or any other
+          value) - "E" for extended payment, or any other alpha character
+          instructed by the credit card company.
+        example: '11'
+  Contact:
+    description: represents a contact
+    type: object
+    properties:
+      type:
+        description: Resource name
+        type: string
+        enum: [contact]
+        example: 'contact'
+      id:
+        description: Contact identifier
+        type: string
+        example: 'ZAY091-2019-10-05-OT-14'
+      addresseeName:
+        description: the name of the person/company addressed by these contact details
+        type: object
+        properties:
+          fullName:
+            type: string
+            example: 'JAMES CARTER'
+      phone:
+        $ref: '#/definitions/Phone'
+      address:
+        $ref: '#/definitions/Address'
+      email:
+        $ref: '#/definitions/Email'
+      language:
+        description: ISO code of the preferred language of communication for notification contacts
+        type: string
+        example: 'FR'
+      purpose:
+        description: the purpose for which this contact is to be used - REGULATORY refers to SSR DOCA element [Advanced Passenger Information].
+        type: array
+        items:
+          type: string
+          enum:
+            - STANDARD
+            - NOTIFICATION
+            - INFORMATION
+            - REGULATORY
+            - BILLING
+            - MAILING
+        example: 'NOTIFICATION'
+      freeFlowFormat:
+        type: string
+        description: >-
+          Field containing a full unformatted contact.
+        example: 'D/JAP/10 RUE DES CANETTES/PARIS-ARRONDISSEMENT6/75006'
+      travelerRefs:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'stakeholder'
+            id: 'ZAY091-2019-10-05-PT-1'
+            ref: 'processedPnr.travelers'
+  Phone:
+    type: object
+    description: Phone information.
+    properties:
+      category:
+        description: Category of the contact element
+        type: string
+        enum:
+          - PERSONAL
+          - BUSINESS
+          - AGENCY
+        example: 'PERSONAL'
+      deviceType:
+        type: string
+        description: 'Type of the device (Landline, Mobile or Fax)'
+        enum:
+          - MOBILE
+          - LANDLINE
+          - FAX
+        example: 'MOBILE'
+      number:
+        type: string
+        description: >-
+          Phone number. Composed of digits only. The number of digits depends on
+          the country.
+        pattern: '[0-9]{1,15}'
+        example: '0033612345678'
+  Email:
+    type: object
+    description: Email information.
+    properties:
+      address:
+        type: string
+        description: Email address
+        example: 'james.carter@gmail.com'
+  Address:
+    type: object
+    description: Address information
+    properties:
+      category:
+        description: Category of the contact element
+        type: string
+        enum:
+          - DESTINATION
+          - RESIDENCE
+          - BUSINESS
+          - PERSONAL
+        example: 'DESTINATION'
+      lines:
+        type: array
+        description: >-
+          Line 1 = Street address, Line 2 = Apartment, suite, unit, building, floor, etc
+        items:
+          type: string
+        example:
+          - '10 RUE DES CANETTES'
+      postalCode:
+        type: string
+        description: postal/zip code of the address
+        example: '75006'
+      countryCode:
+        type: string
+        description: ISO 3166-1 country code
+        pattern: '[a-zA-Z]{2}'
+        example: 'FRA'
+      cityName:
+        type: string
+        description: 'Full city name. Example: Dublin'
+        pattern: '[a-zA-Z -]{1,35}'
+        example: 'PARIS'
+      stateCode:
+        type: string
+        description: State code (two character standard IATA state code)
+        pattern: '[a-zA-Z0-9]{1,2}'
+        example: 'NY'
+      postalBox:
+        type: string
+        description: Postal box of the address
+        example: 'BP 12345'
+  Remark:
+    type: object
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: [remark]
+        example: 'remark'
+      id:
+        type: string
+        description: item identifier
+        example: 'ZAY091-2019-10-05-OT-36'
+      subType:
+        type: string
+        description: >-
+          Possible values for remark category
+          RM Miscellaneous remark
+          RC Confidential remarks
+          RQ Quality control remark
+          RI Invoice remark
+          RX Corporate Remarks
+        example: 'RM'
+      category:
+        type: string
+        description: >-
+          Applicable to miscellaneous remarks only, the subCategory is a 1-alphaChar suffix to category, enabling to identify the applicability scope of the remark. For example, RMH is used to categorize all remarks related to hotels. Possible values: C H A F R X.
+        maxLength: 1
+        example: 'C'
+      content:
+        type: string
+        description: Content of the remark element
+        example: 'NOTIFY PASSENGER PRIOR TO TICKET PURCHASE & CHECK-IN: FEDERAL LAWS FORBID THE CARRIAGE OF HAZARDOUS MATERIALS - GGAMAUSHAZ'
+      travelers:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'stakeholder'
+            id: 'ZAY091-2019-10-05-PT-1'
+            ref: 'processedPnr.travelers'
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'product'
+            id: 'ZAY091-2019-10-05-ST-1'
+            ref: 'processedPnr.products'
+    example:
+      type: 'remark'
+      id: 'ZAY091-2019-10-05-OT-36'
+      subType: 'RM'
+      category: 'C'
+      content: 'NOTIFY PASSENGER PRIOR TO TICKET PURCHASE & CHECK-IN: FEDERAL LAWS FORBID THE CARRIAGE OF HAZARDOUS MATERIALS - GGAMAUSHAZ'
+      travelers:
+        - type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-1'
+          ref: 'processedPnr.travelers'
+      products:
+        - type: 'product'
+          id: 'ZAY091-2019-10-05-ST-1'
+          ref: 'processedPnr.products'
+  AutomatedProcess:
+    type: object
+    description: Provides information on ticketing arrangements and Amadeus Time Limits
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: [automated-process]
+        example: 'automated-process'
+      id:
+        type: string
+        description: item identifier
+        example: 'ZAY091-2019-10-05-OT-37'
+      code:
+        type: string
+        description: >-
+          AT: airport ticketing
+          DO: domestic flight
+          IN: international flight
+          MA: mail
+          OK: ticketed
+          OPC: Amadeus Time Limit - auto itinerary cancellation
+          OPW: Amadeus Time Limit - auto queuing & notification
+          PT: prepaid ticket
+          SS: self service
+          ST: satellite ticketing
+          TL: auto queuing
+          TR: revalidation
+          XL: auto itinerary cancellation
+        enum:
+          - AT
+          - DO
+          - IN
+          - MA
+          - OK
+          - OPC
+          - OPW
+          - PT
+          - SS
+          - ST
+          - TL
+          - TR
+          - XL
+        example: 'TL'
+      dateTime:
+        description: Datetime limit at which the process takes action in case issuance is not done.
+        type: string
+        example: '2019-10-10T10:00:00'
+      office:
+        description: Office onto which the process must be triggered. Office information limited to office ID.
+        $ref: '#/definitions/Office'
+        example:
+          id: 'NCE6X08AA'
+      queue:
+        type: object
+        description: Identifies the queue onto which PNR must be automatically placed upon process execution.
+        properties:
+          number:
+            type: string
+            example: '10'
+          category:
+            type: string
+            example: '1'
+      documentDeliveryOptions:
+        type: string
+        description: >-
+          Options as entered by the agent in cryptic, related to the secondary action that can be requested on the following ticketing arrangements [TL/AT/MA/IN/DO]. In addition to the primary action of the given ticketing arrangement, those options enable to issue/print/email documents as a secondary action. Following documents can be printed or emailed - invoices, e-ticket receipts, EMD receipts, insurance certificates.
+        example: 'TTP/TTM/ED/ITR'
+      text:
+        type: string
+        description: Full PNR element content
+        example: '25OCT/NCE6X08AA/Q10C1//TTP/INV/ED/ITR'
+      applicableCarrierCode:
+        type: string
+        description: Identifier of the airline to which the automatic process applies.
+        example: '6X'
+      isApplicableToInfants:
+        type: boolean
+        description: Indicates that the automated process applies to infant passenger(s)
+        example: false
+      travelers:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'stakeholder'
+            id: 'ZAY091-2019-10-05-PT-1'
+            ref: 'processedPnr.travelers'
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: 'product'
+            id: 'ZAY091-2019-10-05-ST-1'
+            ref: 'processedPnr.products'
+    example:
+      type: 'automatedProcess'
+      id: 'ZAY091-2019-10-05-OT-37'
+      code: 'TL'
+      dateTime: '2019-10-10T10:00:00'
+      office: 'NCE6X08AA'
+      queue:
+        number: '10'
+        category: '1'
+      documentDeliveryOptions: 'TTP/TTM/ED/ITR'
+      text: '25OCT/NCE6X08AA/Q10C1//TTP/INV/ED/ITR'
+      applicableCarrierCode: '6X'
+      isApplicableToInfants: false
+      products:
+        - type: 'product'
+          id: 'ZAY091-2019-10-05-ST-1'
+          ref: 'processedPnr.products'
+      travelers:
+        - type: 'stakeholder'
+          id: 'ZAY091-2019-10-05-PT-1'
+          ref: 'processedPnr.travelers'
+  AssociatedPnr:
+    type: object
+    description: Describes the relation between the current reservation and another one
+    properties:
+      reference:
+        type: string
+        description: Record locator [Amadeus or OA] with which the current reservation is related. In case of a codeshare relation, it enables to identify the operating PNR.
+        example: 'JKL789'
+      associationType:
+        type: string
+        description: Specifies the directionality of a split between two reservations.
+        enum:
+          - CODESHARE
+          - SPLIT
+          - OTHER_AIRLINE
+          - CROSS_REFERENCE
+        example: 'CODESHARE'
+      direction:
+        type: string
+        description: >-
+          In case of a split relation, indicates whether the reference results from a split operation [CHILD] or has originated a split operation [PARENT] leading to the current PNR.
+          Indicates the second reference resulting from the split of the same parent PNR [OTHER].
+        enum:
+          - CHILD
+          - PARENT
+          - OTHER
+        example: 'CHILD'
+      creation:
+        $ref: '#/definitions/EventLog'
+        description: Creation datetime and system code [GDS/CRS] from which originates the associated record.
+        example:
+          dateTime: '2019-10-05T10:00:00Z'
+          pointOfSale:
+            office:
+              systemCode: '1S'
+    example:
+      - reference: 'JKL789'
+        associationType: 'SPLIT'
+        direction: 'CHILD'
+        creation:
+          dateTime: '2019-10-05T10:00:00Z'
+          pointOfSale:
+            office:
+              systemCode: '1S'
+  Office:
+    type: object
+    properties:
+      id:
+        type: string
+        description: AMID - office id in Amadeus
+        example: 'NCE6X08AA'
+      iataNumber:
+        type: string
+        description: IATA assigned office number
+        example: '15398195'
+      systemCode:
+        type: string
+        description: Identifier of the airline/CRS that originated the transaction [2-3 characters].
+        minLength: 2
+        maxLength: 3
+        example: '6X'
+      agentType:
+        type: string
+        description: The issuing channel.
+        enum: [AIRLINE, TRAVEL_AGENT]
+        example: 'AIRLINE'
+  Login:
+    type: object
+    properties:
+      numericSign:
+        type: string
+        description: Authorization code of the agent
+        example: '0001'
+      initials:
+        type: string
+        description: agent initials
+        example: 'JF'
+      dutyCode:
+        type: string
+        description: duty code of the agent
+        example: 'SU'
+      currencyCode:
+        type: string
+        description: ISO currency code of the agent
+        example: 'EUR'
+      countryCode:
+        type: string
+        description: ISO country code of the agent
+        example: 'FR'
+      cityCode:
+        type: string
+        description: city code of the issuing agent/system
+        example: 'NCE'
+  PointOfSale:
+    type: object
+    properties:
+      office:
+        $ref: '#/definitions/Office'
+      login:
+        $ref: '#/definitions/Login'
+  EventLog:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique identifier of a JSON message
+        example: '429074ef1bd011e3-e63dfe23f4a0adc'
+      triggerEventName:
+        description: Trigger of the message - set to 'DATA_INIT' for initialization messages
+        type: string
+        example: 'DATA_INIT'
+      dateTime:
+        type: string
+        format: date-time
+        description: GMT date & time
+        example: '2019-10-05T10:00:00Z'
+      pointOfSale:
+        $ref: '#/definitions/PointOfSale'
+      comment:
+        type: string
+        description: ReceiveFrom content [RF line]
+        example: '6X online BOOKING'
+  Relationship:
+    type: object
+    properties:
+      type:
+        type: string
+        example: 'stakeholder'
+      id:
+        type: string
+        example: 'ZAY091-2019-10-05-PT-1'
+      ref:
+        type: string
+        example: 'processedPnr.travelers'
+      version:
+        type: string
+        description: Only populated for correlated resources defined in Dictionaries
+  CurrencyConversionLookupRates:
+    type: object
+    description: "Conversion from provider's currency to requested currency"
+    properties:
+      rate:
+        type: string
+        description: The conversion factor to apply against the source currency to obtain the requested currency
+        example: '1.14'
+      target:
+        type: string
+        description: Requested currency code
+        example: 'EUR'
+  TravelersGroup:
+    type: object
+    properties:
+      size:
+        type: integer
+        description: Number of name-assigned passengers that can be booked in the group PNR
+        example: 9
+      name:
+        type: string
+        description: Name of the group PNR
+        example: 'GROUP/NAME/IN/SEVERAL/PARTS'
+      sizeTaken:
+        type: integer
+        description: Number of passengers inserted in group PNR
+        example: 5
+      sizeRemaining:
+        type: integer
+        description: Number of passengers that is still available for insertion in group PNR according to its size
+        example: 4
+  # Product Delivery Information definition
+  PassengerDelivery:
+    type: object
+    description: Product Delivery Information related to passengers
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: [passenger-delivery]
+        example: passenger-delivery
+      id:
+        type: string
+        description: item identifier
+        example: ZAY091-2019-05-04-OT-64
+      deliveryAirlineCode:
+        type: string
+        description: Airline responsible for the passenger delivery data
+        example: 6X
+      passengerDetails:
+        description: personalDetails recorded in DCS at passenger level
+        $ref: '#/definitions/PassengerDelivery_Stakeholder'
+      excessBaggageStatus:
+        type: string
+        enum:
+          - PAID
+          - UNPAID
+          - WAIVED
+          - CALCULATED
+          - TICKETS_ISSUED
+        example: PAID
+        description: if the passenger has excess baggage this indicates the status related to pricing and payment
+      lastTrackedTimeLocation:
+        description: last recorded location of the passenger at the airport (e.g. at checkin, gate,...)
+        $ref: '#/definitions/TimeLocationTrackingLog'
+      bagsGroupDeliveries:
+        type: array
+        items:
+          $ref: '#/definitions/BagsGroup'
+    example:
+      type: passenger-delivery
+      id: 'ZAY091-2019-05-04-OT-64'
+      deliveryAirlineCode: '6X'
+      personalDetails:
+        age: 20
+        gender: MALE
+        passengerTypeCode: 'ADT'
+        dateOfBirth: '1998-04-21'
+      excessBaggageStatus: PAID
+      lastTrackedTimeLocation:
+        localDateTime: '2018-10-18T12:48:12'
+        trackedLocation:
+          areaCode: 'CKI'
+          identifier: '101'
+          description: 'LHR TERM-4 CKI 101'
+      traveler:
+        type: 'stakeholder'
+        id: 'ZAY091-2019-10-05-PT-1'
+        ref: 'processedPnr.travelers'
+  PassengerDelivery_Stakeholder:
+    type: object
+    description: PersonalDetails recorded in DCS at passenger level
+    properties:
+      age:
+        description: Age of the stakeholder
+        type: integer
+        example: 40
+      gender:
+        description: Gender of the stakeholder
+        type: string
+        enum:
+          - MALE
+          - FEMALE
+          - UNKNOWN
+        example: 'MALE'
+      passengerTypeCode:
+        description: >-
+          3-characters code defining the passenger type - possible values: ADT, CHD, INS, INF, UNA
+        type: string
+        maxLength: 3
+        example: 'ADT'
+      dateOfBirth:
+        description: The stakeholder's date of birth
+        type: string
+        format: date
+        example: '1978-10-05'
+  SegmentDelivery:
+    type: object
+    description: Product Delivery Information related to segments
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: [segment-delivery]
+        example: segment-delivery
+      id:
+        type: string
+        description: identifier of the segmentDelivery in the PNR
+        example: ZAY091-2019-05-04-OT-65
+      distributionId:
+        type: string
+        description: Unique Product Identifier / Distribution ID
+        example: 2401CA5500003OID
+      flightSegment:
+        $ref: '#/definitions/SegmentDelivery_FlightSegment'
+      associatedTickets:
+        type: array
+        items:
+          $ref: '#/definitions/AirTravelDocument'
+        example:
+          - documentNumber: '1725555555555'
+            documentType: ETICKET
+            associationStatus: ASSOCIATED
+            primaryDocumentNumber: '1721111111111'
+            coupons:
+              number: 1
+      activeIdentityDocument:
+        $ref: '#/definitions/Stakeholder'
+        description: passenger details recorded in the DCS at segment level
+        example:
+          nationality: GBR
+          countryOfResidence: Portugal
+          placeOfBirth: London
+      isNoRec:
+        type: boolean
+        description: indicates if the dcs record was created at the airport because no reservation was found in the system
+        example: false
+      isGoShow:
+        type: boolean
+        description: indicates if the dcs record was created at the airport because the passenger showed up with a flexible ticket but had not yet a reservation for the flight
+        example: false
+      transferFlag:
+        type: string
+        enum:
+          - FROM_FLIGHT
+          - TO_FLIGHT
+      legDeliveries:
+        description: Information at leg level for each leg
+        type: array
+        items:
+          $ref: '#/definitions/LegDelivery'
+      traveler:
+        description: link to associated stakeholder
+        $ref: '#/definitions/Relationship'
+        example:
+          id: ZAY091-2019-05-04-PT-1
+          type: stakeholder
+    example:
+      type: segment-delivery
+      id: 'ZAY091-2019-05-04-OT-65'
+      segment:
+        departure:
+          iataCode: 'LHR'
+        arrival:
+          iataCode: 'JFK'
+        carrierCode: '6X'
+        number: '123'
+        class: 'Y'
+      associatedTickets:
+        - documentNumber: '1721589475494'
+          documentType: ETICKET
+          associationStatus: ASSOCIATED
+          primaryDocumentNumber: '1721589475493'
+          coupons:
+            number: 1
+      personalDetails:
+        nationality: 'GBR'
+        countryOfResidence: 'Portugal'
+        placeOfBirth: 'London'
+      isNorec: false
+      isGoShow: false
+      transferFlag: FROM_FLIGHT
+      legDeliveries:
+        type: 'legDelivery'
+        id: 'ZAY091-2019-05-04-OT-66'
+        departure:
+          iataCode: 'NCE'
+        arrival:
+          iataCode: 'JFK'
+        acceptance:
+          channel: JFE
+          status: ACCEPTED
+          securityNumber: '098'
+          isForceAccepted: true
+          forceAcceptanceReason: 'VIP Passenger'
+          isFrozen: false
+          handlingCarrier: '6X'
+          interAirlineThroughCheckIn:
+            targetDCSCode: '1A'
+            targetCompany: '6X'
+            onwardFlight:
+            carrierCode: '6X'
+            number: '123'
+            operationalSuffix: 'A'
+            departure:
+              iataCode: 'JFK'
+            arrival:
+              iataCode: 'ATL'
+        regrade:
+          priority: '31'
+          cabinCode: 'C'
+          reasonCode: 'OC'
+          reasonLabel: OVERSOLD_CURRENT_FLIGHT
+          reasonFreeText: 'Involuntary upgrade due to oversold flight'
+          authoriserReference: 'AU0123'
+          direction: UPGRADE
+          regradeType: INVOLUNTARY
+        seating:
+          seat:
+          number: '12A'
+          characteristicCodes:
+            - 'N'
+            - 'W'
+        onload:
+          status: 'OLD'
+          cabinCode: 'C'
+        boarding:
+          boardingStatus: NOT_BOARDED
+          boardingPassPrintStatus: PRINTED
+          trackingLog:
+            localDateTime: '2018-10-25T10:00:00'
+        hasBags: true
+        comments:
+          delivery:
+            status: DELIVERED
+          text: 'One cabin bag to be taken on the hold'
+          priority: HIGH
+          usage: AT_BP_REPRINT
+  SegmentDelivery_FlightSegment:
+    type: object
+    description: Flight segment details
+    properties:
+      departure:
+        $ref: '#/definitions/FlightEndPoint'
+      arrival:
+        $ref: '#/definitions/FlightEndPoint'
+      marketing:
+        $ref: '#/definitions/MarketingFlight'
+      isInformational:
+        type: boolean
+        description: Indicates an informational flight segment i.e. already booked on another system.
+  LegDelivery:
+    type: object
+    description: Product Delivery Information related to legs
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: [leg-delivery]
+        example: leg-delivery
+      id:
+        type: string
+        description: identifier of the leg delivery in the PnrApiData
+        example: ZAY091-2019-05-04-OT-66
+      departure:
+        $ref: '#/definitions/FlightEndPoint'
+        description: departure information of the leg, limited to iataCode
+        example:
+          iataCode: LHR
+      arrival:
+        $ref: '#/definitions/FlightEndPoint'
+        description: arrival information of the leg, limited to iataCode
+        example:
+          iataCode: JFK
+      handlingCarrier:
+        type: string
+        description: the 2 or 3 characters code of the handling carrier. Note that this can also refer to a ground handler.
+        example: 7X
+      acceptance:
+        $ref: '#/definitions/AcceptanceDelivery'
+      regrade:
+        $ref: '#/definitions/Regrade'
+      seating:
+        $ref: '#/definitions/SeatingDelivery'
+      onload:
+        description: Onload information for that leg - populated by onload recommendation.
+        $ref: '#/definitions/Onload'
+      boarding:
+        description: Boarding delivery for that leg
+        $ref: '#/definitions/BoardingDelivery'
+      hasBags:
+        type: boolean
+        description: indicates whether the passenger has bags
+        example: true
+      comments:
+        type: array
+        items:
+          $ref: '#/definitions/Comment'
+        description: list of comments assigned to the passenger in the DCS system
+      regulatoryChecks:
+        type: array
+        items:
+          $ref: '#/definitions/RegulatoryChecks'
+      compensations:
+        type: array
+        items:
+          $ref: '#/definitions/Compensation'
+    example:
+      - type: 'legDelivery'
+        id: 'ZAY091-2019-05-04-OT-66'
+        departure:
+          iataCode: 'NCE'
+        arrival:
+          iataCode: 'JFK'
+        acceptance:
+          channel: JFE
+          status: ACCEPTED
+          securityNumber: '098'
+          isForceAccepted: true
+          forceAcceptanceReason: 'VIP Passenger'
+          isFrozen: false
+          handlingCarrier: '6X'
+          interAirlineThroughCheckIn:
+            targetDCSCode: '1A'
+            targetCompany: '6X'
+            onwardFlight:
+            carrierCode: '6X'
+            number: '123'
+            operationalSuffix: 'A'
+            departure:
+              iataCode: 'JFK'
+            arrival:
+              iataCode: 'ATL'
+        regrade:
+          priority: '31'
+          cabinCode: 'C'
+          reasonCode: 'OC'
+          reasonLabel: OVERSOLD_CURRENT_FLIGHT
+          reasonFreeText: 'Involuntary upgrade due to oversold flight'
+          authoriserReference: 'AU0123'
+          direction: UPGRADE
+          regradeType: INVOLUNTARY
+        seating:
+          seat:
+          number: '12A'
+          characteristicCodes:
+            - 'N'
+            - 'W'
+        onload:
+          status: 'OLD'
+          cabinCode: 'C'
+        boarding:
+          boardingStatus: NOT_BOARDED
+          boardingPassPrint:
+            status: PRINTED
+          trackingLog:
+          localDateTime: '2018-10-25T10:00:00'
+        hasBags: true
+        comments:
+          delivery:
+            status: DELIVERED
+          text: 'One cabin bag to be taken on the hold'
+          priority: HIGH
+          usage: AT_BP_REPRINT
+  TimeLocationTrackingLog:
+    description: Structure to represent a time and location for which a passenger was recorded
+    type: object
+    properties:
+      localDateTime:
+        type: string
+        example: "2018-10-18T12:48:12"
+      trackedLocation:
+        $ref: '#/definitions/InfrastructureLocation'
+  InfrastructureLocation:
+    type: object
+    properties:
+      areaCode:
+        type: string
+        description: >-
+          Location type, e.g. CKI for Checkin counter, GTE for gate area
+          Possible values are   ADM     ATO     BCA     BDP     BMD     BOF     CAR     CAT
+          CKI     CSD     CTO     DUT     ECC     ENG     FIN     FOP
+          GTE     IMM     ITS     LCO     LGE     MVC     NOP     OTH
+          PSF     RAM     REG     ROM     SBD     SEC     SSH     SSK
+          SUP     TAG     TKT     TRA     TRN
+        example: CKI
+      identifier:
+        type: string
+        description: location identifier
+        example: 101
+      description:
+        type: string
+        description: non-structure freeflow description of the location
+        example: LHR TERM-4 CKI 101
+  AcceptanceDelivery:
+    type: object
+    description: Structure containing all the acceptance (check-in) information
+    properties:
+      origin:
+        type: string
+        description: the type of channel that originated the acceptance
+        enum:
+          - AIRLINE
+          - SELF_SERVICE
+          - DIRECT_CONSUMER
+          - ELECTRONIC_SYSTEM
+        example: AIRLINE
+      channel:
+        type: string
+        description: Acceptance Channel indicator
+        enum:
+          - EXTERNAL_DCS
+          - CRYPTIC
+          - JFE
+          - KIOSK
+          - MOBILE_PHONE
+          - SMS
+          - TELEPHONE
+          - WEB_APPLICATION
+        example: JFE
+      status:
+        type: string
+        description: Passenger acceptance status
+        enum:
+          - ACCEPTED
+          - STANDBY
+          - NOT_ACCEPTED
+          - REJECTED
+        example: ACCEPTED
+      securityNumber:
+        type: string
+        description: Check-in security ID populated by DCS Customer Management
+        example: 'CDG-005'
+      isForceAccepted:
+        type: boolean
+        description: Force Acceptance indicator - indicator set when the agents override some checks like suitability check
+        example: true
+      reasonFreeText:
+        type: string
+        description: optional free text given by the agent to describe why the passenger was force accepted
+        example: 'VIP passenger'
+      isFrozen:
+        type: boolean
+        description: Freeze indicator - set by the agent to prevent acceptance status to be reassessed during onload
+        example: false
+      interAirlineThroughCheckIn:
+        $ref: '#/definitions/InterAirlineThroughCheckIn'
+      cancellationReasonCode:
+        type: string
+        description: Code for the reason selected by the agent or system when the acceptance of the passenger is cancelled (offload)
+        example: NO
+      cancellationReasonLabel:
+        type: string
+        description: Cancellation reason label corresponding to the reason code
+        enum:
+          - AIRLINE_STAFF
+          - BAGGAGE_NOT_ACCEPTED
+          - CUSTOMER_FAILED_TO_BOARD
+          - CUSTOMER_REQUEST
+          - CUSTOMER_UNWELL
+          - DENIED_BOARDING
+          - FLIGHT_ALTERNATIVE
+          - FLIGHT_DELAYED
+          - FLIGHT_OVERSOLD
+          - FLIGHT_CANCELLED
+          - MISSED_CONNECTION
+          - MEDICAL_REASONS
+          - NOSHOW
+          - OTHER
+          - REGULATORY_REQUIREMENT_NOT_MET
+          - SECURITY_REASONS
+          - TRAVEL_IN_DIFFERENT_CABIN
+          - TRAVEL_DOCUMENTATION_INCOMPLETE
+          - TRAVEL_INDUSTRY_STAFF
+          - USER_ERROR_CORRECTION
+          - VOLUNTARY_DENIED_BOARDING
+          - INVOLUNTARY_DENIED_BOARDING
+        example: NOSHOW
+  InterAirlineThroughCheckIn:
+    type: object
+    properties:
+      originatorCompany:
+        type: string
+        description: In case of Inbound IATCI, this is the code of the company that performed the check in
+        example: 8X
+      targetDCSCode:
+        type: string
+        description: Code of the DCS system where the IATCI check in is performed
+        example: 1S
+      targetCompany:
+        type: string
+        description: In case of Outbound IATCI, this is the code of the company on which check in is performed
+        example: 8X
+      onwardFlight:
+        $ref: '#/definitions/InterAirlineThroughCheckIn_FlightSegment'
+    example:
+      targetDCSCode: '1A'
+      targetCompany: '6X'
+      onwardFlight:
+        carrierCode: '6X'
+        number: '123'
+        operationalSuffix: 'A'
+        departure:
+          iataCode: 'JFK'
+        arrival:
+          iataCode: 'ATL'
+  InterAirlineThroughCheckIn_FlightSegment:
+    type: object
+    description: Flight segment details
+    properties:
+      departure:
+        $ref: '#/definitions/FlightEndPoint'
+      marketing:
+        $ref: '#/definitions/MarketingFlight'
+  SeatingDelivery:
+    description: Structure containing all the delivery seating information
+    type: object
+    properties:
+      seat:
+        $ref: '#/definitions/Seat'
+        description: Seat number and characteristics of the seat delivered in DCS
+    example:
+      seat:
+        number: 12A
+        characteristicCodes:
+          - N
+          - W
+  Regrade:
+    type: object
+    description: Structure containing the regrade information
+    properties:
+      priority:
+        type: string
+        description: Regrade priority
+        example: 31
+      cabinCode:
+        type: string
+        description: Regrade cabin code - has value only in case of Regrade Proposed
+        example: C
+      reasonCode:
+        type: string
+        description: Regrade reason code
+        enum:
+          - OC
+          - OO
+          - MC
+          - PM
+          - SO
+          - AC
+          - CF
+          - RQ
+          - CO
+          - AB
+          - MI
+          - DC
+          - DO
+          - CC
+          - TR
+          - CS
+          - CI
+          - IA
+          - US
+          - SR
+          - ST
+          - CR
+          - VO
+          - BM
+          - PD
+          - HC
+          - MM
+          - CA
+          - CD
+          - DP
+          - MA
+          - OL
+        example: OC
+      reasonLabel:
+        type: string
+        description: Regrade reason label corresponding to reason code
+        enum:
+          - OVERSOLD_CURRENT_FLIGHT
+          - OVERSOLD_OTHER_FLIGHT
+          - CUSTOMER_MISIDENTIFICATION_AT_CHECKIN
+          - PREVIOUSLY_MISHANDLED
+          - SPECIAL_OCCASION
+          - AIRCRAFT_CHANGE
+          - CABIN_CONFIGURATION_CHANGE
+          - SPECIAL_REQUESTOR
+          - COMPASSIONATE
+          - AUTHORIZED_BY
+          - MARKETING_INITIATIVE
+          - DISRUPTION_CURRENT_FLIGHT
+          - DISRUPTION_OTHER_FLIGHT
+          - CREW_CHANGE
+          - TECHNICAL_REASON
+          - CATERING_SHORTFALL
+          - CHECKIN_ERROR
+          - INADMISSIBLE
+          - UNSUITABLE
+          - STAFF
+          - SERVICE_RECOVERY_ENTITLEMENT
+          - COURTESY
+          - CUSTOMER_DOWNGRADE_REQUESTED
+          - BOOKED_MARKETING_UPGRADE
+          - INVOLUNTARY_DOWNGRADE
+          - TICKETED_IN_HIGHER_CLASS
+          - FREQUENT_FLYER_UPGRADE
+          - CANCEL_ACCEPTANCE
+          - CUSTOMER_DOWNGRADE_REQUIREMENT
+          - DUPLICATE_PRODUCT
+          - MANAGEMENT_AUTHORISED
+          - ONLOAD
+      reasonFreeText:
+        type: string
+        description: Regrade reason in free text
+        example: Oversold current flight
+      authoriserReference:
+        type: string
+        description: Regrade authoriser reference
+        example: AU0123
+      direction:
+        type: string
+        description: Regrade direction
+        enum:
+          - UPGRADE
+          - DOWNGRADE
+          - NEUTRAL
+        example: UPGRADE
+      regradeType:
+        type: string
+        description: Regrade type
+        enum:
+          - INVOLUNTARY
+          - REMAIN_FORCE
+          - NO_REGRADE
+        example: INVOLUNTARY
+  Onload:
+    type: object
+    description: Structure containing the onload information
+    properties:
+      status:
+        type: string
+        description: Status of the onload of the passenger(OLD = OK, NOL = NOK, OLR = OK Regrade, RGD = Regrade, OFL = Offload, NA = Not Applicable)
+        example: OLD
+      cabinCode:
+        type: string
+        description: Target cabin code post onload recommendation
+        example: C
+  BoardingDelivery:
+    type: object
+    description: Structure containing the boarding information
+    properties:
+      boardingStatus:
+        type: string
+        description: Passenger boarding status
+        enum:
+          - BOARDED
+          - NOT_BOARDED
+        example: NOT_BOARDED
+      boardingPassPrint:
+        $ref: '#/definitions/BoardingPassPrint'
+        description: Boarding pass print
+      trackingLog:
+        $ref: '#/definitions/TimeLocationTrackingLog'
+        description: Provides the local time at which the passenger has actually boarded the plane for the current leg via the field localDateTime
+  BoardingPassPrint:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Boarding pass print status
+          Possible values PRINTED, NEEDS_PRINTING or NOT_PRINTED
+        example: PRINTED
+  RegulatoryChecks:
+    type: object
+    properties:
+      regulatoryProgram:
+        $ref: '#/definitions/RegulatoryProgram'
+        description: details of the regulatory program
+      statuses:
+        description: list of regulatory statuses
+        type: array
+        items:
+          $ref: '#/definitions/RegulatoryStatus'
+  RegulatoryProgram:
+    type: object
+    description: Structure to represent a regulatory program (e.g. APP)
+    properties:
+      name:
+        type: string
+        description: Name of the regulatory program (AQQ, IAPP, APP, ADC)
+        example: APP
+      countryCode:
+        type: string
+        description: Code of the country the program applies to in the ISO 3166-1 alpha-3 format
+        example: CAN
+  RegulatoryStatus:
+    type: object
+    description: Structure to give the details of a given regulatory status along with the associated message from the authorities
+    properties:
+      statusType:
+        type: string
+        description: >-
+          Nature of the regulatory status - possible values
+            ARQ - APP processing requirement for the product
+            APR - APP result indicator of the product
+            AQQ - AQQ program status
+            TCS - Customer type check state
+            EST - ESTA program status
+            APS - ApiDataStatus indicator
+            MSL - Missing luggage indicator
+            APC - APP status code [APP]
+            TRS - TransitIndicator True [APP]
+            NRM - TransitIndicator False [APP]
+            OVR - APP override Indicator [APP]
+            APP - APP query type [APP]
+            IAP - APP Inhibition [APP]
+            API - APIS data indicator [APP]
+            VDB - Voluntary denied boarding
+        example: TCS
+      statusCode:
+        type: string
+        description: >-
+          Codes for regulatory statuses
+            ARQ status
+              X - APP not required
+              R - APP Required
+            APR status
+              Y - Successful
+              B - Bypassed
+              R - Void
+              X - Not needed
+              N - Failed
+            AQQ status
+              O - OK to board
+              I - Inhibited to board
+              S - Selectee
+              E - Data error
+              N - AQQ not performed
+              X - AQQ not required
+              B - ESTA Bypassed
+            TCS status
+              CTB - Bypassed
+              CTD - Disrupted
+              CTF - Failed
+              CTI - Ignored
+              CTN - Not Required
+              CTO - Overridden
+              CTP - Passed
+              CTR - Required
+              CTU - Undefined
+              CTX - Non-Prime
+            EST status
+              Z - ESTA not required
+              A - Valid ESTA application on file
+              B - ESTA application not present on file
+              C - Additional US Travel Document required (ESTA denied)
+              1 - ESTA inhibited
+              X - Insufficient Information
+              Y - ESTA Bypassed (Internal Status)
+            APS status
+              Y - Complete
+              N - NotComplete
+              R - AgentRevalidation
+              Q - NotRequired
+              P - NotPerformed
+            MSL status
+              Y - Yes
+              N - No
+            APC status
+              APC - ClearToBoard
+              APX - Cancelled
+              APN - NotFound
+              APT - Timeout
+              APE - ErrorCondition
+              APD - Duplicate Name
+              API - Insufficient Data
+              APF - DoNotBoard
+            TRS status
+              T - DepartureTransit
+              O - ArrivalTransit
+              I - IntermediateTransit
+            OVR status
+              OVG - APP override indicator is Government
+              OVA - APP override indicator is Airline
+            APP status
+              APM - APP query is Manual
+              APA - APP query is Automatic
+        example: CTP
+      message:
+        $ref: '#/definitions/RegulatoryComment'
+  RegulatoryComment:
+    type: object
+    description: Structure to represent a comment received by the authorities in the context of a regulatory check
+    properties:
+      commentType:
+        type: string
+        description: Indicates the type of comment from Regulatory System
+          ("Directive" in case of APP, "Override Authorizer" for APP and iAPP, "Special Instructions" for iAPP, "reason" for ADC)
+        example: reason
+      code:
+        type: string
+        description: 4 digit code for directive type comment or G=Government, A=Airline for APP authorizer
+        example: 8517
+      description:
+        type: string
+        description: The comment or override authoriser
+        example: TIMEOUT
+  Compensation:
+    type: object
+    description: Detail of the compensation given to the passenger
+    properties:
+      reason:
+        description: Compensation reason code ((as defined by airlines in BZR)
+        $ref: '#/definitions/CompensationReason'
+  CompensationReason:
+    type: object
+    properties:
+      code:
+        type: string
+        description: Compensation reason code ((as defined by airlines in BZR)
+        example: 'FDD'
+  Comment:
+    type: object
+    description: Structure to describe a comment given to a customer in DCS
+    properties:
+      delivery:
+        description: whether the comment has been delivered to the passenger
+        $ref: '#/definitions/CommentDelivery'
+      text:
+        type: string
+        description: the free text of the comment (ASCII)
+        example: One cabin bag to be taken on the hold
+      priority:
+        type: string
+        enum:
+          - HIGH
+          - NORMAL
+        example: HIGH
+      usage:
+        type: string
+        enum:
+          - BAGGAGE
+          - CABIN
+          - NORMAL
+          - AT_BP_REPRINT
+          - AT_CHECKIN
+          - AT_GATE
+          - NEXT_TIME
+          - PRINT_ON_BP
+          - PRINT_ON_ONBOARD_SERVICE_LIST
+        example: AT_BP_REPRINT
+  CommentDelivery:
+    type: object
+    properties:
+      status:
+        type: string
+        description: whether the comment has been delivered to the passenger
+        enum:
+          - DELIVERED
+          - NOT_DELIVERED
+        example: DELIVERED
+  BagsGroup:
+    type: object
+    description: Structure to describe the data of a bag group
+    properties:
+      type:
+        type: string
+        description: type of the data
+        enum: [bags-group]
+        example: bags-group
+      id:
+        type: string
+        description: The baggage group reference
+        example: 10FBC42026758291
+      checkedBagsCount:
+        description: The number of checked bags comprising this bags group
+        type: integer
+        example: 1
+      checkedBagsWeight:
+        description: The total weight of all checked bags
+        $ref: '#/definitions/Weight'
+      handBagsCount:
+        description: The number of hand baggage items comprising this bags group
+        type: integer
+        example: 1
+      handBagsWeight:
+        description: The total weight of hand baggage items comprising this bags group.
+        $ref: '#/definitions/Weight'
+      isPool:
+        description: Indicates if the current group is a pool of baggage
+        type: boolean
+        example: false
+      checkedBags:
+        type: array
+        description: Map of bag resources with id as key
+        items:
+          $ref: '#/definitions/Bag'
+    example:
+      type: bags-group
+      id: '10FBC42026758291'
+      checkedBagsCount: 1
+      checkedBagsWeight:
+        value: 20
+        unit: KILOGRAMS
+      handBagsCount: 1
+      handBagsWeight:
+        value: 10
+        unit: KILOGRAMS
+      isPool: false
+      checkedBags:
+        - type: bag
+          id: '1000000123123'
+          bagType: CREW
+          bagTag:
+            issuingCarrier: '6X'
+            finalDestination: 'JFK'
+            licensePlate: '06X1234567'
+          systemSource: AUTOMATIC
+          owner:
+            type: 'stakeholder'
+            id: 'ZAY091-2019-05-04-PT-1'
+            ref: 'processedPnr.travelers'
+          legs:
+            - boardPoint: 'LHR'
+              offPoint: 'JFK'
+              acceptanceStatus: NOT_ACCEPTED
+              specialBagHandlingItems:
+                - label: CREW
+                  freeText: 'CONFIDENTIAL CREW BAG'
+              legDelivery:
+                type: 'leg-delivery'
+                id: '1000011122LHR'
+  Weight:
+    type: object
+    description: Generic structure to convey a weight
+    properties:
+      value:
+        type: integer
+        description: the weight value in the given unit
+        example: 10
+      unit:
+        type: string
+        description: the unit of weight measurement
+        enum:
+          - KILOGRAMS
+          - POUNDS
+        example: KILOGRAMS
+  Bag:
+    type: object
+    description: Structure containing all the information related to an individual checked in bag
+    properties:
+      type:
+        type: string
+        description: type of the object
+        enum: [bag]
+        example: bag
+      id:
+        type: string
+        description: The UBI (Universal Baggage Identifier) of the bag item
+        example: 100000001
+      bagType:
+        type: string
+        enum:
+          - RUSH
+          - STANDARD
+          - CREW
+        description: The type of the bag
+        example: STANDARD
+      bagTag:
+        $ref: '#/definitions/BagTag'
+        description: details of the bag tag
+      systemSource:
+        description: From which channel was this bag created
+        type: string
+        enum:
+          - AUTOMATIC
+          - BTM
+          - IATCI
+        example: AUTOMATIC
+      owner:
+        $ref: '#/definitions/Relationship'
+        description: PNR traveler resource owning the bag
+      legs:
+        type: array
+        description: Flight-leg information associated with the bag item
+        items:
+          $ref: '#/definitions/BagLegDelivery'
+    example:
+      type: bag
+      id: '1000000123123'
+      bagType: CREW
+      bagTag:
+        issuingCarrier: '6X'
+        finalDestination: 'JFK'
+        licensePlate: '06X1234567'
+      systemSource: AUTOMATIC
+      owner:
+        type: 'stakeholder'
+        id: 'ZAY091-2019-05-04-PT-1'
+        ref: 'processedPnr.travelers'
+      legs:
+        - boardPoint: 'LHR'
+          offPoint: 'JFK'
+          acceptanceStatus: NOT_ACCEPTED
+          specialBagHandlingitems:
+            - label: CREW
+              freeText: 'CONFIDENTIAL CREW BAG'
+          legDelivery:
+            type: 'leg-delivery'
+            id: '1000011122LHR'
+  BagTag:
+    type: object
+    description: Structure representing a bag tag in the DCS system
+    properties:
+      issuingCarrier:
+        description: The bag tag's issuing carrier code
+        type: string
+        example: 6X
+      finalDestination:
+        description: The IATA code of final destination of the bag as issued on the bag tag
+        type: string
+        example: JFK
+      licensePlate:
+        description: The bag tag number
+        type: string
+        example: 06X1234567
+  BagLegDelivery:
+    type: object
+    description: Structure to describe the delivery information of a bag at leg level
+    properties:
+      boardPoint:
+        $ref: '#/definitions/FlightEndPoint'
+        description: detail of the boardpoint of the leg
+        example:
+          iataCode: LHR
+      offPoint:
+        $ref: '#/definitions/FlightEndPoint'
+        description: detail of the offpoint of the leg
+        example:
+          iataCode: JFK
+      acceptanceStatus:
+        description: The acceptance status of the bag item for the current flight leg
+        type: string
+        example: NOT_ACCEPTED
+        enum:
+          - FULLY_ACCEPTED
+          - NOT_ACCEPTED
+          - PROVISIONALLY_ACCEPTED
+          - NOT_TRAVELLING
+      specialBagHandlingItems:
+        type: array
+        description: special bag handling properties
+        items:
+          $ref: '#/definitions/SpecialBagHandling'
+      legDelivery:
+        $ref: '#/definitions/Relationship'
+        description: link to the corresponding leg delivery
+  SpecialBagHandling:
+    type: object
+    description: Structure to convey special bag handling instructions
+    properties:
+      label:
+        type: string
+        enum:
+          - GROUP
+          - GROUND_TRANSPORT
+          - FRAGILE
+          - DUPLICATE_TAG
+          - DIPLOMATIC_COURIER
+          - DANGEROUS_GOODS
+          - DELIVERED_AT_AIRCRAFT
+          - CREW
+          - COURIER
+          - ROUTING_UPDATE
+          - TOUR
+          - UNACCOMPANIED
+          - VIP
+          - REROUTED
+          - RUSH
+          - SHORT_CONNECTION
+          - JUMP
+          - MISHANDLED
+          - PRIORITY
+          - RELOAD
+          - HAJJ
+          - HOTEL_VOUCHER
+          - HEAVY
+          - IRREGULAR_OPERATION
+          - WEIGHT_REJECT
+        description: special bag label
+        example: CREW
+      freeText:
+        type: string
+        description: Holds any details for the attribute
+        example: 'CONFIDENTIAL CREW BAG'
+  # PNR Pricing Record definition
+  QuotationRecord:
+    type: object
+    description: Structure to describe a given pricing
+    properties:
+      id:
+        type: string
+        description: Defines the identifier of Pricing Record.
+        example: 'ZAY091-2019-01-15-QT-1'
+      type:
+        type: string
+        description: Resource name
+        enum: [quotation-record]
+        example: quotation-record
+      subType:
+        type: string
+        description: Defines the type of pricing record - TST quotation record or TSM quotation record
+        enum:
+          - TST
+          - TSM_P
+        example: TSM_P
+      isManual:
+        type: boolean
+        description: Indicates whether the pricing record has been created/updated by an agent or auto-generated as a result of a fare quote automated pricing transaction
+        example: false
+      documentType:
+        type: string
+        description: Document type indicator indicates if the TST must be issued as a paper ticket or electronic ticket, or if the TSM-P must be issued as an associated EMD or standalone EMD.
+        enum:
+          - TICKET
+          - ETICKET
+          - PAPER_TICKET
+          - EMD_STANDALONE
+          - EMD_ASSOCIATED
+        example: ETICKET
+      issuanceType:
+        type: string
+        description: This indicator defines the Issued indicator of a pricing record
+        enum:
+          - FIRST_ISSUE
+          - REISSUE
+          - FIRST_ISSUE_IT_FARE
+          - FIRST_ISSUE_BT_FARE
+          - REISSUE_IT_FARE
+          - REISSUE_BT_FARE
+        example: FIRST_ISSUE
+      flags:
+        type: array
+        description: Flags attributed to the current quotation record
+        items:
+          type: string
+          enum:
+            - CONFIDENTIAL
+            - PNR_CHANGED
+            - TSM_ISSUED
+            - ISSUANCE_REQUIRED
+        example:
+          - CONFIDENTIAL
+          - PNR_CHANGED
+      creation:
+        description: Date & office of pricing record creation
+        $ref: '#/definitions/EventLog'
+        example:
+          date: '2018-09-03'
+          pointOfSale:
+            office:
+              id: "NCE6X0001"
+      lastModification:
+        description: Date & office of the last modification on the pricing record
+        $ref: '#/definitions/EventLog'
+        example:
+          date: '2018-09-03'
+          pointOfSale:
+            office:
+              id: "NCE6X0001"
+      lastTicketingDate:
+        type: string
+        format: date
+        description: Defines the last issuance date of the pricing record
+        example: '2018-08-10'
+      originCityIataCode:
+        type: string
+        description: Defines the origin city of the quotation itinerary
+      destinationCityIataCode:
+        type: string
+        description: Defines the destination city of the quotation itinerary
+      remark:
+        type: string
+        description: Remark free text entered by the agent in TSM quotation record
+        example: 'SPECIAL SERVICE PRICING'
+      pricingConditions:
+        $ref: '#/definitions/PricingConditions'
+      price:
+        $ref: '#/definitions/Price'
+      currencyConversionLookupRates:
+        type: array
+        description: Conveys currency conversion information from provider's currency to requested currency
+        items:
+          $ref: '#/definitions/CurrencyConversionLookupRates'
+      coupons:
+        type: array
+        description: Defines the price information related to the coupons stored in the current pricing record
+        items:
+          $ref: '#/definitions/Coupon'
+      paymentMethods:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: payment-method
+            id: ZAY091-2019-05-04-OT-47
+            ref: processedPnr.paymentMethods
+      fareElements:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: fare-element
+            id: ZAY091-2019-05-04-OT-45
+            ref: processedPnr.fareElements
+      travelers:
+        type: array
+        items:
+          $ref: '#/definitions/Relationship'
+        example:
+          - type: stakeholder
+            id: ZAY091-2019-10-05-PT-1
+            ref: processedPnr.travelers
+  PricingConditions:
+    type: object
+    properties:
+      flags:
+        type: array
+        description: Flags pertaining to the pricing transaction involved in the current quotation/document
+        items:
+          type: string
+          enum:
+            - FARE_BASIS_OVERRIDE
+            - MILEAGE_OVERRIDE
+            - BOOKING_CLASS_OVERRIDE
+            - ZAP_OFF
+        example:
+          - BOOKING_CLASS_OVERRIDE
+          - ZAP_OFF
+      fareCalculation:
+        $ref: '#/definitions/FareCalculation'
+      fareType:
+        type: string
+        description: >-
+          Nature of the fare obtained as a result of the pricing transaction.
+          While public fares are accessible from any Point Of Sales, private fares are restricted to some POS set up in a security table.
+          Negotiated fares are a special type of private fare that is backed up by a contractual distribution agreement
+          whereby the airline is expected to provide agents with incentives for the fare sold.
+        enum:
+          - PRIVATE
+          - NEGOTIATED
+      negoFareContract:
+        $ref: '#/definitions/NegoFareContract'
+      isInternationalSale:
+        type: boolean
+        description: International fare applied for the given itinerary
+      isDomesticSale:
+        type: boolean
+        description: Domestic fare applied for the given itinerary
+      paymentRestriction:
+        type: string
+        description: Indicates if the fare provides any restrictions related to payment methods that will be used at issuance
+        example: 'NO VISA PAYMENT ON INDIAN MARKET'
+      waiverReason:
+        type: string
+        description: Defines the reason for the fare to be waived
+        example: 'PASSENGER DISRUPTED'
+  NegoFareContract:
+    type: object
+    description: >-
+      Nature and reference of the commercial agreement by which the airline incentivizes the selling travel agency
+      for the quoted negotiated fare. This specific type of fare is used in conjunction with tours,
+      referring to Inclusive Tour fares and Bulk Tour fares.
+      The agent incentive on the IT/BT fare notably depends on the commission element entered in PNR.
+    properties:
+      incentiveScheme:
+        type: string
+        description: Nature of the agreement between the airline and the selling travel agency
+        example: 'NET_REMIT'
+        enum:
+          - NET_REMIT
+          - INCLUSIVE_TOUR
+          - BULK_TOUR
+          - INCLUSIVE_TOUR_WITH_NET_REMIT
+          - BULK_TOUR_WITH_NET_REMIT
+          - FLEXIBLE_COMMISSION
+      contractReference:
+        type: string
+        description: Exclusive with netRemitSchemeReference
+        example: 'SKYTOUR007'
+      netRemitReference:
+        type: string
+        description: Exclusive with commercialAgreementReference
+        example: 'SKYAIRLINE'
+      tourCode:
+        type: string
+        description: Tour code stored in TST NEGO
+        example: 'SKYWORLDTOUR'
+  FareCalculation:
+    type: object
+    properties:
+      pricingIndicator:
+        type: string
+        description: >-
+          The Fare Calculation Pricing Indicator provides a granular view of the pricing mode that has been used during the pricing.
+          Thanks to the FCPI, the travel agency, the airline or any user can know what pricing combinations have been used at pricing time.
+          0: Automatically priced
+          1: Manually created or updated TST.
+          2: No fare:  free or charter entered in the TST.
+          3: Pricing by fare basis.
+          4: Manual manipulation of taxes and/or fees at pricing or issuance time.
+          5: The system did not price according to the entered passenger type.
+          6: For US only: Exchange ticket request
+          7: Bulk fare ticket request
+          8: Fare price override at issuance time
+          9: Inclusive tour ticket request
+          A: SATA fare used.
+          B: Amount discount override applied to fare base at pricing time.
+          C: Amount or percent discount override applied to total fare combined with segment selection at pricing time.
+          D: Amount or percent discount override applied to base fare combined with segment selection at pricing time.
+          E: Percentage discount override at pricing time.
+          F: Private fares have been used at pricing time.
+          G: Dynamic discounted fare used at pricing time.
+          H: HIP may apply. The system has priced but is unable to check a higher intermediate point.
+          I: Override Fare Calculation by M/IT at pricing time.
+          J: Override fare diagnostic entry at pricing time.
+          K: Override Fare Calculation by M/BT at pricing time
+          L: Booking date override
+          M: Negotiated rates have been used at pricing time. Agent/consolidator is a fare updater.
+          N: Negotiated rates have been used at pricing time. Airline is a fare updater.
+          O: Past date TST override at issuance time.
+          P: Lowest possible fare override at pricing time.
+          Q: Depends on TSTIndicator. Either Manually stored endorsement before pricing or Manually added a tour code (FT element) on a private or public fare
+          R: Validating carrier override at issuance time.
+          S: Booking class override used on negotiated fares.
+          T: Amount discount override applied to Total fare at pricing time.
+          U: Stopover/transfer override is used in the pricing entry.
+          V: Pricing override used with a pricing past date.
+          W: Booking class override used on non-negotiated fares.
+          Z: Net fare field manually updated (not used in US market)
+        example: 0
+      text:
+        type: string
+        description: Content of the fare calculation
+        example: 'PAR 6X YTO289.85SKWI5LGT 6X PAR289.85SKWI5LGT NUC579.70END ROE0.862490'
+      isManual:
+        type: boolean
+        description: Indicates whether the fare calculation stored in the quotation record has been inserted/updated
+          by an agent or auto-generated as a result of a fare quote automated pricing transaction
+        example: false
+  Price:
+    type: object
+    properties:
+      total:
+        type: string
+        description: total amount
+      currency:
+        type: string
+        description: currency
+      detailedPrices:
+        type: array
+        items:
+          $ref: '#/definitions/ElementaryPrice'
+      taxes:
+        type: array
+        items:
+          $ref: '#/definitions/Tax'
+      fees:
+        type: array
+        items:
+          $ref: '#/definitions/Fee'
+  Coupon:
+    type: object
+    description: Structure providing details on a given TST/TSM-P quotation coupon
+    properties:
+      fareBasis:
+        $ref: '#/definitions/FareBasis'
+      reasonForIssuance:
+        $ref: '#/definitions/PriceCategory'
+      isNonRefundable:
+        type: boolean
+        description: Indicates the coupon's non-eligibility for the refund operation. Default value is false.
+      isNonExchangeable:
+        type: boolean
+        description: Indicates the coupon's non-eligibility for the exchange operation.
+          You can only exchange an EMD if none of the EMD coupons have this indicator set to true.
+          Default value is false.
+      isNonInterlineable:
+        type: boolean
+        description: Indicates that the coupon cannot be part of an interline itinerary. Default value is false.
+      isFromConnection:
+        type: boolean
+        description: Indicates whether the flight segment priced is departing from a connection with the previous flight
+        example: false
+      isFromStopOver:
+        type: boolean
+        description: Indicates whether the flight segment priced is departing from a stop over relative to the previous flight
+        example: false
+      validityDates:
+        type: object
+        properties:
+          notValidBeforeDate:
+            type: string
+            format: date
+            description: Not valid before date(GMT) in format ISO 8601 YYYY-MM-DD
+          notValidAfterDate:
+            type: string
+            format: date
+            description: Not valid after date(GMT) in ISO 8601format,YYYY-MM-DD
+      monetaryValue:
+        $ref: '#/definitions/ElementaryPrice'
+      servicePresentation:
+        type: object
+        properties:
+          toCarrierIataCode:
+            type: string
+            description: Carrier to which document must be presented. Equals marketing company code of associated SSR e.g. 6X
+          atAirportIataCode:
+            type: string
+            description: Location where the service document must be presented. Equals departure airport of associated flight e.g. 'LHR'
+      serviceRemark:
+        type: string
+        description: Service remark populated in EMD coupons (free text)
+      baggageAllowance:
+        type: object
+        description: Define the rule about baggage allowance for this coupon
+        properties:
+          weight:
+            $ref: '#/definitions/Weight'
+          quantity:
+            type: integer
+            description: Total number of units
+            example: 1
+      associatedDocuments:
+        type: array
+        items:
+          properties:
+            documentType:
+              type: string
+              description: it defines if it's an electronic or a paper coupon
+              enum: [ETICKET, PAPER_TICKET]
+              example: ELECTRONIC
+            documentNumber:
+              type: string
+              description: defines the number of the document
+              example: '1724546546479'
+            couponNumbers:
+              type: array
+              items:
+                type: integer
+              example:
+                - 1
+      product:
+        $ref: '#/definitions/Relationship'
+        example:
+          type: product
+          id: ZAY091-2019-05-04-ST-1
+          ref: processedPnr.products
+  PriceCategory:
+    type: object
+    description: >-
+      AN EMD IS CATEGORISED BASED ON ITS REASON FOR ISSUANCE CODE (RFIC), WHICH
+      DEFINES THE GROUP OF SERVICES IT BELONGS TO. THERE CAN ONLY BE ONE RFIC
+      CODE PER EMD. SOME CODES ARE DEFINED BY IATA, HOWEVER, OTHERS CAN BE
+      DEFINED BY INDIVIDUAL AIRLINES.  AN EMD, AND EACH RFIC, CAN HAVE MULTIPLE
+      REASON FOR ISSUANCE SUB-CODES (RFISC). THERE IS ONE RFISC IN EACH EMD
+      COUPON AND THEY ARE AIRLINE-SPECIFIC.
+    properties:
+      code:
+        type: string
+        description: >-
+          The reason for issuance code (RFIC) chargeability indicator defined
+          for the sellable object
+        example: C
+      subCode:
+        type: string
+        description: >-
+          The reason for issuance sub code (RFISC) chargeability indicator
+          defined for the sellable object
+        example: 0BT
+      description:
+        type: string
+        description: description of reason for issuance sub code
+        example: PET IN CABIN - CAT
+  FareBasis:
+    type: object
+    description: Composed of codes used by airlines to identify the type of a fare proposed to the booker
+      and to allow airline staff and travel agents to find the rules applicable to that fare.
+    properties:
+      fareBasisCode:
+        type: string
+        description: Defines the code of the fare delivered to the booker - up to 6 alphanumerical chars
+        example: 'TTI'
+      primaryCode:
+        type: string
+        description: Defines the category of the fare delivered to the booker - up to 3 letters
+        example: 'BYM3M'
+      ticketDesignatorCode:
+        type: string
+        description: Indicates a type of discount that has been applied to this fare - up to 6 alphanumerical chars
+        example: 'CD10'
+  ElementaryPrice:
+    type: object
+    description: Structure representing any kind of monetary value
+    properties:
+      amount:
+        type: string
+        description: Defines the monetary value with decimal position. It can be in cash or miles.
+        example: '5000.50'
+      currency:
+        type: string
+        description: Defines a specific monetary unit using ISO4217 currency code
+        example: 'CND'
+      issueCurrencyType:
+        type: string
+        description: >-
+          Used for ATC use cases to specify if the currency code is a ICOS (Issue currency of Selling) or RCOS (Reissue currency of selling)
+        example: 'ICOS'
+      elementaryPriceType:
+        type: string
+        description: >-
+          Defines the type of price, eg. for base fare, total, grand total
+        example: 'BASE_FARE'
+  Fee:
+    type: object
+    description: Structure to describe a ticketing Fee
+    properties:
+      code:
+        type: string
+        description: Indicates the type of fee.
+        example: 'OB'
+      subCode:
+        type: string
+        description: >-
+          Identify uniquely the OB fee associated to the TST - 1.Automated ticketing subcode (Txx) 2. Non-automated ticketing subcodes (Rxx)
+        example: TX003
+      amount:
+        type: string
+        description: >-
+          Defines the monetary value with decimal position. It can be in cash or miles.
+        example: '5000.50'
+      currency:
+        type: string
+        description: >-
+          Defines a specific monetary unit using ISO4217 currency code
+        example: 'CND'
+      exempted:
+        type: boolean
+        description: Indicates if fee is exempted or not
+        example: false
+      requested:
+        type: boolean
+        description: Indicates if fee is Requested or not
+        example: true
+      taxIncluded:
+        type: boolean
+        description: Indicates if fee the tax is included or not
+        example: true
+      description:
+        type: string
+        description: Indicates the commercial name. Describes the fee
+      taxes:
+        type: array
+        items:
+          $ref: '#/definitions/Tax'
+  Tax:
+    type: object
+    description: Structure to describe a Tax
+    properties:
+      amount:
+        type: string
+        description: Defines the monetary value with decimal position. It can be in cash or miles.
+        example: '5000.50'
+      currency:
+        type: string
+        description: Defines a specific monetary unit using ISO4217 currency code
+        example: 'CND'
+      code:
+        type: string
+        description: International Standards Organization (ISO) tax code which is a two-letter country code
+        example: IZ
+      nature:
+        type: string
+        description: Nature of the tax in Fare Quote filing
+        example: EB
+      category:
+        type: string
+        description: >-
+          Used to specify if the tax is New, Old or Refundable.
+        enum: [ NEW, OLD, REFUNDABLE]
+        example: NEW
+      percentage:
+        type: string
+        description: >-
+          In the case of a tax on TST value, the percentage of the tax will be indicated in this field.
+        example: '5.00'
+      included:
+        type: boolean
+        description: Indicates if tax is included or not
+        example: true
+      exempted:
+        type: boolean
+        description: Indicates if tax is exempted or not
+        example: false
+      description:
+        type: string
+        description: text describing the tax
+        example: 'Government tax'
+      taxType:
+        type: string
+        description: Defines the type of Taxes, PFC taxes, Airport Taxes, EquivalentTaxes for TCH.
+        example: Airport Taxes
+  FlightTransfer:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Unique Disruption Transfer (COP) or Enhanced Reaccommodation (TRR) id
+        example: '10121277'
+      type:
+        type: string
+        example: hard-coded as 'flight-disruption-transfer'
+      subType:
+        type: string
+        enum:
+          - CUSTOMER_OPERATIONAL_PROTECTION
+          - TRAVEL_READY_REACCOMODATION
+        example: CUSTOMER_OPERATIONAL_PROTECTION
+      associatedOrder:
+        $ref: '#/definitions/AssociatedPnr'
+      travelers:
+        type: array
+        description: Definition of PNR travelers impacted by Disruption Transfer.
+        items:
+          $ref: '#/definitions/Stakeholder'
+      fromSegments:
+        type: array
+        description: All the segments from which the passengers have been disrupted/reaccommodated.
+        items:
+          $ref: '#/definitions/FlightSegment'
+      toSegments:
+        type: array
+        description: All the segments to which the passengers have been disrupted/reaccommodated.
+        items:
+          $ref: '#/definitions/FlightSegment'
+  # PNR Correlations
+  CorrelationPnrTicket:
+    type: object
+    description: Structure of correlation between a Passenger Name Record and tickets.
+    properties:
+      pnrId:
+        type: string
+        description: Current record locator + its creation date.
+        example: ZAY091-2019-10-05
+      ticketIds:
+        type: array
+        description: Contains identifiers of the tickets correlated with the current Passenger Name Record. Format is ticket number + its issuance date.
+        example: ["1721234567890-2019-10-05", "1721234509876-2019-10-05"]
+        items:
+          type: string
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataPnrTicket'
+    example:
+      pnrId: 'ZAY091-2019-10-05'
+      ticketIds:
+        - '1721234567890-2019-10-05'
+        - '1721234509876-2019-10-05'
+      correlatedData:
+        - '1721234567890-2019-10-05':
+            - ticketCouponId: '1721234567890-2019-10-05-1'
+              pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+              pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-10'
+            - ticketCouponId: '1721234567890-2019-10-05-2'
+              pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+              pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-10'
+        - '1721234509876-2019-10-05':
+            - ticketCouponId: '1721234509876-2019-10-05-1'
+              pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+              pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-12'
+            - ticketCouponId: '1721234509876-2019-10-05-2'
+              pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+              pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-12'
+  CorrelationPnrEmd:
+    type: object
+    description: Structure of correlation between a Passenger Name Record and Electronic Miscellaneous Documents.
+    properties:
+      pnrId:
+        type: string
+        description: Current record locator + its creation date.
+        example: ZAY091-2019-10-05
+      emdIds:
+        type: array
+        description: Contains identifiers of the EMDs correlated with the current Passenger Name Record - Format is EMD number + its issuance date.
+        example: ["1729999999999-2019-10-05", "1725555555555-2019-10-05"]
+        items:
+          type: string
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataPnrEmd'
+    example:
+      pnrId: 'ZAY091-2019-10-05'
+      emdIds:
+        - '1729999999999-2019-10-05'
+        - '1725555555555-2019-10-05'
+      correlatedData:
+        - '1729999999999-2019-10-05':
+            - emdCouponId: '1729999999999-2019-10-05-1'
+              pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+              pnrServiceId: 'ZAY091-2019-10-05-OT-5'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+              pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-19'
+        - '1725555555555-2019-10-05':
+            - emdCouponId: '1725555555555-2019-10-05-1'
+              pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+              pnrServiceId: 'ZAY091-2019-10-05-OT-6'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+              pnrTicketingReferenceId: 'ZAY091-2019-10-05-OT-20'
+  CorrelationPnrDcsPassenger:
+    type: object
+    description: Structure of correlation between a Passenger Name Record and DCS Passengers.
+    properties:
+      pnrId:
+        type: string
+        description: Current record locator + its creation date.
+        example: 'ZAY091-2019-10-05'
+      dcsPassengerIds:
+        type: array
+        description: Contains identifiers of the DCS Passengers [UCI] correlated with the current Passenger Name Record.
+        example: ["2501ADE0000001", "2501ADE0000005"]
+        items:
+          type: string
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataPnrDcsPassenger'
+    example:
+      pnrId: 'ZAY091-2019-10-05'
+      dcsPassengerIds:
+        - '2501ADE0000001'
+        - '2501ADE0000005'
+      correlatedData:
+        - '2501ADE0000001':
+            - pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+              dcsPassengerSegmentDeliveryId: '2401CA1011111OID'
+            - pnrTravelerId: 'ZAY091-2019-10-05-PT-1'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+              dcsPassengerSegmentDeliveryId: '2401CA1033333OID'
+        - '2501ADE0000005':
+            - pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+              dcsPassengerSegmentDeliveryId: '2401CA1055555OID'
+            - pnrTravelerId: 'ZAY091-2019-10-05-PT-2'
+              pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+              dcsPassengerSegmentDeliveryId: '2401CA1099999OID'
+  CorrelationPnrSchedule:
+    type: object
+    description: Structure of correlation between a Passenger Name Record and Schedule Flights.
+    properties:
+      pnrId:
+        type: string
+        description: Current record locator + its creation date.
+        example: ZAY091-2019-10-05
+      scheduleIds:
+        type: array
+        description: Contains identifiers of the Schedule Dated Flights correlated with the current Passenger Name Record. Format is carrier code + flight number + flight
+          date + operational suffix.
+        example: ["6X-123-2019-10-15", "6X-789-2019-10-25" ]
+        items:
+          type: string
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataPnrSchedule'
+    example:
+      pnrId: 'ZAY091-2019-10-05'
+      scheduleIds:
+        - '6X-123-2019-10-25'
+        - 'SK-789-2019-10-25'
+      correlatedData:
+        - '6X-123-2019-10-25':
+            - pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+              scheduleSegmentId: '2019-10-19-NCE-CDG'
+        - '6X-789-2019-10-25':
+            - pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+              scheduleSegmentId: '2019-10-25-CDG-NCE'
+              schedulePartnershipId: '6X-567-2019-10-25'
+  CorrelationPnrInventory:
+    type: object
+    description: Structure of correlation between a Passenger Name Record and Inventory Flights.
+    properties:
+      pnrId:
+        type: string
+        description: Current record locator + its creation date.
+        example: ZAY091-2019-10-05
+      inventoryIds:
+        type: array
+        description: Contains identifiers of the Inventory Dated Flights correlated with the current Passenger Name Record. Format is carrier code + flight number + flight
+          date + operational suffix.
+        example: ["6X-123-2019-10-15", "6X-789-2019-10-25"]
+        items:
+          type: string
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataPnrInventory'
+    example:
+      pnrId: 'ZAY091-2019-10-05'
+      inventoryIds:
+        - '6X-123-2019-10-15'
+        - '6X-789-2019-10-25'
+      correlatedData:
+        - '6X-123-2019-10-15':
+            - pnrAirSegmentId: 'ZAY091-2019-10-05-ST-1'
+              inventorySegmentId: '2019-10-15-NCE-CDG'
+        - '6X-789-2019-10-25':
+            - pnrAirSegmentId: 'ZAY091-2019-10-05-ST-2'
+              inventorySegmentId: '2019-10-25-CDG-NCE'
+              inventoryPartnershipId: '6X-567-2019-10-25'
+  CorrelationPnrBagsGroup:
+    type: object
+    description: Structure of correlation between a Passenger Name Record and DCS Baggage.
+    properties:
+      pnrId:
+        type: string
+        description: Current record locator + its creation date.
+        example: "AA42BA1395020102" 
+      bagsGroupIds:
+        type: array
+        description: Identifiers of the DCS Baggage Groups correlated with the current Passenger Name Record. List of Baggage Group Identifiers.
+        example: [ "AA42BA1395020102" ]
+        items:
+          type: string
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataPnrBagsGroup'
+    example:
+      pnrId: 'ZAY091-2018-10-19'
+      bagsGroupIds:
+        - 'AA42BA1395020102'
+      correlatedData:
+        'AA42BA1395020102':
+          - pnrTravelerId: 'ZAY091-2018-10-19-PT-1'
+            bagId: '1101CA1100003431'
+            bagLegCorrelations:
+              - pnrAirSegmentId: 'ZAY091-2018-10-19-ST-1'
+                bagLegDeliveryId: '1101CA1100003431-ORY'
+          - pnrTravelerId: 'ZAY091-2018-10-19-PT-2'
+            bagId: '5550CA1100003555'
+            bagLegCorrelations:
+              - pnrAirSegmentId: 'ZAY091-2018-10-19-ST-1'
+                bagLegDeliveryId: '5550CA1100003555-ORY'
+  CorrelationPnrMembership:
+    type: object
+    description: Structure of correlation between a Passenger Name Record and Loyalty Membership.
+    properties:
+      pnrId:
+        type: string
+        description: Current record locator + its creation date.
+        example: ZAY091-2018-10-19
+      membershipIds:
+        type: array
+        description: Identifiers of the Loyalty Memberships correlated with the current Passenger Name Record. Format is carrier code (owner of the program) + frequent flyer id (within the loyalty program)
+        example: [ "6X-1234567890", "6X-1234567891" ]
+        items:
+          type: string
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataPnrMemberships'
+    example:
+      pnrId: 'ZAY091-2018-10-19'
+      membershipIds:
+        - '6X-1234567890'
+        - '6X-1234567891'
+      correlatedData:
+        '6X-1234567890':
+          - pnrProductId: 'ZAY091-2018-10-19-OT-7'
+          - pnrLoyaltyRequestId: 'ZAY091-2018-10-19-OT-9'
+        '6X-1234567891':
+          - pnrLoyaltyRequestId: 'ZAY091-2018-10-19-OT-15'
+  CorrelatedDataPnrTicket:
+    type: object
+    description: Set of data field identifiers defining the correlation between a PNR and a ticket.
+    properties:
+      ticketCouponId:
+        type: string
+        example: '1721234567890-2019-10-05-1'
+      pnrTravelerId:
+        type: string
+        example: 'ZAY091-2019-10-05-PT-1'
+      pnrAirSegmentId:
+        type: string
+        example: 'ZAY091-2019-10-05-ST-1'
+      pnrTicketingReferenceId:
+        type: string
+        example: 'ZAY091-2019-10-05-OT-10'
+  CorrelatedDataPnrEmd:
+    type: object
+    description: Set of data field identifiers defining the correlation between a PNR and an Electronic Miscellaneous Document.
+    properties:
+      emdCouponId:
+        type: string
+        example: '1729999999999-2019-10-05-1'
+      pnrTravelerId:
+        type: string
+        example: 'ZAY091-2019-10-05-PT-1'
+      pnrServiceId:
+        type: string
+        example: 'ZAY091-2019-10-05-OT-5'
+      pnrAirSegmentId:
+        type: string
+        example: 'ZAY091-2019-10-05-ST-1'
+      pnrTicketingReferenceId:
+        type: string
+        example: 'ZAY091-2019-10-05-OT-19'
+  CorrelatedDataPnrDcsPassenger:
+    type: object
+    description: Set of data field identifiers defining the correlation between a PNR and a DCS Passenger record [CPR].
+    properties:
+      pnrTravelerId:
+        type: string
+        example: 'ZAY091-2019-10-05-PT-1'
+      pnrAirSegmentId:
+        type: string
+        example: 'ZAY091-2019-10-05-ST-1'
+      dcsPassengerSegmentDeliveryId:
+        type: string
+        example: '2401CA1011111OID'
+  CorrelatedDataPnrSchedule:
+    type: object
+    description: Set of data field identifiers defining the correlation between a PNR and a Schedule Flight record.
+    properties:
+      pnrAirSegmentId:
+        type: string
+        example: 'ZAY091-2019-10-05-ST-1'
+      scheduleSegmentId:
+        type: string
+        example: '2019-10-15-NCE-CDG'
+      schedulePartnershipId:
+        type: string
+        example: '6X-567-2019-10-25'
+  CorrelatedDataPnrInventory:
+    type: object
+    description: Set of data field identifiers defining the correlation between a PNR and an Inventory Flight record.
+    properties:
+      pnrAirSegmentId:
+        type: string
+        example: 'ZAY091-2019-10-05-ST-1'
+      inventorySegmentId:
+        type: string
+        example: '2019-10-15-NCE-CDG'
+      inventoryPartnershipId:
+        type: string
+        example: '6X-567-2019-10-25'
+  CorrelatedDataPnrBagsGroup:
+    type: object
+    description: Set of data field identifiers defining the correlation between a PNR and a DCS Baggage.
+    properties:
+      pnrTravelerId:
+        type: string
+        example: 'ZAY091-2018-10-19-PT-1'
+      bagId:
+        type: string
+        example: '1101CA1100003431'
+      bagLegCorrelations:
+        type: array
+        items:
+          $ref: '#/definitions/CorrelatedDataPnrBagLeg'
+  CorrelatedDataPnrBagLeg:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a PNR flight segment and a DCS Baggage leg delivery.
+    properties:
+      pnrAirSegmentId:
+        type: string
+        example: 'ZAY091-2018-10-19-ST-1'
+      bagLegDeliveryId:
+        type: string
+        example: '1101CA1100003431-ORY'
+  CorrelatedDataPnrMemberships:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a PNR product/service and a Loyalty Membership.
+    properties:
+      pnrProductId:
+        type: string
+        example: 'ZAY091-2018-10-19-OT-7'
+      pnrLoyaltyRequestId:
+        type: string
+        example: ZAY091-2018-10-19-OT-9
+  Events:
+    type: object
+    description: Structure of Dynamic Intelligence Hub functional events
+    properties:
+      recordDomain:
+        type: string
+        description: >-
+          Functional domain of the record i.e. either functional PNR or PNR correlation.
+          Possible values - PNR, PNR_TICKET, PNR_EMD, PNR_DCSPASSENGER, PNR_SCHEDULE, PNR_INVENTORY, PNR_MEMBERSHIP.
+        example: 'PNR'
+      recordId:
+        type: string
+        description: Record identifier e.g. record locator
+        example: 'ZAY091-2019-10-05'
+      originFeedTimeStamp:
+        type: string
+        description: Incoming PSS feed time stamp - not populated in correlation feeds
+        format: date-time
+        example: '2019-10-25T10:00:00Z'
+      events:
+        type: array
+        description: List of events that have been detected on the record
+        items:
+          type: object
+          properties:
+            origin:
+              type: string
+              description: Type of event e.g. 'COMPARISON' / 'TIME_INITIATED_EVENT'
+              example: 'COMPARISON'
+            eventType:
+              type: string
+              description: >-
+                In case of comparison events, type of operation notified by the event
+              enum:
+                - CREATED
+                - UPDATED
+                - DELETED
+              example: UPDATED
+            currentPath:
+              type: string
+              description: >-
+                String containing the JSON Pointer (see IETF RFC6901) that points to the data referenced by the event in the latest version of the entity.
+                It is only applicable for CREATED and UPDATED events.
+              example: '/products/0/airSegment/bookingStatusCode'
+            previousPath:
+              type: string
+              description: >-
+                String containing the JSON Pointer (see IETF RFC6901) that points to the data referenced by the event in the previous version of the entity.
+                It is only applicable for DELETED and UPDATED events.
+              example: '/products/0/airSegment/bookingStatusCode'
+    example:
+      recordDomain: 'PNR'
+      recordId: 'ZAY091-2019-10-05'
+      originFeedTimeStamp: '2019-10-25T10:00:00Z'
+      events:
+        - origin: 'COMPARISON'
+          eventType: UPDATED
+          currentPath: '/products/0/airSegment/bookingStatusCode'
+          previousPath: '/products/0/airSegment/bookingStatusCode'
+  IssueSource:
+    description: an object containing references to the source of the error
+    type: object
+    properties:
+      pointer:
+        description: >-
+          A JSON Pointer [RFC6901] to the associated entity in the request
+          document
+        type: string
+      parameter:
+        description: A string indicating which URI query parameter caused the issue
+        type: string

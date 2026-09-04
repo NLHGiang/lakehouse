@@ -1,0 +1,1637 @@
+swagger: '2.0'
+################################################################################
+#                              API Information                                 #
+################################################################################
+info:
+  title: Dynamic Intelligence Hub Data Model - Schedule Flight Date
+  description: >-
+    This document describes DIH output for Schedule flight date Data Push Feed    
+  version: 2.1.1
+
+################################################################################
+#                                    Paths                                     #
+################################################################################
+paths:
+  ########## DIH flight date feeds definition ##########
+  /schedule/processed-flights-feed:
+    post:
+      tags:
+        - FEED
+      summary: Schedule Flight Date DataPush Feed
+      description: SKD Flight Date feed pushed by Amadeus DIH. Please note this is NOT a POST API - this section is only used to specify the data model pushed.
+      responses:
+        default:
+          description: SKD Flight Date Data Push Feed
+          schema:
+            $ref: '#/definitions/ScheduleFlightDataPush'
+  /schedule/processed-flights-correlation-feed:
+    post:
+      tags:
+        - FEED
+      summary: Schedule Flight Date Correlation DataPush Feed
+      description: SKD Flight Date correlations feed pushed by Amadeus DIH. Please note this is NOT a POST API - this section is only used to specify the data model pushed.
+      responses:
+        default:
+          description: SKD Flight Date Correlations Data Push Feed
+          schema:
+            $ref: '#/definitions/ScheduleFlightCorrelationDataPush'
+            
+################################################################################
+#                                 Definitions                                  #
+################################################################################
+definitions:
+  Included:
+    type: object
+    properties:
+      correlationSchedulePnr:
+        type: object
+        description: Map of CorrelationSchedulePnr with Schedule Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationSchedulePnr'
+      correlationScheduleTicket:
+        type: object
+        description: Map of CorrelationScheduleTicket with Schedule Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationScheduleTicket'
+      correlationScheduleDcsPassenger:
+        type: object
+        description: Map of CorrelationScheduleDcsPassenger with Schedule Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationScheduleDcsPassenger'
+      correlationScheduleInventory:
+        type: object
+        description: Map of CorrelationScheduleInventory with Schedule Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationScheduleInventory'
+      correlationScheduleDcsfm:
+        type: object
+        description: Map of CorrelationScheduleDcsfm with Schedule Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationScheduleDcsfm'
+  ScheduleFlightData:
+    title: dated Flight
+    type: object
+    allOf:
+      - $ref: '#/definitions/DatedFlight'
+      - $ref: '#/definitions/CorrelationReferences'
+  ScheduleCorrelationsFeedData:
+    type: object
+    properties:
+      correlationSchedulePnr:
+        $ref: '#/definitions/CorrelationSchedulePnr'
+      correlationScheduleTicket:
+        $ref: '#/definitions/CorrelationScheduleTicket'
+      correlationScheduleDcsPassenger:
+        $ref: '#/definitions/CorrelationScheduleDcsPassenger'
+      correlationScheduleInventory:
+        $ref: '#/definitions/CorrelationScheduleInventory'
+      correlationScheduleDcsfm:
+        $ref: '#/definitions/CorrelationScheduleDcsfm'
+      dictionaries:
+        $ref: '#/definitions/Dictionaries'
+  Dictionaries:
+    type: object
+    properties:
+      schedules:
+        type: object
+        description: Set of key/value pairs with scheduleId as key
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      pnrs:
+        type: object
+        description: Set of key/value pairs with pnrId as key
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      tickets:
+        type: object
+        description: Set of key/value pairs with ticketId as key
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      dcsPassengers:
+        type: object
+        description: Set of key/value pairs with dcsPassengerId as key
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      inventories:
+        type: object
+        description: Set of key/value pairs with inventoryId as key
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      dcsfmFlightLegs:
+        type: object
+        description: Set of key/value pairs with dcsfmId as key
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+    example:
+      schedules:
+        - 6X-123-2018-12-12:
+            type: dated-flight
+            id: 6X-123-2018-12-12
+            version: '1545129287123456'
+      pnrs:
+        - ORY4NY-2018-10-19:
+            type: pnr
+            id: ORY4NY-2018-10-19
+            version: '1'
+        - KBR849-2018-09-17:
+            type: pnr
+            id: KBR849-2018-09-17
+            version: '1'
+      tickets:
+        - 1728767935960-2018-08-21:
+            type: air-travel-document
+            id: 1728767935960-2018-08-21
+            version: '1'
+        - 1728767935961-2018-08-21:
+            type: air-travel-document
+            id: 1728767935961-2018-08-21
+            version: '1'
+      dcsPassengers:
+        - 2501ADE0000001:
+            type: dcs-passenger
+            id: 2501ADE0000001
+            version: '1485129287'
+      inventories:
+        - 6X-123-2018-12-12:
+            type: dated-flight
+            id: 6X-123-2018-12-12
+            version: '1536835243'
+      dcsfmFlightLegs:
+        - 6X-123-2018-12-12-LHR:
+            type: dcs-flight-management
+            id: 6X-123-2018-12-12-LHR
+            version: '1'
+  Meta:
+    type: object
+    description: Technical information related to the feed.
+    properties:
+      triggerEventLog:
+        $ref: '#/definitions/EventLog'
+      version:
+        description: Version of the JSON feed produced.
+        type: string
+        example: 2.1.1
+    example:
+      triggerEventLog:
+        id: 429074ef1bd011e3-e63dfe23f4a0adc
+        triggerEventName: DATA_INIT
+      version: 2.1.1
+  EventLog:
+    type: object
+    description: Information related to the initial event that trigger the process.
+    properties:
+      id:
+        description: Unique identifier of a JSON message.
+        type: string
+        example: 429074ef1bd011e3-e63dfe23f4a0adc
+      triggerEventName:
+        description: >-
+          Trigger of the message - set to 'DATA_INIT' for initialization
+          messages.
+        type: string
+        example: DATA_INIT
+  DatedFlight:
+    type: object
+    properties:
+      type:
+        type: string
+        description: Refers to dated flight.
+        example: dated-flight
+      id:
+        type: string
+        description: ID of the flight.
+        example: 6X-123-2018-12-12
+      version:
+        type: string
+        description: >-
+          Version of the flight message. Timestamp of the message is used as
+          version.
+        example: 1536835243123456
+      flightDesignator:
+        $ref: '#/definitions/FlightDesignator'
+      scheduledDepartureDate:
+        type: string
+        format: date
+        description: >-
+          The departure date of the flight date (in Local Time) in ISO format
+          yyyy-mm-dd.
+        example: '2018-09-17'
+      dayOfOperation:
+        type: string
+        description: Day of operation (in LT) of the date.
+        example: MON
+        enum:
+          - MON
+          - TUE
+          - WED
+          - THU
+          - FRI
+          - SAT
+          - SUN
+      isCancelled:
+        type: boolean
+        description: 'Depicts if a flight is cancelled(true) or active(false).'
+        example: 'false'
+      characteristics:
+        type: array
+        example: 'INTERNATIONAL'
+        items:
+          type: string
+          description: It indicates whether the flightdate is international or domestic.
+          example: INTERNATIONAL
+          enum:
+            - PSEUDO
+            - HIDDEN
+            - INTERNATIONAL
+            - DOMESTIC
+            - ADHOC
+      codeshare:
+        type: string
+        description: Type of codeshare defined on the flight.
+        example: OPERATING
+        enum:
+          - PRIME
+          - MARKETING
+          - OPERATING
+      flightPoints:
+        type: array
+        items:
+          type: object
+          description: >-
+            'Airport in the flight routing (a two-leg flight NCE-CDG-NTE has 3 flight points: NCE, CDG and NTE).'
+          properties:
+            id:
+              type: string
+              description: Identifier of the flight point.
+              example: LHR_1
+            iataCode:
+              type: string
+              description: IATA code of the airport.
+              example: LHR
+            city:
+              type: string
+              description: city code of the flight point.
+              example: LON
+            country:
+              type: string
+              description: Country code of the flight point.
+              example: GB
+            region:
+              type: string
+              description: Region code of the flight point.
+              example: EUROP
+            continent:
+              type: string
+              description: Continent code of the flight point.
+              example: ITC2
+            departure:
+              $ref: '#/definitions/Departure'
+            arrival:
+              $ref: '#/definitions/Arrival'
+      segments:
+        type: array
+        items:
+          type: object
+          description: Segment level information for the flight.
+          properties:
+            id:
+              type: string
+              description: >-
+                ID of the segment, which comprises of  segment departure date +
+                boardPoint + offPoint.
+              example: 2018-09-17-LHR-CDG
+            boardFlightPointId:
+              type: string
+              description: >-
+                ID of the FlightPoint that represents the departure point of the
+                segment.
+              example: LHR_1
+            offFlightPointId:
+              type: string
+              description: >-
+                ID of the FlightPoint that represents the arrival point of the
+                segment.
+              example: CDG_2
+            boardPointIataCode:
+              type: string
+              description: IATA code of the board point of the segment.
+              example: LHR
+            offPointIataCode:
+              type: string
+              description: IATA code of the off point of the segment.
+              example: CDG
+            scheduledDepartureDateTime:
+              type: string
+              format: datetime
+              description: >-
+                'Scheduled departure date and time of the segment(in LT), ISO
+                format yyyy-mm-ddThh:mm:ss'.
+              example: '2018-09-17T12:40:00'
+            scheduledArrivalDateTime:
+              type: string
+              format: datetime
+              description: >-
+                'Scheduled arrival date and time of the segment(in LT), ISO
+                format yyyy-mm-ddThh:mm:ss'.
+              example: '2018-09-17T14:45:00'
+            numberOfLegs:
+              type: integer
+              description: Number of legs contained in this segment.
+              example: '1'
+            legIds:
+              type: array
+              description: List of the ids of the legs which are contained in this segment.
+              example: LHR-CDG
+              items:
+                type: string
+            trafficRestrictions:
+              type: array
+              description: List of traffic restriction codes set on this segment.
+              example: '[D,A]'
+              items:
+                type: string
+            partnerships:
+              type: object
+              description: >-
+                Provides the information of the partnership flight of the main flight.
+                If the main flight is operating, then marketing flight(s) information is
+                populated. Else if the main flight is marketing, then the operating
+                flight information is populated.
+              properties:
+                operatingFlight:
+                  type: object
+                  description: >-
+                    This property is populated only when the
+                    main flight is a marketing flight.
+                  properties:
+                    id:
+                      type: string
+                      description: >-
+                        Operating flight ID.
+                      example: 7X-346-2018-09-17
+                    flightDesignator:
+                      $ref: '#/definitions/FlightDesignator'
+                marketingFlights:
+                  type: array
+                  items:
+                    type: object
+                    description: >-
+                      This property is populated only when the
+                      main flight is an operating flight.
+                    properties:
+                      id:
+                        type: string
+                        description: >-
+                          Marketing flight ID.
+                        example: 8X-9623-2018-09-17
+                      flightDesignator:
+                        $ref: '#/definitions/FlightDesignator'
+      legs:
+        type: array
+        items:
+          type: object
+          description: >-
+            Provides leg level information of the flight.
+          properties:
+            id:
+              type: string
+              description: Identifier of the leg, which comprises of boardPoint + offPoint.
+              example: LHR-CDG
+            boardFlightPointId:
+              type: string
+              description: >-
+                ID of the FlightPoint that represents the departure point of the
+                leg.
+              example: LHR_1
+            offFlightPointId:
+              type: string
+              description: >-
+                ID of the FlightPoint that represents the arrival point of the
+                leg.
+              example: CDG_2
+            boardPointIataCode:
+              type: string
+              description: IATA code of the board point of the leg.
+              example: LHR
+            offPointIataCode:
+              type: string
+              description: IATA code of the off point of the leg.
+              example: CDG
+            scheduledDepartureDateTime:
+              type: string
+              format: datetime
+              description: >-
+                'Scheduled departure date and time of the segment(in LT), ISO
+                format yyyy-mm-ddThh:mm:ss'.
+              example: '2018-09-17T12:40:00'
+            scheduledArrivalDateTime:
+              type: string
+              format: datetime
+              description: >-
+                'Scheduled arrival date and time of the segment(in LT), ISO
+                format yyyy-mm-ddThh:mm:ss'.
+              example: '2018-09-17T14:45:00'
+            routingOrder:
+              type: integer
+              description: Absolute position of the leg in the whole flight.
+              example: '1'
+            serviceType:
+              type: string
+              description: Service type defined for this leg
+              example: 'X'
+              enum:
+                - UNKNOWN_SERVICE_TYPE
+                - J
+                - S
+                - U
+                - F
+                - V
+                - M
+                - Q
+                - G
+                - B
+                - A
+                - R
+                - C
+                - O
+                - H
+                - L
+                - P
+                - T
+                - K
+                - D
+                - E
+                - W
+                - X
+                - I
+                - N
+                - Y
+                - Z
+            aircraftEquipment:
+              type: object
+              description: Information on the aircraft equipment.
+              properties:
+                aircraftType:
+                  type: string
+                  description: Type of the aircraft equipment(Airbus 320).
+                  example: '320'
+                franchiseeFlight:
+                  type: object
+                  description: Franchisee flight details
+                  properties:
+                    airlineCode:
+                      type: string
+                      description: Airline code of the franchisee flight.
+                      example: 8X
+                    disclosure:
+                      type: string
+                      description: Disclosure provided for the franchisee flight.
+                      example: EXPRESS AIRWAYS
+                scheduledFittedConfiguration:
+                  $ref: '#/definitions/AircraftConfiguration'
+                totalScheduledFittedCapacity:
+                  type: integer
+                  description: The total capacity of scheduledFittedConfiguration.
+                  example: '292'
+                operationalSaleableConfiguration:
+                  $ref: '#/definitions/AircraftConfiguration'
+                scheduledSaleableConfiguration:
+                  $ref: '#/definitions/AircraftConfiguration'
+                operationalFittedConfiguration:
+                  $ref: '#/definitions/AircraftConfiguration'
+            legDCSStatuses:
+              $ref: '#/definitions/LegDCSStatuses'
+  CorrelationReferences:
+    type: object
+    properties:
+      correlations:
+        type: object
+        description: >-
+          Correlation structures are defined in the included section. This
+          section provides links for all the correlation structures pertaining
+          to the current schedule flight record.
+        properties:
+          schedulePnr:
+            $ref: '#/definitions/Relationship'
+          scheduleTicket:
+            $ref: '#/definitions/Relationship'
+          scheduleDcsPassenger:
+            $ref: '#/definitions/Relationship'
+          scheduleInventory:
+            $ref: '#/definitions/Relationship'
+          scheduleDcsfm:
+            $ref: '#/definitions/Relationship'
+        example:
+          schedulePnr:
+            ref: included/correlationSchedulePnr/6X-834-2018-09-17
+          scheduleTicket:
+            ref: included/correlationScheduleTicket/6X-834-2018-09-17
+          scheduleDcsPassenger:
+            ref: included/correlationScheduleDcsPassenger/6X-834-2018-09-17
+          scheduleInventory:
+            ref: included/correlationScheduleInventory/6X-834-2018-09-17
+          scheduleDcsfm:
+            ref: included/correlationScheduleDcsfm/6X-834-2018-09-17
+  FlightDesignator:
+    type: object
+    description: >-
+      Provides information of flight number, carrier code and operational suffix.
+    properties:
+      carrierCode:
+        type: string
+        description: Two letter IATA standard carrier code
+        example: 6X
+      flightNumber:
+        type: string
+        description: 1-4 digit number
+        example: '835'
+      operationalSuffix:
+        type: string
+        description: The operational suffix
+        example: B
+  LegDCSStatuses:
+    type: object
+    properties:
+      acceptanceStatus:
+        type: string
+        description: >-
+          Acceptance status of the flight * `NOT_OPEN` - Acceptance is not open * `OPEN`
+          Acceptance is open * `SUSPENDED` - Acceptance is suspended * `CLOSED` - Acceptance is
+          closed * `FINALISED` - Acceptance is finalised.
+        example: 'OPEN'
+        enum:
+          - NOT_OPEN
+          - OPEN
+          - GATED
+          - SUSPENDED
+          - CLOSED
+          - FINALISED
+      generalStatus:
+        type: string
+        description: >-
+          General status of the flight * `DEPARTED` - Flight is departed * `PLAN_INITIALISED`
+          Flight is initialized * `LOCKED` - Flight is locked * `NOT_OPEN` - Flight is not open
+          `OPEN` - Flight is open * `SUSPENDED` - Fight is suspended * `CANCELLED` - Fight is
+          cancelled.
+        example: 'OPEN'
+        enum:
+          - DEPARTED
+          - PLAN_INITIALISED
+          - LOCKED
+          - NOT_OPEN
+          - OPEN
+          - SUSPENDED
+          - CANCELLED
+      loadControlStatus:
+        type: string
+        description: >-
+          Local control status of the flight * `CONTROL_IGNORED` - Load control is ignored *
+          `OPEN` - Load control is open * `NOT_OPEN` - Load control is not open * `CLOSED` - Load
+          control is closed * `SHEET_FINALISED` - Load control is sheet finalised
+          `CONTROL_FINALISED` - Load control is finalised * `CONTROL_SUSPENDED` - Load control is
+          suspended * `CANCELLED` - Load control is cancelled.
+        example: 'OPEN'
+        enum:
+          - CONTROL_IGNORED
+          - OPEN
+          - NOT_OPEN
+          - CLOSED
+          - SHEET_FINALISED
+          - CONTROL_FINALISED
+          - CONTROL_SUSPENDED
+          - CANCELLED
+      boardingStatus:
+        type: string
+        description: >-
+          Boarding status of the flight * `OPEN` - Boarding is open * `NOT_OPEN` - Boarding is not
+          open * `CLOSED` - Boarding is closed * `SUSPENDED` - Boarding is suspended.
+        example: 'OPEN'
+        enum:
+          - OPEN
+          - NOT_OPEN
+          - CLOSED
+          - SUSPENDED
+  Departure:
+    type: object
+    description: Departure details
+    properties:
+      timings:
+        type: array
+        items:
+          type: object
+          properties:
+            qualifier:
+              type: string
+              description: Type of timing information.
+              example: STD
+              enum:
+                - STD
+                - STA
+                - ETD_OFF_BLOCK
+                - ETD_TAKEOFF
+                - ETA_TOUCHDOWN
+                - ETA_ON_BLOCK
+                - ATD_OFF_BLOCK
+                - ATD_TAKEOFF
+                - ATA_TOUCHDOWN
+                - ATA_ON_BLOCK
+                - STANDARD_TIME_OF_DEPARTURE_ZULU
+                - STANDARD_TIME_OF_ARRIVAL_ZULU
+            value:
+              type: string
+              format: datetime
+              description: >-
+                Value of the timing  attached to the related type in ISO format
+                yyyy-mm-ddThh:mm:ss
+              example: '2018-09-17T12:40:00'
+      terminals:
+        description: >-
+          It is an array to accommodate terminal information from more than 1
+          source( Ex, if the first terminal information was from schedule source
+          and later DCS system sends a terminal info, both the information will
+          be stored here. However currently there is no source information in
+          this section so you will always receive only the terminal code from
+          schedule source only.)
+        type: array
+        items:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Terminal code.
+              example: '1'
+  Arrival:
+    type: object
+    description: Arrival details
+    properties:
+      timings:
+        type: array
+        items:
+          type: object
+          properties:
+            qualifier:
+              type: string
+              description: Type of timing information.
+              example: STA
+              enum:
+                - STD
+                - STA
+                - ETD_TAKEOFF
+                - ETD_FLIX_FD
+                - ETA_TOUCHDOWN
+                - ETA_ON_BLOCK
+                - ATD_OFF_BLOCK
+                - ATD_TAKEOFF
+                - ATA_TOUCHDOWN
+                - ATA_ON_BLOCK
+                - STANDARD_TIME_OF_DEPARTURE_ZULU
+                - STANDARD_TIME_OF_ARRIVAL_ZULU
+            value:
+              type: string
+              format: datetime
+              description: >-
+                Value of the timing attached to the related type in ISO format
+                yyyy-mm-ddThh:mm:ss
+              example: '2018-09-17T14:45:00'
+      terminals:
+        description: >-
+          It is an array to accommodate terminal information from more than 1
+          source( Ex, if the first terminal information was from schedule source
+          and later DCS system sends a terminal info, both the information will
+          be stored here. However currently there is no source information in
+          this section so you will always receive only the terminal code from
+          schedule source only).
+        type: array
+        items:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Terminal code.
+              example: '1'
+  AircraftConfiguration:
+    type: object
+    properties:
+      code:
+        type: string
+        description: Code associated to the configuration.
+        example: '331'
+      configurationContents:
+        type: array
+        description: Description of the configuration (cabin codes/ capacities)
+        items:
+          type: object
+          properties:
+            cabin:
+              type: string
+              description: Cabin code.
+              example: J
+            capacity:
+              type: integer
+              description: Cabin capacity.
+              example: '27'
+  issueSource:
+    description: an object containing references to the source of the error
+    properties:
+      pointer:
+        description: a JSON Pointer [RFC6901] to the associated entity in the request document
+        type: string
+      parameters:
+        description: a string indicating which URI query parameter caused the issue
+        type: string
+  CorrelationSchedulePnr:
+    type: object
+    description: Structure of correlation between a flight and a Passenger Name Record.
+    properties:
+      scheduleId:
+        type: string
+        description: Id of the flight record which is correlating with PNRs.
+        example: 6X-835-2018-09-17
+      pnrIds:
+        type: array
+        description: >-
+          Identifying the PNR(s) correlated with the current schedule flight -
+          item format is record locator + creation date.
+        example: '[QFBCSR-2018-05-12,KNGBAD-2018-06-16]'
+        items:
+          type: string
+      correlatedData:
+        type: object
+        description: The sub-entity details which used for correlating the main records
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataSchedulePnr'
+    example:
+      scheduleId: 6X-835-B-2018-09-17
+      pnrIds:
+        - QFBCSR-2018-05-12
+        - KNGBAD-2018-06-16
+      correlatedData:
+        - QFBCSR-2018-05-12:
+            - pnrAirSegmentId: QFBCSR-2018-05-12-ST-1
+              scheduleSegmentId: 2018-09-17-LHR-CDG
+              schedulePartnershipId: 7X-9623-2018-09-17
+            - pnrAirSegmentId: QFBCSR-2018-05-12-ST-2
+              scheduleSegmentId: 2018-09-17-LHR-CDG
+              schedulePartnershipId: 7X-9623-2018-09-17
+        - KNGBAD-2018-06-16:
+            - pnrAirSegmentId: KNGBAD-2018-06-16-ST-5
+              scheduleSegmentId: 2018-09-17-CDG-NCE
+              schedulePartnershipId: 7X-9623-2018-09-17
+  CorrelationScheduleTicket:
+    type: object
+    description: Structure of correlation between a schedule and a ticket Record.
+    properties:
+      scheduleId:
+        type: string
+        description: Id of the flight record which is correlating with tickets.
+        example: 6X-835-2018-09-17
+      ticketIds:
+        type: array
+        description: >-
+          Ids of the tkts correlated with the current schedule flight, where
+          ticket Id is ticket number + issuance date.
+        example: '[1723214567845-2018-05-12,1722541219542-2018-06-16]'
+        items:
+          type: string
+      correlatedData:
+        type: object
+        description: The sub-entity details which used for correlating the main records
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataScheduleTicket'
+    example:
+      scheduleId: 6X-835-B-2018-09-17
+      ticketIds:
+        - 1723214567845-2018-05-12
+        - 1722541219542-2018-06-16
+      correlatedData:
+        - 1723214567845-2018-05-12:
+            - ticketCouponId: 1723214567845-2018-05-12-1
+              scheduleSegmentId: 2018-09-17-LHR-CDG
+              schedulePartnershipId: 7X-9623-2018-09-17
+        - 1722541219542-2018-06-16:
+            - ticketCouponId: 1722541219542-2018-06-16-2
+              scheduleSegmentId: 2018-09-17-CDG-YZZ
+  CorrelationScheduleDcsPassenger:
+    type: object
+    description: Structure of correlation between a schedule and a CM record
+    properties:
+      scheduleId:
+        type: string
+        description: Id of the flight record which is correlating with DcsPassenger.
+        example: 6X-835-2018-09-17
+      dcsPassengerIds:
+        type: array
+        description: >-
+          Ids of the DcsPassenger records correlated with the current schedule
+          flight.
+        example: 2501ADE0000001
+        items:
+          type: string
+      correlatedData:
+        type: object
+        description: The sub-entity details which used for correlating the main records
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataScheduleDcsPassenger'
+    example:
+      scheduleId: 6X-835-B-2018-09-17
+      dcsPassengerIds:
+        - 2501ADE0000001
+      correlatedData:
+        - 2501ADE0000001:
+            - scheduleSegmentId: 2018-09-17-LHR-CDG
+              dcsPassengerSegmentDeliveryId: 2401CA5500003OID
+              schedulePartnershipId: 7X-9623-2018-09-17
+              correlatedLegs:
+                - scheduleLegId: LHR-CDG
+                  dcsPassengerLegDeliveryId: 2401DA55000037F3-LHR
+  CorrelationScheduleInventory:
+    type: object
+    description: Structure of correlation between a schedule and an inventory record
+    properties:
+      scheduleId:
+        type: string
+        description: Id of the flight record which is correlating with DcsPassenger.
+        example: 6X-835-2018-09-17
+      inventoryFlightIds:
+        type: array
+        description: >-
+          Ids of the inventory flight records correlated with the current
+          schedule flight.
+        example: 6X-835-2018-09-17
+        items:
+          type: string
+      correlatedData:
+        type: object
+        description: The sub-entity details which used for correlating the main records
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataScheduleInventory'
+    example:
+      scheduleId: 6X-835-2018-09-17
+      inventoryFlightIds:
+        - 6X-835-2018-09-17
+      correlatedData:
+        - 6X-835-2018-09-17:
+            - scheduleSegmentId: 2018-09-17-LHR-CDG
+              inventorySegmentId: 2018-09-17-LHR-CDG
+              schedulePartnershipIds:
+                - 7X-434-2018-09-17
+                - 8X-876-2018-09-17
+              correlatedLegs:
+                - scheduleLegId: LHR-CDG
+                  inventoryLegId: LHR-CDG
+            - scheduleSegmentId: 2018-09-17-LHR-NCE
+              inventorySegmentId: 2018-09-17-LHR-NCE
+              schedulePartnershipIds:
+                - 7X-434-2018-09-17
+                - 8X-876-2018-09-17
+              correlatedLegs:
+                - scheduleLegId: LHR-CDG
+                  inventoryLegId: LHR-CDG
+                - scheduleLegId: CDG-NCE
+                  inventoryLegId: CDG-NCE
+            - scheduleSegmentId: 2018-09-17-CDG-NCE
+              inventorySegmentId: 2018-09-17-CDG-NCE
+              schedulePartnershipIds:
+                - 7X-434-2018-09-17
+              correlatedLegs:
+                - scheduleLegId: CDG-NCE
+                  inventoryLegId: CDG-NCE
+  CorrelationScheduleDcsfm:
+    type: object
+    description: Structure of correlation between a schedule and DCS Flight management record(s)
+    properties:
+      scheduleId:
+        type: string
+        description: Id of the flight record which is correlating with DcsFM.
+        example: 6X-835-2018-09-17
+      dcsfmIDs:
+        type: array
+        description: >-
+          Id(s) of the DCS FM flight leg records which are correlating with schedule flight.
+        example: ["6X-835-2018-09-17-LHR","6X-835-2018-09-17-CDG"]
+        items:
+          type: string
+      correlatedData:
+        type: object
+        description: The sub-entity details which used for correlating the main records
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataScheduleDcsfm'
+    example:
+      scheduleId: 6X-835-2018-09-17
+      dcsfmIDs: 
+        - 6X-835-2018-09-17-LHR
+        - 6X-835-2018-09-17-CDG
+      correlatedData:
+        - 6X-835-2018-09-17-LHR:
+            - dcsfmLegId: LHR-CDG
+              scheduleLegId: LHR-CDG
+              scheduleSegmentIds: 
+                - 2018-06-12-LHR-NCE
+                - 2018-06-12-LHR-CDG
+        - 6X-835-2018-09-17-CDG:
+            - dcsfmLegId: CDG-NCE
+              scheduleLegId: CDG-NCE
+              scheduleSegmentIds: 
+                - 2018-06-12-LHR-NCE
+                - 2018-06-12-CDG-NCE                   
+  CorrelatedDataSchedulePnr:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a flight
+      schedule and a PNR
+    properties:
+      pnrAirSegmentId:
+        type: string
+        description: The Id of the PNR air segment that is involved in correlation.
+        example: QFBCSR-2018-05-12-ST-1
+      scheduleSegmentId:
+        type: string
+        description: The Id of the flight segment that is involved in correlation.
+        example: 2018-09-17-LHR-CDG
+      schedulePartnershipId:
+        type: string
+        description: >-
+          If the carrier is a codeshare and the booking is linked to one of the
+          codeshare partner, it is Id of that partner flight.
+        example: 7X-9623-2018-09-17
+  CorrelatedDataScheduleTicket:
+    type: object
+    description: Set of data field identifiers defining the correlation between skd and tkt
+    properties:
+      ticketCouponId:
+        type: string
+        description: The Id of the coupon that is involved in correlation.
+        example: 1723214567845-2018-05-12-1
+      scheduleSegmentId:
+        type: string
+        description: The Id of the flight segment that is involved in correlation.
+        example: 2018-09-17-LHR-CDG
+      schedulePartnershipId:
+        type: string
+        description: >-
+          If the carrier is a codeshare and the booking is linked to one of the
+          codeshare partner, it is Id of that partner flight.
+        example: 7X-9623-2018-09-17
+  CorrelatedDataScheduleDcsPassenger:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a dated
+      flight and a CM Pax record
+    properties:
+      scheduleSegmentId:
+        type: string
+        description: The Id of the flight segment that is involved in correlation.
+        example: 2018-09-17-LHR-CDG
+      dcsPassengerSegmentDeliveryId:
+        type: string
+        description: >-
+          The Id of the segment delivery of Dcs Passenger that is involved in
+          correlation.
+        example: 2401CA5500003OID
+      schedulePartnershipId:
+        type: string
+        description: >-
+          If the carrier is a codeshare and the booking is linked to one of the
+          codeshare partner, it is Id of that partner flight.
+        example: 7X-9623-2018-09-17
+      correlatedLegs:
+        type: array
+        items:
+          $ref: '#/definitions/CorrelatedScheduleDcsPassengerLegData'
+  CorrelatedDataScheduleInventory:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a schedule
+      dated flight and a inventory dated flight record
+    properties:
+      scheduleSegmentId:
+        type: string
+        description: The Id of the schedule flight segment that is involved in correlation.
+        example: 2018-09-17-LHR-CDG
+      inventorySegmentId:
+        type: string
+        description: >-
+          The Id of the inventory flight segment that is involved in
+          correlation.
+        example: 2018-09-17-LHR-CDG
+      schedulePartnershipIds:
+        type: array
+        description: Flight Id(s) of the partnership carrier(s).
+        example: '[ "7X-434-2018-09-17", "8X-876-2018-09-17" ]'
+        items:
+          type: string
+          example: '["7X-343-2018-09-17","8X-655-2018-09-17"]'
+      correlatedLegs:
+        type: array
+        items:
+          $ref: '#/definitions/CorrelatedScheduleInventoryLegData'
+  CorrelatedDataScheduleDcsfm:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a schedule
+      dated flight and DCS flight management records
+    properties:
+      scheduleLegId:
+        type: string
+        description: The Id of the schedule flight leg that is involved in correlation.
+        example: LHR-CDG
+      dcsfmLegId:
+        type: string
+        description: >-
+          The Id of the DCS FM leg that is involved in correlation.
+        example: LHR-CDG
+      scheduleSegmentIds:
+        type: array
+        description: Segment Id(s) of the schedule which is correlated with the DCS FM record.
+        example: '[ "2018-06-12-LHR-NCE", "2018-06-12-LHR-CDG" ]'
+        items:
+          type: string
+          example: '["2018-06-12-LHR-CDG", "2018-06-12-LHR-NCE"]'
+  Relationship:
+    type: object
+    description: Details of a relationship
+    properties:
+      id:
+        type: string
+        description: Id of the related resource
+        example: 6X-234-2019-12-12
+      type:
+        type: string
+        description: Type of the related resource
+        example: dated-flight
+      version:
+        type: string
+        description: Version of the document.
+        example: '1536835243123456'
+      ref:
+        type: string
+        description: >-
+          The reference to the related resource if this latter exists in the
+          same document
+        example: included/correlationScheduleTicket/6X-123-A-2018-12-12
+  CorrelatedScheduleDcsPassengerLegData:
+    type: object
+    properties:
+      scheduleLegId:
+        type: string
+        description: Id of the flight leg which is involved in correlation.
+        example: LHR-CDG
+      dcsPassengerLegDeliveryId:
+        type: string
+        description: Id of the leg delivery of Dcs Passenger involved in correlation.
+        example: 2401DA55000037F3-LHR
+  CorrelatedScheduleInventoryLegData:
+    type: object
+    properties:
+      scheduleLegId:
+        type: string
+        description: Id of the schedule flight leg which is involved in correlation.
+        example: LHR-CDG
+      inventoryLegId:
+        type: string
+        description: Id of the inventory flight leg involved in correlation.
+        example: LHR-CDG
+  Events:
+    type: object
+    description: Structure of Dynamic Intelligence Hub functional events
+    properties:
+      recordDomain:
+        type: string
+        description: Functional domain of the record
+        example: SCHEDULE
+      recordId:
+        type: string
+        description: Record identifier e.g. FlightId
+        example: 6X-123-A-2018-12-12
+      originFeedTimeStamp:
+        type: string
+        description: Incoming PSS feed time stamp
+        format: date-time
+        example: '2018-12-20T04:55:04.028079777Z'
+      events:
+        type: array
+        description: List of events that have been detected on the FlightDate document
+        items:
+          type: object
+          properties:
+            origin:
+              type: string
+              description: Type of event e.g. COMPARISON / TIME_INITIATED_EVENT
+              example: COMPARISON
+            eventType:
+              type: string
+              description: 'In case of comparison events, type of operation notified by the'
+              example: CREATED
+              enum:
+                - CREATED
+                - UPDATED
+                - DELETED
+            currentPath:
+              type: string
+              description: >-
+                String containing the JSON Pointer (see IETF RFC6901) that
+                points to the data referenced by the Event in the latest version
+                of the entity. It is only applicable for CREATED and UPDATED
+                events.
+              example: >-
+                /correlationScheduleTicket/correlatedData/1722345676472-2018-09-20
+            previousPath:
+              type: string
+              description: >-
+                String containing the JSON Pointer (see IETF RFC6901) that
+                points to the data referenced by the Event in the previous
+                version of the entity. It is only applicable for DELETED and
+                UPDATED events.
+              example: >-
+                /correlationScheduleTicket/correlatedData/1722345676472-2018-09-20
+    example:
+      recordDomain: SCHEDULE_TICKET
+      recordId: 6X-123-A-2018-12-12
+      events:
+        - origin: COMPARISON
+          eventType: UPDATED
+          currentPath: /correlationScheduleTicket/correlatedData/1722345676472-2018-09-20
+          previousPath: /correlationScheduleTicket/correlatedData/1722345676472-2018-09-20
+  PatchOperation:
+    type: object
+    description: >-
+      A single JSON Patch operation as defined by RFC 6902 (see
+      https://tools.ietf.org/html/rfc6902)
+    required:
+      - op
+      - path
+    properties:
+      op:
+        type: string
+        description: The operation to be performed
+        example: add
+        enum:
+          - add
+          - remove
+          - replace
+          - move
+          - copy
+          - test
+      path:
+        type: string
+        description: >-
+          A JSON Pointer as defined by RFC 6901 (see
+          https://tools.ietf.org/html/rfc6901)
+        example: scheduleProcessedFlight/legs/0/aircraftEquipment/aircraft_type
+      value:
+        type: object
+        description: The value to be used within the operations
+        example: '320'
+      from:
+        type: string
+        description: >-
+          A JSON Pointer as defined by RFC 6901 (see
+          https://tools.ietf.org/html/rfc6901)
+        example: scheduleProcessedFlight/legs/1
+  ###############Data push model###############
+  ScheduleFlightDataPush:
+    properties:
+      meta:
+        $ref: '#/definitions/Meta'
+      previousRecord:
+        description: List of JSON Patches as defined by RFC 6902 (see https://tools.ietf.org/html/rfc6902) to apply to DatedFlight [latest version] in order to obtain the actual JSON of the previous DatedFlight version.
+        type: array
+        items:
+          $ref: '#/definitions/PatchOperation'
+      scheduleProcessedFlight:
+        $ref: '#/definitions/DatedFlight'
+      events:
+        $ref: '#/definitions/Events'
+    example:
+      meta:
+        triggerEventLog:
+          id: 429074ef1bd011e3-e63dfe23f4a0adc
+          triggerEventName: DATA_INIT
+        version: 2.1.1
+      previousRecord:
+        - op: replace
+          path: scheduleProcessedFlight/legs/0/aircraftEquipment/aircraftType
+          value: 320
+        - op: replace
+          path: /version
+          value: '1524839045128470'
+      scheduleProcessedFlight:
+        type: dated-flight
+        id: 6X-835-2018-09-17
+        version: '1536835243123456'
+        flightDesignator:
+          carrierCode: 6X
+          flightNumber: '835'
+          operationalSuffix: B
+        scheduledDepartureDate: '2018-09-17'
+        dayOfOperation: MON
+        isCancelled: 'false'
+        characteristics:
+          - INTERNATIONAL
+        codeshare: OPERATING
+        flightPoints:
+          - id: LHR_1
+            iataCode: LHR
+            city: LON
+            country: GB
+            region: EUROP
+            continent: ITC2
+            departure:
+              timings:
+                - qualifier: STD
+                  value: '2018-09-17T12:40:00'
+              terminals:
+                - code: '1'
+          - id: CDG_2
+            iataCode: CDG
+            city: PAR
+            country: FR
+            region: EUROP
+            continent: ITC2
+            departure:
+              timings:
+                - qualifier: STD
+                  value: '2018-09-17T17:00:00'
+            arrival:
+              timings:
+                - qualifier: STA
+                  value: '2018-09-17T14:45:00'
+          - id: NCE_3
+            iataCode: NCE
+            city: NCE
+            country: FR
+            region: EUROP
+            continent: ITC2
+            arrival:
+              timings:
+                - qualifier: STA
+                  value: '2018-09-17T18:19:00'
+              terminals:
+                - code: '1'
+        segments:
+          - id: 2018-09-17-LHR-CDG
+            boardFlightPointId: LHR_1
+            offFlightPointId: CDG_2
+            boardPointIataCode: LHR
+            offPointIataCode: CDG
+            scheduledDepartureDateTime: '2018-09-17T12:40:00'
+            scheduledArrivalDateTime: '2018-09-17T14:45:00'
+            numberOfLegs: 1
+            legIds:
+              - LHR-CDG
+            trafficRestrictions:
+              - D
+              - A
+            partnerships:
+              marketingFlights:
+                - id: 7X-9623-2018-09-17
+                  flightDesignator:
+                    carrierCode: 7X
+                    flightNumber: '9623'
+                - id: 8X-6828-2018-09-17
+                  flightDesignator:
+                    carrierCode: 8X
+                    flightNumber: '6828'
+                - id: 9X-4551-2018-09-17
+                  flightDesignator:
+                    carrierCode: 9X
+                    flightNumber: '4551'
+          - id: 2018-09-17-LHR-NCE
+            boardFlightPointId: LHR_1
+            offFlightPointId: NCE_3
+            boardPointIataCode: LHR
+            offPointIataCode: NCE
+            scheduledDepartureDateTime: '2018-09-17T12:40:00'
+            scheduledArrivalDateTime: '2018-09-17T18:19:00'
+            numberOfLegs: 2
+            legIds:
+              - LHR-CDG
+              - CDG-NCE
+            partnerships:
+              marketingFlights:
+                - id: 7X-9623-2018-09-17
+                  flightDesignator:
+                    carrierCode: 7X
+                    flightNumber: '9623'
+                - id: 8X-6828-2018-09-17
+                  flightDesignator:
+                    carrierCode: 8X
+                    flightNumber: '6828'
+                - id: 8X-4642-2018-09-17
+                  flightDesignator:
+                    carrierCode: 8X
+                    flightNumber: '4642'
+          - id: 2018-09-17-CDG-NCE
+            boardFlightPointId: CDG_2
+            offFlightPointId: NCE_3
+            boardPointIataCode: CDG
+            offPointIataCode: NCE
+            scheduledDepartureDateTime: '2018-09-17T17:00:00'
+            scheduledArrivalDateTime: '2018-09-17T18:19:00'
+            numberOfLegs: 1
+            legIds:
+              - CDG-NCE
+            partnerships:
+              marketingFlights:
+                - id: 7X-9623-2018-09-17
+                  flightDesignator:
+                    carrierCode: 7X
+                    flightNumber: '9623'
+                - id: 8X-6828-2018-09-17
+                  flightDesignator:
+                    carrierCode: 8X
+                    flightNumber: '6828'
+                - id: 8X-4642-2018-09-17
+                  flightDesignator:
+                    carrierCode: 8X
+                    flightNumber: '4642'
+        legs:
+          - id: LHR-CDG
+            boardFlightPointId: LHR_1
+            offFlightPointId: CDG_2
+            boardPointIataCode: LHR
+            offPointIataCode: CDG
+            scheduledDepartureDateTime: '2018-09-17T12:40:00'
+            scheduledArrivalDateTime: '2018-09-17T14:45:00'
+            routingOrder: 1
+            aircraftEquipment:
+              aircraftType: 320
+              franchiseeFlight:
+                airlineCode: 8X
+                disclosure: EXPRESS AIRWAYS
+              scheduledFittedConfiguration:
+                code: '331'
+                configurationContents:
+                  - cabin: J
+                    capacity: 27
+                  - cabin: W
+                    capacity: 21
+                  - cabin: 'Y'
+                    capacity: 244
+              totalScheduledFittedCapacity: 292
+              operationalSaleableConfiguration:
+                code: '001'
+                configurationContents:
+                  - cabin: J
+                    capacity: 27
+                  - cabin: O
+                    capacity: 21
+                  - cabin: 'Y'
+                    capacity: 244
+              scheduledSaleableConfiguration:
+                code: '052'
+                configurationContents:
+                  - cabin: J
+                    capacity: 27
+                  - cabin: O
+                    capacity: 21
+                  - cabin: 'Y'
+                    capacity: 244
+              operationalFittedConfiguration:
+                code: '009'
+                configurationContents:
+                  - cabin: J
+                    capacity: 27
+                  - cabin: O
+                    capacity: 21
+                  - cabin: 'Y'
+                    capacity: 244
+            legDCSStatuses:
+              acceptanceStatus: 'OPEN'
+              generalStatus: 'OPEN'
+              loadControlStatus: 'OPEN'
+              boardingStatus: 'OPEN'
+          - id: CDG-NCE
+            boardFlightPointId: CDG_2
+            offFlightPointId: NCE_3
+            boardPointIataCode: CDG
+            offPointIataCode: NCE
+            scheduledDepartureDateTime: '2018-09-17T17:00:00'
+            scheduledArrivalDateTime: '2018-09-17T18:19:00'
+            routingOrder: 2
+            serviceType: X
+            aircraftEquipment:
+              aircraftType: 320
+              franchiseeFlight:
+                airlineCode: 8X
+                disclosure: EXPRESS AIRWAYS
+              scheduledFittedConfiguration:
+                code: '331'
+                configurationContents:
+                  - cabin: J
+                    capacity: 27
+                  - cabin: W
+                    capacity: 21
+                  - cabin: 'Y'
+                    capacity: 244
+              totalScheduledFittedCapacity: 292
+              operationalSaleableConfiguration:
+                code: '001'
+                configurationContents:
+                  - cabin: J
+                    capacity: 27
+                  - cabin: O
+                    capacity: 21
+                  - cabin: 'Y'
+                    capacity: 244
+              scheduledSaleableConfiguration:
+                code: '052'
+                configurationContents:
+                  - cabin: J
+                    capacity: 27
+                  - cabin: O
+                    capacity: 21
+                  - cabin: 'Y'
+                    capacity: 244
+              operationalFittedConfiguration:
+                code: '009'
+                configurationContents:
+                  - cabin: J
+                    capacity: 27
+                  - cabin: O
+                    capacity: 21
+                  - cabin: 'Y'
+                    capacity: 244
+            legDCSStatuses:
+              acceptanceStatus: 'OPEN'
+              generalStatus: 'OPEN'
+              loadControlStatus: 'OPEN'
+              boardingStatus: 'OPEN'
+      events:
+        recordDomain: SCHEDULE
+        recordId: 6X-835-2018-09-17
+        events:
+          - origin: COMPARISON
+            eventType: UPDATED
+            currentPath: /flightPoints/0/departure/timings
+            previousPath: /flightPoints/0/departure/timings
+  ScheduleFlightCorrelationDataPush:
+    properties:
+      meta:
+        $ref: '#/definitions/Meta'
+      scheduleCorrelations:
+        $ref: '#/definitions/ScheduleCorrelationsFeedData'
+      events:
+        $ref: '#/definitions/Events'
+    example:
+      meta:
+        triggerEventLog:
+          id: 429074ef1bd011e3-e63dfe23f4a0adc
+          triggerEventName: DATA_INIT
+        version: 2.1.1
+      scheduleCorrelations:
+        CorrelationSchedulePnr:
+          scheduleId: 6X-835-B-2018-09-17
+          pnrIds:
+            - QFBCSR-2018-05-12
+            - KNGBAD-2018-06-16
+          correlatedData:
+            - QFBCSR-2018-05-12:
+              - pnrAirSegmentId: QFBCSR-2018-05-12-ST-1
+                scheduleSegmentId: 2018-09-17-LHR-CDG
+                schedulePartnershipId: 7X-9623-2018-09-17
+              - pnrAirSegmentId: QFBCSR-2018-05-12-ST-2
+                scheduleSegmentId: 2018-09-17-LHR-CDG
+                schedulePartnershipId: 7X-9623-2018-09-17
+            - KNGBAD-2018-06-16:
+              - pnrAirSegmentId: KNGBAD-2018-06-16-ST-5
+                scheduleSegmentId: 2018-09-17-CDG-NCE
+                schedulePartnershipId: 7X-9623-2018-09-17
+        CorrelationScheduleTicket:
+          scheduleId: 6X-835-B-2018-09-17
+          ticketIds:
+            - 1723214567845-2018-05-12
+            - 1722541219542-2018-06-16
+          correlatedData:
+            - 1723214567845-2018-05-12:
+              - ticketCouponId: 1723214567845-2018-05-12-1
+                scheduleSegmentId: 2018-09-17-LHR-CDG
+                schedulePartnershipId: 7X-9623-2018-09-17
+            - 1722541219542-2018-06-16:
+              - ticketCouponId: 1722541219542-2018-06-16-1
+                scheduleSegmentId: 2018-09-17-CDG-NCE
+        CorrelationScheduleDcsPassenger:
+          scheduleId: 6X-835-B-2018-09-17
+          dcsPassengerIds:
+            - 2501ADE0000001
+          correlatedData:
+              - 2501ADE0000001:
+                - scheduleSegmentId: 2018-09-17-LHR-CDG
+                  dcsPassengerSegmentDeliveryId: 2401CA5500003OID
+                  schedulePartnershipId: 7X-9623-2018-09-17
+                  correlatedLegs:
+                    - scheduleLegId: LHR-CDG
+                      dcsPassengerLegDeliveryId: 2401DA55000037F3-LHR
+        CorrelationScheduleInventory:
+          scheduleId: 6X-835-2018-09-17
+          inventoryFlightIds:
+            - 6X-835-2018-09-17
+          correlatedData:
+            - 6X-835-2018-09-17:
+              - scheduleSegmentId: 2018-09-17-LHR-CDG
+                inventorySegmentId: 2018-09-17-LHR-CDG
+                schedulePartnershipIds:
+                  - 7X-434-2018-09-17
+                  - 8X-876-2018-09-17
+                correlatedLegs:
+                  - scheduleLegId: LHR-CDG
+                    inventoryLegId: LHR-CDG
+              - scheduleSegmentId: 2018-09-17-LHR-NCE
+                inventorySegmentId: 2018-09-17-LHR-NCE
+                schedulePartnershipIds:
+                  - 7X-434-2018-09-17
+                  - 8X-876-2018-09-17
+                correlatedLegs:
+                  - scheduleLegId: LHR-CDG
+                    inventoryLegId: LHR-CDG
+                  - scheduleLegId: CDG-NCE
+                    inventoryLegId: CDG-NCE
+              - scheduleSegmentId: 2018-09-17-CDG-NCE
+                inventorySegmentId: 2018-09-17-CDG-NCE
+                schedulePartnershipIds:
+                  - 7X-434-2018-09-17
+                correlatedLegs:
+                  - scheduleLegId: CDG-NCE
+                    inventoryLegId: CDG-NCE
+        CorrelationScheduleDcsfm:
+          scheduleId: 6X-835-2018-09-17
+          dcsfmIDs:
+            - 6X-835-2018-09-17-LHR
+            - 6X-835-2018-09-17-CDG
+          correlatedData:
+            - 6X-835-2018-09-17-LHR:
+              - dcsfmLegId: LHR-CDG
+                scheduleLegId: LHR-CDG
+                scheduleSegmentIds: 
+                  - 2018-06-12-LHR-NCE
+                  - 2018-06-12-LHR-CDG
+            - 6X-835-2018-09-17-CDG:
+              - dcsfmLegId: CDG-NCE
+                scheduleLegId: CDG-NCE
+                scheduleSegmentIds: 
+                  - 2018-06-12-LHR-NCE
+                  - 2018-06-12-CDG-NCE
+        dictionaries:
+          schedules:
+            '6X-835-2018-09-17':
+              type: 'dated-flight'
+              id: '6X-835-2018-09-17'
+              version: '1536835243123456'
+          pnrs:
+            'QFBCSR-2018-05-12':
+              type: 'pnr'
+              id: 'QFBCSR-2018-05-12'
+              version: '2'
+            'KNGBAD-2018-06-16':
+              type: 'pnr'
+              id: 'KNGBAD-2018-06-16'
+              version: '1'
+          tickets:
+            '1723214567845-2018-05-12':
+              type: 'air-travel-document'
+              id: '1723214567845-2018-05-12'
+              version: '1'
+            '1722541219542-2018-06-16':
+              type: 'air-travel-document'
+              id: '1722541219542-2018-06-16'
+              version: '1'
+          dcsPassengers:
+            '2501ADE0000001':
+              type: 'dcs-passenger'
+              id: '2501ADE0000001'
+              version: '1609937279'
+          inventories:
+            '6X-835-2018-09-17':
+              type: 'dated-flight'
+              id: '6X-835-2018-09-17'
+              version: '1536835243'
+          dcsfmFlightLegs:
+            '6X-835-2018-09-17-LHR':
+              type: 'dated-flight'
+              id: '6X-835-2018-09-17-LHR'
+              version: '1'
+            '6X-835-2018-09-17-CDG':
+              type: 'dated-flight'
+              id: '6X-835-2018-09-17-CDG'
+              version: '1'
+      events:
+        recordDomain: 'SCHEDULE_PNR'
+        recordId: '6X-835-2018-09-17'
+        events:
+          - origin: 'COMPARISON'
+            eventType: UPDATED
+            currentPath: '/correlationSchedulePnr/correlatedData'
+            previousPath: '/correlationSchedulePnr/correlatedData'
+          - origin: 'COMPARISON'
+            eventType: CREATED
+            currentPath: '/correlationSchedulePnr/correlatedData/KNGBAD-2018-06-16'

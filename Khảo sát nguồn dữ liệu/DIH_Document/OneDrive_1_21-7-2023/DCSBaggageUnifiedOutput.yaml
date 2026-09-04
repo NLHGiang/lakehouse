@@ -1,0 +1,1405 @@
+swagger: '2.0'
+################################################################################
+#                              API Information                                 #
+################################################################################
+info:
+  version: &VERSION 2.1.0
+  title: Dynamic Intelligence Hub API and Data Models - DCS Baggage
+  description: >-
+    This document describes the API Specifications used to query DCS Baggage data.
+    DCSBaggage record consists of
+    - BagsGroup entity - attributes for group of bags travelling together
+    - Bag entities - attributes for each Bag in the BagsGroup
+    - ExcessBaggaggeCharge entities - attributes for any excess baggage charges associated
+    The API returns Bags Group, Bags and Excess Baggage information along with Bag Pool
+    information and Relationships of Responsible Passengers if any. The default language
+    is "en" for string formatting like monetary amount.
+
+################################################################################
+#                  Host, Base Path, Schemes and Content Types                  #
+################################################################################
+schemes:
+  - https
+host: airlines.api.amadeus.com
+basePath: /v2
+consumes:
+  - application/json
+produces:
+  - application/vnd.amadeus+json
+################################################################################
+#                                   Parameters                                 #
+################################################################################
+parameters:
+  id:
+    name: id
+    description: Identifier of a DCS Baggage Record
+    required: true
+    in: path
+    type: string
+################################################################################
+#                                  Security                                    #
+################################################################################
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+################################################################################
+#                                    Paths                                     #
+################################################################################
+paths:
+  '/departure-control/processed-bags-groups/{id}':
+    get:
+      tags:
+        - BaggageAPIs
+      operationId: getBaggage
+      summary: Retrieve DCS Baggage Entities using a Baggage Group Identifier
+      description: Returns the DCS Baggage Entities inside the Baggage Group whose identifier is passed as parameter.
+      consumes: []
+      parameters:
+        - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/DcsBaggageApiResponse'
+        '401':
+          description: Unauthorized. Missing credentials in header request.
+          schema:
+            $ref: '#/definitions/Errors'
+        '403':
+          description: Forbidden. Authorization refused for the credentials provided.
+          schema:
+            $ref: '#/definitions/Errors'
+        '404':
+          description: Baggage Group or Baggage with the requested id was not found.
+          schema:
+            $ref: '#/definitions/Errors'
+        '500':
+          description: Internal server error / Technical
+          schema:
+            $ref: '#/definitions/Errors'
+      security:
+        - basicAuth: []
+  '/departure-control/dcs-baggage-feed':
+    post:
+      tags:
+        - Data Push Models
+      summary: DCS Baggage Data Push
+      description: >-
+        Model for the DCS Baggage data push feed.
+        Please be aware this is NOT a POST API, rather this explains the format of the data pushed out by Amadeus.
+      responses:
+        '200':
+          description: >
+          schema:
+            $ref: '#/definitions/DcsBaggagePush'
+
+  '/departure-control/dcs-baggages-correlations-feed':
+    post:
+      tags:
+        - Data Push Models
+      summary: DCS Baggage Correlations Data Push
+      description: >-
+        Model for the DCS Baggage correlations data push feed.
+        Please be aware this is NOT a POST API, rather this explains the format of the data pushed out by Amadeus.
+      responses:
+        '200':
+          description: >
+          schema:
+            $ref: '#/definitions/DcsBaggageCorrelationsPush'
+################################################################################
+#                                 Definitions                                  #
+################################################################################
+definitions:
+
+  ErrorSource:
+    properties:
+      parameter:
+        type: string
+        description: The key of the URI path or query parameter that caused the error
+      pointer:
+        type: string
+        description: A JSON Pointer [RFC6901] to the associated entity in the request body that caused this error
+      example:
+        type: string
+        description: A sample input to guide the user when resolving this issue
+
+  Warning:
+    required:
+      - code
+      - title
+    properties:
+      code:
+        type: integer
+        description: A machine-readable error code from the Canned Messages table, that will enable the API Consumers code to handle this type of error
+      title:
+        type: string
+        description: "An error title from the Canned Messages table with a 1:1 correspondence to the error code. This may be localized"
+      detail:
+        type: string
+        description: "An easy-to-read explanation specific to this occurrence of the problem. It should give the API consumer an idea of what went wrong and how to recover from it. Like the title, this field’s value can be localized."
+      source:
+        $ref: "#/definitions/ErrorSource"
+      documentation:
+        type: string
+        format: url
+        description: A link to a web page or file with further documentation to help the API consumer resolve this error
+
+  Error:
+    required:
+      - status
+      - code
+      - title
+    properties:
+      status:
+        type: integer
+        description: "The [HTTP status code](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml) of this response. This is present only in terminal errors which cause an unsuccessful response. In the case of multiple errors, they must all have the same status."
+      code:
+        type: integer
+        description: A machine-readable error code from the Amadeus Canned Messages table, that will enable the API Consumers code to handle this type of error
+      title:
+        type: string
+        description: "An error title from the Canned Messages table with a 1:1 correspondence to the error code. This may be localized"
+      detail:
+        type: string
+        description: "An easy-to-read explanation specific to this occurrence of the problem. It should give the API consumer an idea of what went wrong and how to recover from it. Like the title, this field’s value can be localized."
+      source:
+        $ref: "#/definitions/ErrorSource"
+      documentation:
+        type: string
+        format: url
+        description: A link to a web page or file with further documentation to help the API consumer resolve this error
+    example:
+      status: 401
+      code: 20
+      title: "RESTRICTED"
+      detail: "Query unauthorised"
+
+  Errors:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+
+  Meta:
+    type: object
+    description: Technical information related to the feed
+    properties:
+      triggerEventLog:
+        description: Information related to the initial event that triggered the process
+        $ref: '#/definitions/EventLog'
+      version:
+        description: Version of the JSON feed produced
+        type: string
+        enum:
+          - *VERSION
+        example: *VERSION
+
+  DcsBaggagePush:
+    type: object
+    description: >-
+      The Online data push schema to be referenced in the main Swagger spec.
+    properties:
+      meta:
+        $ref: '#/definitions/Meta'
+      lastModification:
+        $ref: '#/definitions/EventLog'
+      processedBagsGroup:
+        $ref: '#/definitions/BagsGroup'
+      processedBags:
+        type: array
+        items:
+          $ref: '#/definitions/Bag'
+      processedExcessBaggageCharges:
+        type: array
+        items:
+          $ref: '#/definitions/ExcessBaggageCharge'
+      previousRecord:
+        description: List of JSON Patches as defined by RFC 6902 (see https://tools.ietf.org/html/rfc6902) to apply to processedBagsGroup, processedBags, processedExcessBaggageCharges [latest BagsGroup, Bag and ExcessBaggageCharge version] in order to obtain the actual JSON of the previous BagsGroup, Bag and ExcessBaggageCharge version.
+        type: array
+        items:
+          $ref: '#/definitions/PatchOperation'
+      events:
+        $ref: '#/definitions/Events'
+    example:
+      meta:
+        triggerEventLog:
+          id: '46541dsfsSDRWFS54'
+        version: '2.1.0'
+      lastModification:
+        dateTime: '2015-10-05T10:00:00.043Z'
+        triggerEventName: 'BBTGPQ-Print Baggage Tag'
+        user:
+          id: 'USR0001'
+          officeId: 'NCE6X08AA'
+          workstation:
+            id: 'A/LHR/T/2/CKI/1/1'
+            fullLocation:
+              airportCode: 'LHR'
+              cityCode: 'LON'
+              terminalId: '2E'
+              buildingId: '1'
+              areaCode: 'CKI'
+              identifier: '1'
+              description: 'LHR TERM-2E'
+      processedBagsGroup:
+        type: bags-group
+        id: 10FBC42026758291
+        eTag: 1602876919851
+        checkedBagsCount: 1
+        checkedBagsWeight:
+          value: 125
+          unit: KILOGRAMS
+        handBagsCount: 1
+        handBagsWeight:
+          value: 125
+          unit: KILOGRAMS
+        responsiblePassenger:
+          id: 1200000000000001
+          type: dcs-passenger
+          href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/1200000000000001'
+          methods:
+            - GET
+        checkedBags:
+          collection:
+            - id: 1101CA1100003431
+              type: bag
+              ref: 'processedBags'
+        pooledPassengers:
+          collection:
+            - id: 1200000000000001
+              type: dcs-passenger
+              href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/1200000000000001'
+              methods:
+                - GET
+        itinerary:
+          - id: JFK
+            boardPoint:
+              iataCode: JFK
+            offPoint:
+              iataCode: LHR
+      processedBags:
+        - id: 1101CA1100003431
+          bagType: STANDARD
+          bagTag:
+            licensePlate: 0057483945
+            issuingCarrier: 6X
+            finalDestination: JFK
+            systemSource: AUTOMATIC
+          linkedBagTag:
+            licensePlate: 0057483946
+            issuingCarrier: 6X
+            finalDestination: JFK
+            issuanceDay: 2
+          lastSeenLocation:
+            deviceId: AF5FA7A4
+            deviceUser: 116554
+            localDateTime: '2018-10-30T16:43'
+            logSource: BAGGAGE_RECONCILIATION_SYSTEM
+          systemSource: AUTOMATIC
+          weight:
+            value: 125
+            unit: KILOGRAMS
+          owner:
+            id: 1200000000000001
+            type: dcs-passenger
+            href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/1200000000000001'
+            methods:
+              - GET
+          legs:
+            - id: JFK
+              boardPoint:
+                iataCode: JFK
+                localDateTime: '2018-11-29'
+              offPoint:
+                iataCode: LHR
+              operatingFlight:
+                carrierCode: 6X
+                flightNumber: 1011
+                operationalSuffix: A
+              acceptanceStatus: FULLY_ACCEPTED
+              activationStatus: ACTIVE
+              travelClassCode: 'Y'
+              authorityToLoad: true
+              authorityToTransport: true
+              offloaded: false
+              checkinLocation:
+                trackedLocation:
+                  identifier: 'CKIN'
+              specialBagHandlingItems:
+                - id: GOLF
+                  service:
+                    code: GOLF
+                    subType: SPECIAL_SERVICE_REQUEST
+                    description: Golf Bag
+                    statusCode: HK
+      processedExcessBaggageCharges:
+        - id: 1000000000000001
+          paymentStatus: PAID
+          waiverReason:
+            text: Excess Waived by Admin
+          responsiblePassenger:
+            id: 1200000000000001
+            type: dcs-passenger
+            href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/1200000000000001'
+            methods:
+              - GET
+          segments:
+            collection:
+              - id: 2401CA5500003431
+                type: segment-delivery
+          totalCharge:
+            total: '150.50'
+            currency: GBP
+          calculations:
+            - id: 10DF2D0000BD64F4
+              boardPoint:
+                iataCode: JFK
+              offPoint:
+                iataCode: LHR
+              items:
+                - id: 1000000000A21C1B
+                  itemType: WEIGHT
+                  quantity: 1
+                  weight:
+                    value: 125
+                    unit: KILOGRAMS
+                  boardPoint:
+                    iataCode: JFK
+                  offPoint:
+                    iataCode: LHR
+                  rate:
+                    total: '15.50'
+                    currency: GBP
+                  charge:
+                    total: '150.50'
+                    currency: GBP
+                  bag:
+                    id: 1101CA1100003431
+                    type: bag
+                    ref: 'processedBags'
+                  paymentDocument:
+                    documentType: EMD
+                    number: '1728200002469'
+                  waiverReason:
+                    text: Excess Waived by Admin
+      previousRecord:
+        - op: replace
+          path: '/processedBagsGroup/responsiblePassenger/id'
+          value: '2501ADE000000000'
+      events:
+        recordDomain: 'DCSBAGGAGE'
+        recordId: '2501ADE000000001'
+        originFeedTimeStamp: '2018-10-24T14:19:00Z'
+        events:
+          - origin: 'COMPARISON'
+            eventType: 'UPDATED'
+            currentPath: '/processedBagsGroup/responsiblePassenger/id'
+            previousPath: '/processedBagsGroup/responsiblePassenger/id'
+
+  DcsBaggageCorrelationsPush:
+    type: object
+    properties:
+      meta:
+        $ref: '#/definitions/Meta'
+      dcsBaggageCorrelations:
+        $ref: '#/definitions/CorrelationData'
+      events:
+        $ref: '#/definitions/Events'
+    example:
+      meta:
+        triggerEventLog:
+          id: '46541dsfsSDRWFS54'
+        version: '2.1.0'
+      dcsBaggageCorrelations:
+        correlationBagsGroupDcsPassenger:
+          bagsGroupId: AA42BA1395020102
+          dcsPassengerIds:
+            - 2401CA5500003431
+          correlatedData:
+            2401CA5500003431:
+              - bagId: 1101CA1100003431
+                bagLegCorrelations:
+                  - bagLegDeliveryId: LHR
+                    dcsPassengerLegDeliveryId: LHR
+                    dcsPassengerSegmentDeliveryId: 2202DA1200003432
+                  - bagLegDeliveryId: BKK
+                    dcsPassengerLegDeliveryId: BKK
+                    dcsPassengerSegmentDeliveryId: 2202DA1200003432
+        correlationBagsGroupPnr:
+          bagsGroupId: AA42BA1395020102
+          pnrIds:
+            - ORY4NY-2018-10-19
+          correlatedData:
+            ORY4NY-2018-10-19:
+              - bagId: 1101CA1100003431
+                pnrTravelerId: ORY4NY-2018-10-19-PT-1
+                bagLegCorrelations:
+                  - bagLegDeliveryId: ORY
+                    pnrAirSegmentId: ORY4NY-2018-10-19-ST-1
+        dictionaries:
+          bagsGroups:
+            AA42BA1395020102:
+              type: bags-group
+              id: AA42BA1395020102
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-bags-groups/AA42BA1395020102'
+          dcsPassengers:
+            2401CA5500003431:
+              type: dcs-passenger
+              id: 2401CA5500003431
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2401CA5500003431'
+          pnrs:
+            ORY4NY-2018-10-19:
+              type: pnr
+              id: ORY4NY-2018-10-19
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v1/reservation/processed-pnrs/ORY4NY-2018-10-19'
+      events:
+        recordDomain: DCSBAGGAGE_DCSPASSENGER
+        recordId: AA42BA1395020102
+        originFeedTimeStamp: '2018-10-24T14:19:00Z'
+        events:
+          - origin: COMPARISON
+            eventType: UPDATED
+            currentPath: /dcsBaggageCorrelations/correlationBagsGroupDcsPassenger/correlatedData/bagsGroupId/AA42BA1395020102
+            previousPath: /dcsBaggageCorrelations/correlationBagsGroupDcsPassenger/correlatedData/bagsGroupId/AA42BA1395020102
+
+  Events:
+    type: object
+    description: >-
+      Structure of Dynamic Intelligence Hub functional events.
+      It has information about what exactly changed in the current payload as compared
+      to the previous version.
+    properties:
+      recordDomain:
+        type: string
+        description: Functional domain of the record
+        example: DCSBAGGAGE
+      recordId:
+        type: string
+        description: Record identifier e.g. Baggage Group Identifier
+        example: AA42BA1395020102
+      originFeedTimeStamp:
+        type: string
+        description: Incoming PSS feed time stamp
+        format: date-time
+      events:
+        type: array
+        description: List of events that have been detected on the DCS Baggage document
+        items:
+          type: object
+          properties:
+            origin:
+              type: string
+              description: Type of event e.g. 'COMPARISON' / 'TIME_INITIATED_EVENT'
+              example: COMPARISON
+            eventType:
+              type: string
+              description: >-
+                In case of comparison events, type of operation notified by the event
+              example: CREATED
+              enum:
+                - CREATED
+                - UPDATED
+                - DELETED
+            currentPath:
+              type: string
+              description: >-
+                String containing the JSON Pointer (see IETF RFC6901) that points to the data referenced by the
+                Event in the latest version of the entity. It is only applicable for CREATED and UPDATED events.
+              example: ''
+            previousPath:
+              type: string
+              description: >-
+                String containing the JSON Pointer (see IETF RFC6901) that points to the data referenced by the
+                Event in the previous version of the entity. It is only applicable for DELETED and UPDATED events.
+              example: ''
+    example:
+      recordDomain: 'DCSBAGGAGE_DCSPASSENGER'
+      recordId: 'AA42BA1395020102'
+      originFeedTimeStamp: '2018-10-24T14:19:00Z'
+      events:
+        - origin: 'COMPARISON'
+          eventType: 'UPDATED'
+          currentPath:  '/dcsBaggageCorrelations/correlationBagsGroupDcsPassenger/correlatedData/bagsGroupId/AA42BA1395020102'
+          previousPath: '/dcsBaggageCorrelations/correlationBagsGroupDcsPassenger/correlatedData/bagsGroupId/AA42BA1395020102'
+
+  CorrelationBagsGroupDcsPassenger:
+    type: object
+    description: >-
+      Structure of correlation between a DCS Baggage Group and DCS Passenger(s).
+    properties:
+      bagsGroupId:
+        type: string
+        description: Current DCS Baggage Group Identifier
+        example: AA42BA1395020102
+      dcsPassengerIds:
+        type: array
+        description: >-
+          Identifying DCS Passenger(s) correlated with the DCS Baggage record
+        items:
+          type: string
+        example: 2501ADE000000001
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataBagsGroupDcsPassenger'
+    example:
+      bagsGroupId: 'AA42BA1395020102'
+      dcsPassengerIds:
+        - '2401CA5500003431'
+      correlatedData:
+        '2401CA5500003431':
+          - bagId: '1101CA1100003431'
+            bagLegCorrelations:
+              - bagLegDeliveryId: 'LHR'
+                dcsPassengerLegDeliveryId: 'LHR'
+                dcsPassengerSegmentDeliveryId: '2202DA1200003432'
+              - bagLegDeliveryId: 'BKK'
+                dcsPassengerLegDeliveryId: 'BKK'
+                dcsPassengerSegmentDeliveryId: '2202DA1200003432'
+
+  CorrelatedDataBagsGroupDcsPassenger:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a DCS Baggage record and a DCS Passenger
+    properties:
+      bagId:
+        type: string
+        example: '1101CA1100003431'
+      bagLegCorrelations:
+        type: array
+        items:
+          $ref: '#/definitions/CorrelatedBagsGroupDcsPassengerLegData'
+
+  CorrelatedBagsGroupDcsPassengerLegData:
+    type: object
+    properties:
+      bagLegDeliveryId:
+        type: string
+        example: LHR
+      dcsPassengerLegDeliveryId:
+        type: string
+        example: LHR
+      dcsPassengerSegmentDeliveryId:
+        type: string
+        example: 2202DA1200003432
+
+  CorrelationBagsGroupPnr:
+    type: object
+    description: >-
+      Structure of correlation between a DCS Baggage Group and Passenger Name Records.
+    properties:
+      bagsGroupId:
+        type: string
+        description: Current DCS Baggage Group Identifier
+        example: AA42BA1395020102
+      pnrIds:
+        type: array
+        description: >-
+          Identifying the PNR correlated with the current DCS Baggage Group - item
+          format is record locator + creation date
+        items:
+          type: string
+        example: [ORY4NY-2018-10-19, KBR849-2018-09-17]
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataBagsGroupPnr'
+    example:
+      bagsGroupId: 'AA42BA1395020102'
+      pnrIds:
+        - 'ORY4NY-2018-10-19'
+      correlatedData:
+        'ORY4NY-2018-10-19':
+          - bagId: '1101CA1100003431'
+            pnrTravelerId: 'ORY4NY-2018-10-19-PT-1'
+            bagLegCorrelations:
+              - bagLegDeliveryId: 'ORY'
+                pnrAirSegmentId: 'ORY4NY-2018-10-19-ST-1'
+
+  CorrelatedDataBagsGroupPnr:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between DCS Baggage Group and Pnr Segments
+    properties:
+      bagId:
+        type: string
+        example: '1101CA1100003431'
+      pnrTravelerId:
+        type: string
+        example: 'ORY4NY-2018-10-19-PT-1'
+      bagLegCorrelations:
+        type: array
+        items:
+          $ref: '#/definitions/CorrelatedBagsGroupPnrLegData'
+
+  CorrelatedBagsGroupPnrLegData:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between DCS Baggage Group and Pnr Air Segments
+    properties:
+      bagLegDeliveryId:
+        type: string
+        example: 'LHR'
+      pnrAirSegmentId:
+        type: string
+        example: 'ORY4NY-2018-10-19-ST-1'
+
+  CorrelationData:
+    type: object
+    properties:
+      correlationBagsGroupDcsPassenger:
+        $ref: '#/definitions/CorrelationBagsGroupDcsPassenger'
+      correlationBagsGroupPnr:
+        $ref: '#/definitions/CorrelationBagsGroupPnr'
+      dictionaries:
+        $ref: '#/definitions/Dictionaries'
+
+  Dictionaries:
+    type: object
+    properties:
+      bagsGroups:
+        type: object
+        description: >-
+          Set of key/value pairs with Baggage Group Identifier as key
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      dcsPassengers:
+        type: object
+        description: >-
+          Set of key/value pairs with UCI as key example '2401CA5500003431'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      pnrs:
+        type: object
+        description: >-
+          Set of key/value pairs with pnrId as key i.e. record
+          locator + creation date - key example 'ABCDEF-2018-05-15'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+    example:
+      bagsGroups:
+        'AA42BA1395020102':
+          type: 'bags-group'
+          id: 'AA42BA1395020102'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-bags-groups/AA42BA1395020102'
+      dcsPassengers:
+        '2401CA5500003431':
+          type: 'dcs-passenger'
+          id: '2401CA5500003431'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2401CA5500003431'
+      pnrs:
+        'ORY4NY-2018-10-19':
+          type: 'pnr'
+          id: 'ORY4NY-2018-10-19'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v1/reservation/processed-pnrs/ORY4NY-2018-10-19'
+
+  IncludedResources:
+    type: object
+    properties:
+      bags:
+        type: object
+        description: Map of Bag resources with Baggage Entity Identifier (Unique Bag Identifier) as key
+        additionalProperties:
+          $ref: '#/definitions/Bag'
+      excessBaggageCharges:
+        type: object
+        description: Map of Excess Baggage Charge resources with Excess Baggage Charge Identifier as key
+        additionalProperties:
+          $ref: '#/definitions/ExcessBaggageCharge'
+      correlationBagsGroupDcsPassenger:
+        type: object
+        description: Map of CorrelationBagsGroupDcsPassenger with Baggage Group Identifier as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationBagsGroupDcsPassenger'
+      correlationBagsGroupPnr:
+        type: object
+        description: Map of CorrelationBagsGroupPnr with Baggage Group Identifier as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationBagsGroupPnr'
+
+  DcsBaggageApiData:
+    allOf:
+      - $ref: '#/definitions/BagsGroup'
+      - properties:
+          bags:
+            $ref: '#/definitions/Relationships'
+          excessBaggageCharges:
+            $ref: '#/definitions/Relationships'
+          correlations:
+            type: object
+            description: >-
+              Correlation structures are defined in the included section. This section provides links for all the correlation structures pertaining to the current Baggage Group. Following are correlation link examples.
+            properties:
+              bagsGroupDcsPassenger:
+                $ref: '#/definitions/Relationship'
+              bagsGroupPnr:
+                $ref: '#/definitions/Relationship'
+
+  DcsBaggageApiResponse:
+    properties:
+      data:
+        $ref: '#/definitions/DcsBaggageApiData'
+      included:
+        $ref: '#/definitions/IncludedResources'
+      dictionaries:
+        $ref: '#/definitions/Dictionaries'
+
+  Bag:
+    type: object
+    description: >-
+      Main entity providing core information on a Baggage Entity. A passenger (Pax) in DCS can own one or more bags, i.e. Bag entities. (ID – UBI)
+    properties:
+      id:
+        type: string
+        description: The UBI (Unique Baggage Identifier) of the bag item
+        example: 1101CA1100003431
+      bagType:
+        type: string
+        description: The type of the baggage
+        enum:
+          - EARLY
+          - RUSH
+          - STANDARD
+          - CREW
+        example: STANDARD
+      bagTag:
+        $ref: '#/definitions/BagTag'
+      linkedBagTag:
+        $ref: '#/definitions/BagTag'
+      lastSeenLocation:
+        $ref: '#/definitions/TimeLocationTrackingLog'
+      systemSource:
+        description: The system process that created the Baggage
+        type: string
+        enum:
+          - AUTOMATIC
+          - BTM
+          - CRYPTIC
+          - AUTO_BAG_DROP
+          - IATCI
+          - FRONTEND
+          - KIOSK
+          - OTHERS
+          - BPM
+          - SMS
+          - TELEPHONE
+          - WEB
+        example: AUTOMATIC
+      weight:
+        $ref: '#/definitions/Weight'
+      owner:
+        $ref: '#/definitions/Relationship'
+        description: Relationship to the DCS passenger that owns this baggage
+      legs:
+        type: array
+        description: Flight-leg information associated with the baggage item
+        items:
+          $ref: '#/definitions/BagLegDelivery'
+
+  BagTag:
+    description: >-
+      A document issued by carrier solely for identification of checked baggage, the baggage (strap) tag portion of which is attached by carrier to a particular article of checked baggage and the baggage (identification) tag portion of which is given to the passenger.
+    type: object
+    properties:
+      licensePlate:
+        description: The bag's 10 digit licence plate comprising of leading digit, company code and tag number
+        type: string
+        example: 0057483945
+      issuingCarrier:
+        description: The bag tag's issuing carrier code
+        type: string
+        example: 6X
+      finalDestination:
+        description: The final destination of the bag as issued on the bag tag, given as the three letter IATA airport code
+        type: string
+        example: JFK
+      issuanceDay:
+        description: The day of the bag tag issuance (0-366), typically empty if not a linked bag tag
+        type: integer
+        example: 2
+      systemSource:
+        description: Which system process was the bag tag created
+        type: string
+        enum:
+          - AUTOMATIC
+          - BTM
+          - BPM
+          - IATCI
+          - MANUAL
+        example: AUTOMATIC
+
+  BagLegDelivery:
+    type: object
+    description: >-
+      Stores all the itinerary related information of the bag or bag group corresponding to a flight-leg.
+      operatingFlight is not populated for itinerary in BagsGroup.
+    properties:
+      id:
+        description: Bag Leg Identifier
+        type: string
+        example: JFK
+      boardPoint:
+        $ref: '#/definitions/FlightEndPoint'
+      offPoint:
+        $ref: '#/definitions/FlightEndPoint'
+      operatingFlight:
+        $ref: '#/definitions/FlightDesignator'
+      acceptanceStatus:
+        description: The acceptance status of the bag item for the current flight leg
+        type: string
+        enum:
+          - FULLY_ACCEPTED
+          - NOT_ACCEPTED
+          - PROVISIONALLY_ACCEPTED
+          - NOT_TRAVELLING
+        example: FULLY_ACCEPTED
+      activationStatus:
+        description: The activation status of the bag item for the current flight leg
+        type: string
+        enum:
+          - ACTIVE
+          - INACTIVE
+          - VALIDATED
+        example: ACTIVE
+      travelClassCode:
+        type: string
+        description: The cabin class code associated with the bag item
+        example: 'Y'
+      authorityToLoad:
+        description: Indicates if the Bag is authorised to be loaded onto the flight
+        type: boolean
+        example: true
+      authorityToTransport:
+        description: Indicates if the Bag is authorised to be transported by the flight
+        type: boolean
+        example: true
+      offloaded:
+        description: Indicates if the Bag was offloaded from the flight
+        type: boolean
+        example: false
+      checkinLocation:
+        $ref: '#/definitions/TimeLocationTrackingLog'
+      specialBagHandlingItems:
+        type: array
+        items:
+          $ref: '#/definitions/SpecialBagHandling'
+
+  SpecialBagHandling:
+    type: object
+    description: Support bag handling information that can change from one leg to another (should the baggage be delivered at aircraft, ...) and the kind of good that is transported.
+    properties:
+      id:
+        description: Special Bag Handling Identifier
+        example: 'GOLF'
+        type: string
+      service:
+        $ref: '#/definitions/Service'
+      freeText:
+        type: string
+        description: Holds any details for the attribute
+        example: Broken Handle
+      label:
+        type: string
+        enum:
+          - GROUP
+          - GROUND_TRANSPORT
+          - FRAGILE
+          - DUPLICATE_TAG
+          - DIPLOMATIC_COURIER
+          - DANGEROUS_GOODS
+          - DELIVERED_AT_AIRCRAFT
+          - CREW
+          - COURIER
+          - ROUTING_UPDATE
+          - TOUR
+          - UNACCOMPANIED
+          - VIP
+          - REROUTED
+          - RUSH
+          - SHORT_CONNECTION
+          - JUMP
+          - MISHANDLED
+          - PRIORITY
+          - RELOAD
+          - HAJJ
+          - HOTEL_VOUCHER
+          - HEAVY
+          - IRREGULAR_OPERATION
+          - WEIGHT_REJECT
+        example: COURIER
+
+  Weight:
+    type: object
+    description: An object representing weight and unit.
+    properties:
+      value:
+        type: integer
+        description: Defines the weight value without decimal position.
+        example: 125
+      unit:
+        type: string
+        description: The unit of measurement used for the weight value.
+        enum:
+          - KILOGRAMS
+          - POUNDS
+        example: KILOGRAMS
+
+  FlightEndPoint:
+    type: object
+    description: Departure or arrival information. localDateTime property is only applicable to BagLegDelivery structure.
+    properties:
+      iataCode:
+        description: IATA Airport code
+        type: string
+        example: JFK
+      localDateTime:
+        description: "Local date and time in ISO 8601 format"
+        type: string
+        example: '2018-09-14'
+
+  Service:
+    type: object
+    description: Service representation. Can be used for SSR/SK/OSI elements within PNR.
+    properties:
+      id:
+        type: string
+        description: Service Item identifier
+        example: '1000000000BC2107'
+      code:
+        type: string
+        description: This code is used to identify the service type
+        maxLength: 4
+        example: 'GOLF'
+      subType:
+        type: string
+        description: This field is used to indicate if we are dealing with an SSR/SK/OSI element
+        enum:
+          - SPECIAL_SERVICE_REQUEST
+          - SPECIAL_KEYWORD
+          - OTHER_SERVICE_INFORMATION
+          - MANUAL_AUXILIARY_SEGMENT
+        example: SPECIAL_SERVICE_REQUEST
+      description:
+        type: string
+        description: This field is used to describe the service free text
+        example: 'Golf Bag'
+      statusCode:
+        type: string
+        description: >-
+          Information about the status of the service
+            HK - Confirmed
+            HL - Waitlist
+            UN - Unable to confirm not operating
+            UC - Unable to confirm
+            HX - Have Cancelled
+            NO - No action taken
+        example: 'HK'
+
+  ChargeableServiceDocument:
+    type: object
+    description: >-
+      A reference to either MCO or EMD document by number and type. A chargeable service document represents the document
+      issued as a result of the chargeable service payment. The document status stores the state of the document as either
+      refunded, voided, or flown (used).
+    properties:
+      documentType:
+        description: the type of document for the chargeable service. Either MCO for Miscellaneous Charge Order or EMD for Electronic Miscellaneous Document
+        type: string
+        enum:
+          - EMD
+          - MCO
+        example: EMD
+      number:
+        description: the document number
+        type: string
+        example: '1728200002469'
+
+  FlightDesignator:
+    type: object
+    description: This is an identifier that consists of airline code, the flight number and optional operational suffix.
+    properties:
+      carrierCode:
+        type: string
+        example: 6X
+      flightNumber:
+        type: string
+        example: '1011'
+      operationalSuffix:
+        type: string
+        example: A
+
+  BagsGroup:
+    type: object
+    description: >-
+      The BagsGroup serves to group and aggregate properties of bags travelling together, including weight, number of bags, the common itinerary and pooling.
+      Each BagsGroup has a responsible passenger, which in the case of pooling is the head of the pool.
+      Every individual bag (baggage entity) forms part of at least one BagsGroup. An individual bag is part of multiple BagsGroups when a passenger is travelling with multiple bags on a multi-legged flight, with some bags not travelling on all the legs.In this case a BagsGroup is formed for every subset of bags on the legs they are travelling together.
+      Therefore, the Bag and BagsGroup entities form a many-to-many relation.
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: [bags-group]
+        example: bags-group
+      id:
+        type: string
+        description: The baggage group reference
+        example: 10FBC42026758291
+      etag:
+        type: string
+        description: Sequence number for comparison between two baggage images and to know which one is the latest.
+        example: 1602876919851
+      checkedBagsCount:
+        description: The number of checked bags comprising this bags group
+        type: integer
+        example: 5
+      checkedBagsWeight:
+        description: The total weight of all checked bags
+        $ref: '#/definitions/Weight'
+      handBagsCount:
+        description: The number of hand baggage items comprising this bags group
+        type: integer
+        example: 1
+      handBagsWeight:
+        description: The total weight of hand baggage items comprising this bags group.
+        $ref: '#/definitions/Weight'
+      responsiblePassenger:
+        description: The DCS Passenger responsible for the BagsGroup and the head of pool
+        $ref: '#/definitions/Relationship'
+      checkedBags:
+        description: A collection of links to the individual bags comprising this bags group
+        $ref: '#/definitions/Relationships'
+      pooledPassengers:
+        description: A one-to-many relationship between the BagsGroup and the DCS-Passengers that are pooled in the group (not including the head of pool)
+        $ref: '#/definitions/Relationships'
+      itinerary:
+        type: array
+        description: The itinerary where the bags comprising the bags group are travelling
+        items:
+          $ref: '#/definitions/BagLegDelivery'
+
+  TimeLocationTrackingLog:
+    type: object
+    description: >-
+      Details about the last location where the Bag was tracked by DCS system.
+    properties:
+      deviceId:
+        type: string
+        description: tracking device
+        example: AF5FA7A4
+      deviceUser:
+        type: string
+        description: the agent's sign in who last tracked
+        example: 116554
+      localDateTime:
+        type: string
+        description: Last tracked date and time in ISO 8601 format
+        example: '2018-10-30T16:43'
+      logSource:
+        type: string
+        description: channel how last tracked
+        enum:
+          - EXTERNAL_DCS
+          - CRYPTIC
+          - JFE
+          - KIOSK
+          - MOBILE_PHONE
+          - SMS
+          - TELEPHONE
+          - WEB
+          - AIRLINE_AGENT
+          - GROUND_HANDLING_AGENT
+          - AUTO_CHECK_IN
+          - AUTO_BAG_DROP
+          - LOUNGE_ACCESS
+          - BRS_SCANNER
+          - WIRELESS_HANDHELD_BOARDING
+          - EXTERNAL_FRONTEND
+          - BAGGAGE_SORTATION_SYSTEM
+          - BAGGAGE_RECONCILIATION_SYSTEM
+        example: KIOSK
+      trackedLocation:
+        $ref: '#/definitions/InfrastructureLocation'
+
+  Relationship:
+    type: object
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+        description: The type of the related resource
+        example: dcs-passenger
+      href:
+        type: string
+        description: The URI of the related resource
+        example: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2401CA5500003431'
+        format: uri
+      version:
+        type: string
+        description: Only populated for correlated resources defined in Dictionaries
+        example: '1'
+      ref:
+        type: string
+        description: The reference to the related resource if this latter exists in the same document
+        example: 'included/correlationBagsGroupDcsPassenger/AA42BA1395020102'
+      methods:
+        type: array
+        description: Accepted Methods
+        items:
+          type: string
+          enum:
+            - GET
+
+  Relationships:
+    type: object
+    properties:
+      collection:
+        type: array
+        items:
+          $ref: "#/definitions/Relationship"
+
+  ExcessBaggageCharge:
+    type: object
+    description: >-
+      The ExcessBaggageCharge entity maps the core information related to baggage in excess. The entity intends to capture the following information-
+      - The total charges incurred to a passenger and their payment status
+      - The part of the passenger's journey for which excess is calculated
+      - The passenger's baggage allowance on that journey
+      - A breakdown of the calculation per item in excess
+      There is not one single way of calculating excess in DCS. There are different flavors of excess used by different airlines. These differences are mainly observable in the way the baggage allowance and excess rates and charges are determined.
+    properties:
+      id:
+        description: Unique Identifier of Excess Baggage Charge XCI
+        type: string
+        example: 1000000000000001
+      paymentStatus:
+        description: Denotes if the payment has be made or waived etc
+        type: string
+        enum:
+          - PAID
+          - UNPAID
+          - WAIVED
+          - EXEMPTED
+        example: PAID
+      waiverReason:
+        description: Waiver reason associated with the Excess Baggage Charge
+        $ref: '#/definitions/QualifiedFreeText'
+      responsiblePassenger:
+        $ref: '#/definitions/Relationship'
+      segments:
+        description: Links to the products of the responsible passenger to which this charge applies.
+        $ref: '#/definitions/Relationships'
+      totalCharge:
+        description: A breakdown of the total charge
+        $ref: '#/definitions/Price'
+      calculations:
+        type: array
+        items:
+          $ref: '#/definitions/ExcessBaggageCalculation'
+
+  ExcessBaggageCalculation:
+    type: object
+    description: >-
+      The airline can decide whether it considers customer's baggage per piece or per weight, so the allowed limit will be set in weight units (Kg) or number of pieces. Additionally, if the airline uses a piece policy, it can also define a maximum weight per piece. Any bags over this weight will also be considered as excess baggage, and more specifically as heavy bags. Therefore, the calculation of the charges to pay by the passenger in case of excess baggage will depend on the airline's policy/scheme.
+    properties:
+      id:
+        type: string
+        description: The identifier of excess baggage calculation
+        example: 10DF2D0000BD64F4
+      boardPoint:
+        $ref: '#/definitions/FlightEndPoint'
+      offPoint:
+        $ref: '#/definitions/FlightEndPoint'
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/ExcessBaggageItem'
+
+  ExcessBaggageItem:
+    type: object
+    description: A breakdown of the calculation per item in excess.
+    properties:
+      id:
+        type: string
+        description: The identifier of excess baggage item
+        example: 1000000000A21C1B
+      itemType:
+        type: string
+        enum:
+          - PIECE
+          - WEIGHT
+          - HEAVY_CHARGE
+      quantity:
+        type: integer
+      boardPoint:
+        $ref: '#/definitions/FlightEndPoint'
+      offPoint:
+        $ref: '#/definitions/FlightEndPoint'
+      rate:
+        $ref: '#/definitions/Price'
+      weight:
+        description: only used with itemType "WEIGHT"
+        $ref: '#/definitions/Weight'
+      charge:
+        $ref: '#/definitions/Price'
+      bag:
+        $ref: '#/definitions/Relationship'
+        description: The relationship to the bag item this charge is applied on
+      paymentDocument:
+        $ref: '#/definitions/ChargeableServiceDocument'
+      waiverReason:
+        description: Waiver reason associated with the Excess Baggage Item
+        $ref: '#/definitions/QualifiedFreeText'
+
+  Price:
+    type: object
+    description: >-
+      This structure provides price details related to a product or a services during quotation for offers or selling transaction. The amount can be represented as a string or as numeric value for computation and detailed currency decimal position to prevent issue with rounding methods.
+    properties:
+      currency:
+        type: string
+        description: the currency code of the price calculated
+        example: EUR
+      total:
+        type: string
+        description: the monetary value calculated
+        example: 75.00
+
+  QualifiedFreeText:
+    type: object
+    description: Specific type to convey a list of string for specific information type
+    properties:
+      text:
+        type: string
+        description: Free Text
+        example: Authorised by Admin
+      lang:
+        type: string
+        description: The language of this free text. See RFC 5646. Note that this field is currently not populated. It is reserved for future use.
+        example: "fr-FR"
+      status:
+        type: string
+        description: The status of the free text. Note that this field is currently not populated. It is reserved for future use.
+        example: ACTIVE
+
+  EventLog:
+    type: object
+    description: >-
+      Details about the original event triggering the current datapush feed
+      Used by Meta.triggerEventLog and DcsBaggagePush.lastModification
+    properties:
+      id:
+        description: Identifier of the change
+        type: string
+        example: '46541dsfsSDRWFS54'
+      triggerEventName:
+        description: The name of the trigger event. Set to 'DATA_INIT' for initialization messages
+        type: string
+        example: 'DATA_INIT'
+      dateTime:
+        type: string
+        format: date-time
+        description: GMT date & time
+        example: '2015-10-05T10:00:00Z'
+      user:
+        $ref: '#/definitions/User'
+
+  User:
+    type: object
+    description: The user that initiated/performed the change in case of user initiated events
+    properties:
+      id:
+        type: string
+        description: Identifier of the User
+        example: "3355KJ"
+      officeId:
+        type: string
+        description: Office Id of the User. Defaulted to "LON1A0955" in case of DCS system initiated actions
+        example: "FRALH04SS"
+      workstation:
+        $ref: '#/definitions/Workstation'
+
+  Workstation:
+    type: object
+    description: Workstation details from where the change was done
+    properties:
+      id:
+        type: string
+        description: Identifier of the Workstation in format 'qualifier - address'
+        example: "J-04SS"
+      fullLocation:
+        $ref: '#/definitions/InfrastructureLocation'
+
+  InfrastructureLocation:
+    type: object
+    description: Full location details of the DCS agent/device.
+    properties:
+      airportCode:
+        type: string
+        description: IATA three-digit airport code (exclusive with cityCode)
+        example: 'LHR'
+      cityCode:
+        type: string
+        description: IATA three-digit metro area code (exclusive with airportCode)
+        example: 'LON'
+      terminalId:
+        type: string
+        description: Terminal identifier as in appendix of the SSM manual (exclusive with buildingId)
+        example: '2E'
+      buildingId:
+        type: string
+        description: Building identifier - non verified or regulated (exclusive with terminalId)
+        example: 1
+      areaCode:
+        type: string
+        description: Category of the location
+        example: 'CKI'
+      identifier:
+        type: string
+        description: Identifier of the closer location / zone
+        example: 1
+      description:
+        type: string
+        description: Admin user defined non structured free-flow text
+        example: 'LHR TERM-2E'
+
+  PatchOperation:
+    description: A single JSON Patch operation as defined by RFC 6902 (see https://tools.ietf.org/html/rfc6902)
+    type: object
+    required:
+      - "op"
+      - "path"
+    properties:
+      op:
+        type: string
+        description: The operation to be performed
+        enum:
+          - "add"
+          - "remove"
+          - "replace"
+          - "move"
+          - "copy"
+          - "test"
+      path:
+        type: string
+        description: A JSON Pointer as defined by RFC 6901 (see https://tools.ietf.org/html/rfc6901)
+      value:
+        type: object
+        description: The value to be used within the operations
+      from:
+        type: string
+        description: A JSON Pointer as defined by RFC 6901 (see https://tools.ietf.org/html/rfc6901)

@@ -1,0 +1,4043 @@
+swagger: '2.0'
+################################################################################
+#                              API Information                                 #
+################################################################################
+info:
+  version: &VERSION 2.2.0
+  title: Dynamic Intelligence Hub API and Data Models - DCS Passenger
+  description: >-
+      This document describes the OpenAPI for:
+       1. GET for DCS Passenger data
+       2. Data models for the information pushed out by Amadeus for DCS Passenger
+################################################################################
+#                  Host, Base Path, Schemes and Content Types                  #
+################################################################################
+schemes:
+- https
+host: airlines.api.amadeus.com
+basePath: /v2
+consumes:
+- application/json
+produces:
+- application/vnd.amadeus+json
+################################################################################
+#                                   Parameters                                 #
+################################################################################
+parameters:
+  id:
+    name: id
+    description: Identifier of a DCS Passenger Record
+    required: true
+    in: path
+    type: string
+################################################################################
+#                                  Security                                    #
+################################################################################
+securityDefinitions:
+  basicAuth:
+    type: basic
+    description: HTTP Basic Authentication. Works over `HTTP` and `HTTPS`
+################################################################################
+#                                    Paths                                     #
+################################################################################
+paths:
+  '/departure-control/processed-dcs-passengers/{id}':
+    get:
+      tags:
+      - DcsPassengerAPIs
+      operationId: getPassenger
+      summary: Retrieve DCS Passenger by ID (UCI)
+      description: Returns the DCS Passenger Record for the ID provided
+      consumes: []
+      parameters:
+      - $ref: '#/parameters/id'
+      responses:
+        '200':
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/DcsPassengerApiResponse'
+        '401':
+          description: Unauthorized. Missing credentials in header request.
+          schema:
+            $ref: '#/definitions/Errors'
+        '403':
+          description: Forbidden. Authorization refused for the credentials provided.
+          schema:
+            $ref: '#/definitions/Errors'
+        '404':
+          description: Passenger with the requested id was not found.
+          schema:
+            $ref: '#/definitions/Errors'
+        '500':
+          description: Internal server error / Technical
+          schema:
+            $ref: '#/definitions/Errors'
+      security:
+      - basicAuth: []
+  '/departure-control/dcs-passenger-feed':
+    post:
+      tags:
+      - Data Push Models
+      summary: DCS Passenger Data Push
+      description: >-
+        Model for the DCS Passenger data push feed.
+        Please be aware this is NOT a POST API, rather this explains the format of
+        the data pushed out by Amadeus.
+      responses:
+        '200':
+          description: >
+          schema:
+            $ref: '#/definitions/DcsPassengerPush'
+  '/departure-control/dcs-passengers-correlations-feed':
+    post:
+      tags:
+      - Data Push Models
+      summary: DCS Passenger Correlations Data Push
+      description: >-
+        Model for the DCS Passenger correlations data push feed.
+        Please be aware this is NOT a POST API, rather this explains the format of
+        the data pushed out by Amadeus.
+      responses:
+        '200':
+          description: >
+          schema:
+            $ref: '#/definitions/DcsPassengerCorrelationsPush'
+################################################################################
+#                                 Definitions                                  #
+################################################################################
+definitions:
+  ErrorSource:
+    properties:
+      parameter:
+        type: string
+        description: The key of the URI path or query parameter that caused the error
+      pointer:
+        type: string
+        description: >-
+          A JSON Pointer [RFC6901] to the associated entity in the request body
+          that caused this error
+      example:
+        type: string
+        description: A sample input to guide the user when resolving this issue
+
+  Warning:
+    required:
+    - code
+    - title
+    properties:
+      code:
+        type: integer
+        description: >-
+          A machine-readable error code from the Canned Messages table, that
+          will enable the API Consumers code to handle this type of error
+      title:
+        type: string
+        description: >-
+          An error title from the Canned Messages table with a 1:1 correspondence
+          to the error code. This may be localized
+      detail:
+        type: string
+        description: >-
+          An easy-to-read explanation specific to this occurrence of the problem.
+          It should give the API consumer an idea of what went wrong and how to
+          recover from it. Like the title, this field's value can be localized.
+      source:
+        $ref: "#/definitions/ErrorSource"
+      documentation:
+        type: string
+        format: url
+        description: >-
+          A link to a web page or file with further documentation to help the
+          API consumer resolve this error
+
+  Error:
+    required:
+    - status
+    - code
+    - title
+    properties:
+      status:
+        type: integer
+        description: >-
+          The [HTTP status code](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml)
+          of this response. This is present only in terminal errors which cause an unsuccessful response.
+          In the case of multiple errors, they must all have the same status.
+      code:
+        type: integer
+        description: >-
+          A machine-readable error code from the Amadeus Canned Messages table, that
+          will enable the API Consumers code to handle this type of error
+      title:
+        type: string
+        description: >-
+          An error title from the Canned Messages table with a 1:1 correspondence
+          to the error code. This may be localized.
+      detail:
+        type: string
+        description: >-
+          An easy-to-read explanation specific to this occurrence of the problem.
+          It should give the API consumer an idea of what went wrong and how to
+          recover from it. Like the title, this field's value can be localized.
+      source:
+        $ref: "#/definitions/ErrorSource"
+      documentation:
+        type: string
+        format: url
+        description: A link to a web page or file with further documentation to help the API consumer resolve this error
+    example:
+      status: 401
+      code: 20
+      title: "RESTRICTED"
+      detail: "Query unauthorised"
+
+  Errors:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          $ref: '#/definitions/Error'
+
+  Meta:
+    type: object
+    description: Technical information related to the feed
+    properties:
+      triggerEventLog:
+        description: Information related to the initial event that triggered the process
+        $ref: '#/definitions/EventLog'
+      version:
+        description: Version of the JSON feed produced
+        type: string
+        enum:
+        - *VERSION
+        example: *VERSION
+
+  DcsPassengerPush:
+    type: object
+    description: >-
+      The Online data push schema for DcsPassenger and events.
+      The structure also contains:
+      - meta data (technical details like version)
+      - lastModification (information about originating DCS transaction)
+      - previousRecord (JSON patches to get to the previous version of DcsPassenger
+        with respect to the current one)
+    properties:
+      meta:
+        $ref: '#/definitions/Meta'
+      lastModification:
+        $ref: '#/definitions/EventLog'
+      processedDcsPassenger:
+        $ref: '#/definitions/DcsPassenger'
+      previousRecord:
+        description: >-
+          List of JSON Patches as defined by RFC 6902 (see https://tools.ietf.org/html/rfc6902)
+          to apply to processedDcsPassenger [latest DcsPassenger version] in order to obtain
+          the actual JSON of the previous DcsPassenger version.
+        type: array
+        items:
+          $ref: '#/definitions/PatchOperation'
+      events:
+        $ref: '#/definitions/Events'
+    example:
+      meta:
+        triggerEventLog:
+          id: '46541dsfsSDRWFS54'
+        version: 2.2.0
+      lastModification:
+        dateTime: '2015-10-05T10:00:00.000Z'
+        triggerEventName: 'Customer Acceptance'
+        user:
+          id: 'USR0001'
+          officeID: 'NCE6X08AA'
+          workStation:
+            id: 'A/LHR/T/2/CKI/1/1'
+            fullLocation:
+              airportCode: 'LHR'
+              cityCode: 'LON'
+              terminalId: '2E'
+              buildingId: '1'
+              areaCode: 'CKI'
+              identifier: '1'
+              description: 'LHR TERM-2E'
+      processedDcsPassenger:
+        type: dcs-passenger
+        id: 2501ADE000000001
+        etag: 1602876919851
+        segmentDeliveries:
+        - id: 2401CA5500003OID
+          type: segment-delivery
+          uniqueCustomerIdentifier: 2501ADE000000001
+          segment:
+            departure:
+              iataCode: LHR
+              at: '2018-01-11'
+            arrival:
+              iataCode: SIN
+            number: '1234'
+            carrierCode: 7X
+            suffix: B
+            class: Q
+            cabin: M
+            statusCode: HK
+            operating:
+              carrierCode: 6X
+              number: '17'
+          recordLocator: PC3XYV
+          dcsProductType: ACTIVE_SYNCHRONISED
+          legDeliveries:
+          - id: LHR
+            departure:
+              iataCode: LHR
+              at: '2018-09-14T10:10:00'
+            arrival:
+              iataCode: SIN
+              at: '2018-09-14T10:10:00'
+            operatingFlight:
+              carrierCode: 6X
+              number: '741'
+              suffix: A
+            travelCabinCode: C
+            acceptance:
+              securityNumber: '098'
+              status: CAC
+              acceptanceType: PRM
+              isAdvanceAccepted: false
+              isForceAccepted: true
+              forceAcceptanceReason: emergency travel request
+              isFrozen: false
+              channel: JFE
+              physicalAcceptanceLocation: BMD
+              standbyReason: CSAX
+              cancellationReason: Customer Unwell
+            seating:
+              seatStatus: NOT_GUARANTEED
+              seatProductStatus: HL
+              isChargeableSeat: true
+              seat:
+                number: 12A
+                characteristicsCodes:
+                  - CH
+                  - W
+              chargeableSeat:
+                chargeableServiceId: 10000007896346C1
+                priceCategory:
+                  code: C
+                  subCode: 99Y
+                chargeableServiceDocument:
+                  documentType: EMD
+                  number: '1728200002469'
+                  status: REFUNDED
+                paymentStatus: WAIVED
+                isIssuanceRequired: true
+                waiver:
+                  authoriser: Check-in agent
+                  reasonCode: Technical
+                  reasonText: A technical issue occurred at check-in. Agent had to waive the chargeable service
+              seatPreferences:
+                number: 12A
+                characteristicsCodes:
+                  - CH
+                  - W
+            boarding:
+              error: Unpaid excess exists
+              warning: Customer is CBBG
+              boardingStatus: NBD
+              boardingPassPrint:
+                status: PPT
+                channel: JFE
+              boardingZone: B
+              trackingLog:
+                deviceId: AF5FA7A4
+                referenceDeviceType: SELF_BOARDING_DEVICE
+                deviceUser: 116554
+                utcDateTime: 2018-10-23T22:00:00Z
+                localDateTime: 2018-10-23T22:00:00
+                logSource: MOBILE_PHONE
+                trackedLocation:
+                  airportCode: LHR
+                  cityCode: LON
+                  terminalId: 2E
+                  buildingId: 1
+                  areaCode: CKI
+                  identifier: 1
+                  description: CDG TERM-2F LGE TRCK2 Lounge 2F2
+            onload:
+              status: OK
+              priority: W31
+              cabinCode: C
+              edit:
+                reasonCode: TO_REMAIN
+                reasonFreeText: Keep in same cabin
+                cabinCode: 'Y'
+            regradeDelivered:
+              status: ACTIONED
+              priority: W31
+              cabinCode: C
+              reason: OVER_SOLD_CURRENT_FLIGHT
+              reasonFreeText: Oversold current flight
+              authoriserReference: AU0123
+              regradeType: REMAIN_FORCE
+            regradeProposed:
+              status: ACTIONED
+              priority: W31
+              cabinCode: C
+              reason: OVER_SOLD_CURRENT_FLIGHT
+              reasonFreeText: Oversold current flight
+              authoriserReference: AU0123
+              direction: RGH
+              regradeType: REMAIN_FORCE
+            regulatoryChecks:
+            - id: 1255477819
+            - regulatoryProgram:
+                name: AQQ
+                countryCode: USA
+              statuses:
+              - id: 1255477820
+              - statusType: SECURITY
+                statusCode: S
+                override:
+                  commentType: OVERRIDE_AUTHORIZER
+                  description: Authorized by Mr. John Smith
+                message:
+                  commentType: SPECIAL_INSTRUCTIONS
+                  code: 8517
+                  description: TIMEOUT
+                isVerifiedId: false
+              assesmentTime: '2018-07-31T11:23:20Z'
+            comments:
+            - id: 1000000000810D86
+              text: One cabin bag to be taken on the hold
+              priority: HIGH
+              usage: AT_BP_REPRINT
+              delivery:
+                status: DELIVERED
+            compensations:
+            - id:
+              categoryDescription: ACCOMODATION
+              reason:
+                code: FDD
+                label: Flight Delayed on Departure
+              authorisation:
+                authorizer: 1100AC
+                status: AUTHORIZED
+                date: 2018-08-19
+                quantity: 2
+              vouchers:
+              - id: 9423690240
+                voucherType: GTP
+                form: Cash
+                description: Meal Voucher
+                comment: Creating meal voucher for customer John SMITH on AC123
+                status: ACTIVE
+                printStatus: PRINTED
+                isReprintable: true
+                providerCode: AC
+          associatedPassengerSegments:
+            onwardId: 2401CA5500003OID
+            infantId: 2401CA5500003JID
+            cbbgId: 2401CA5500003CID
+            exstId: 2401CA5500003EID
+            informativeOnwardId: 2401CA5500003CID
+            acceptedOnwardId: 2401CA5500003CID
+            alternateOnwardId: 2401CA5500003CID
+            misconnectedOnwardId: 2401CA5500003CID
+            tciOnwardId: 2401CA5500003CID
+            disruptedOnwardId: 2401CA5500003CID
+          staff:
+            idType: N2
+            transfersDuringDay: 2
+            transferDays: 3
+          frequentFlyer:
+          - id: FF0001
+            frequentFlyerNumber: 6X090807061234
+            serviceCode: FQTU
+            applicableAirlineCode: 6X
+            confirmationStatus: K
+            airlineLevel:
+              name: Gold
+              code: G
+              priorityCode: 1
+              companyCode: 6X
+            allianceLevel:
+              name: Gold
+              code: G
+              priorityCode: 1
+              companyCode: 6X
+            isValidationOverriden: false
+          associatedAirTravelDocuments:
+          - id: '1234556677812'
+            documentType: ETICKET
+            primaryDocumentNumber: '1234556677812'
+            conjunctiveDocumentNumbers:
+            - '1234556677812'
+            - '1234556677813'
+            validatingCarrierCode: 6X
+            associationStatus: ASSOCIATED
+            blacklistCategory: Fraud
+            airCoupons:
+            - id: '1'
+              number: 1
+              documentNumber: '1234556677812'
+          - id: '1234556677567'
+            documentType: EMD
+            primaryDocumentNumber: '1234556677567'
+            conjunctiveDocumentNumbers:
+            - '1234556677567'
+            airCoupons:
+            - id: '1'
+              number: 1
+              documentNumber: '1234556677567'
+            status: 'CHECKED_IN'
+            associatedDocuments:
+            - id: '1234556677812'
+              documentType: EMD
+              primaryDocumentNumber: '1234556677812'
+              conjunctiveDocumentNumbers:
+                - '1234556677812'
+              airCoupons:
+                - id: '1'
+                  number: 1
+                  documentNumber: '1234556677812'
+            reasonForIssuance:
+              code: 'C'
+              subCode: '99Y'
+              rfiscDescription: 'BAG- EXCESS PC ALLOWANCE'
+          previousTicket:
+            id: '1234556677568'
+            documentType: ETICKET
+            primaryDocumentNumber: '1234556677568'
+          services:
+            - code: DOCA
+              address:
+                category: DESTINATION
+                lines:
+                 - '101, JENYA'
+                postalCode: '560068'
+                countryCode: IN
+                cityName: BLR
+                stateCode: KAR
+            - id: 1000000000BC2107
+              chargeableServiceId: 10000007896346C1
+              code: BIKE
+              subType: SSR
+              priceCategory:
+                code: C
+                subCode: 99Y
+              status: MCF
+              NIP: 1
+              isSubjectToQuota: true
+              quotaCode: SSRQ123
+              chargeableServiceDocument:
+                documentType: EMD
+                number: '1728200002469'
+                status: REFUNDED
+              paymentStatus: WAIVED
+              isIssuanceRequired: true
+              waiver:
+                authoriser: Check-in agent
+                reasonCode: Technical
+                reasonText: A technical issue occurred at check-in. Agent had to waive the chargeable service
+          contacts:
+            - id: '762636429911'
+              addresseeName:
+                firstName: 'John'
+                lastName: 'SMITH'
+              phone:
+                text: '001461415588511'
+              purpose:
+                - EMERGENCY
+              isDeclined: false
+          regulatoryDocuments:
+          - id: 100000001AFC111A
+            document:
+              documentType: PASSPORT
+              number: GB12345
+              issuanceDate: '2018-08-15'
+              expiryDate: '2025-08-15'
+              effectiveDate: '2018-09-15'
+              issuanceCountry: GB
+              issuanceLocation: LONDON
+              gender: MALE
+              name:
+                firstName: John
+                lastName: SMITH
+                title: Mr
+              validToDate: '2019-08-14'
+              validity:
+                numberOfDays: 100
+                numberOfDaysUsed: 15
+                numberOfDaysPerEntry: 60
+                numberOfEntriesPermitted: 10
+                numberOfEntriesUsed: 9
+            recordedDocumentType: VVV
+            countryOfRegistration: USA
+            countryOfPortOfEntry: PRI
+            presentedAtPort: SJU
+            isCarried: false
+            isBearer: true
+            inputSource:
+              entryMethod: SWIPED
+              isSwipeOverriden: false
+              isOCR: false
+              isHistorical: false
+              scannedMethod: MACHINE_READABLE
+            usedFor: ARRIVAL
+          segmentLinks:
+            - id: '127317712391918'
+              collection:
+                - id: 2112C1E05536001D
+                  type: segment-delivery
+          revenueIntegrity:
+            checks:
+            - id: '6521372834902'
+              checkType: CUSTOMER_TYPE_CHECK
+              status: PASSED
+            comments:
+            - id: '1255477819'
+              commentType: PASSED_CUSTOMER_TYPES
+              description: STUDENT1
+          passengerDisruption:
+            originalDestination: LHR
+            productState:
+              status: DISRUPTED
+              reason: Disrupted From Flight
+          nationality: GRC
+          volunteerDowngrade: NOT_ASKED
+          volunteerDeniedBoarding: VOLUNTEERED
+        passenger:
+          name:
+            firstName: John
+            lastName: Smith
+            title: Mr
+          age: '45'
+          dateOfBirth: '1980-01-30'
+          gender: MALE
+          flightPassengerType: ADULT
+          contacts:
+            - id: '762636429911'
+              email:
+                address: contact@contactstandard.xyz
+              language: EN
+              purpose:
+                - STANDARD
+              carrierCode: 6X
+            - id: '126511237759'
+              phone:
+                text: '00446716216622'
+              language: FR
+              purpose:
+                - STANDARD
+              carrierCode: 6X
+            - id: '992873466222'
+              addresseeName:
+                firstName: 'John'
+                lastName: 'SMITH'
+              phone:
+                text: '001461415588511'
+              purpose:
+                - EMERGENCY
+              carrierCode: 6X
+              isDeclined: false
+        recordLocator: PXT607
+        cprFeedType: MARKETING_SBR
+        isSamePhysicalCustomer: false
+        isSystemMarkedSPC: false
+        isMasterRecord: true
+        groupName: Star Travels
+        staff:
+          id: ST0793
+          companyCode: WT
+          companyName: World Travellers
+          relationshipType: Self
+          category: BOOKABLE
+          joiningDate: '2011-02-28'
+          retirementDate: '2011-02-28'
+        flightTransfers:
+          - id: 12385310
+            subType: TRAVEL_READY_REACCOMODATION
+            disruptionTransferReason: FLIGHT_DIVERTED
+            dcsTransferStatus: COMPLETED
+            dataTransferStatus: SUCCESS
+            fromSegments:
+              departure:
+                iataCode: LHR
+                at: '2018-01-11'
+              arrival:
+                iataCode: SIN
+              number: '1567'
+              carrierCode: 7X
+              suffix: B
+              operating:
+                carrierCode: 6X
+                number: '17'
+            toSegments:
+              departure:
+                iataCode: LHR
+                at: '2018-01-11'
+              arrival:
+                iataCode: SIN
+              number: '3234'
+              carrierCode: 7X
+              suffix: B
+              operating:
+                carrierCode: 6X
+                number: '18'
+        frequentFlyer:
+        - id: FF0001
+          frequentFlyerNumber: 6X090807061234
+          serviceCode: FQTU
+          applicableAirlineCode: 6X
+          confirmationStatus: K
+          airlineLevel:
+            name: Gold
+            code: G
+            priorityCode: 1
+            companyCode: 6X
+          allianceLevel:
+            name: Gold
+            code: G
+            priorityCode: 1
+            companyCode: 6X
+          isValidationOverriden: false
+        services:
+          - code: DOCA
+            address:
+              category: DESTINATION
+              lines:
+                - '203, LAA APARTMENTS'
+              postalCode: '560068'
+              countryCode: IN
+              cityName: BLR
+              stateCode: KAR
+            serviceProvider:
+              code: 6X
+        passengerLinks:
+          - id: '176126316661283'
+            collection:
+              - id: 2002CAE00036002D
+                type: dcs-passenger
+                href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2721234567890726'
+                methods:
+                - GET
+        regulatoryDocuments:
+        - id: 100000001AFC111B
+          document:
+            documentType: PASSPORT
+            number: GB12345
+            issuanceDate: '2018-08-15'
+            expiryDate: '2025-08-15'
+            effectiveDate: '2018-09-15'
+            issuanceCountry: GB
+            issuanceLocation: GBR
+            gender: MALE
+            name:
+              firstName: John
+              lastName: SMITH
+              title: Mr
+            validToDate: '2019-08-14'
+            validity:
+              numberOfDays: 100
+              numberOfDaysUsed: 15
+              numberOfDaysPerEntry: 60
+              numberOfEntriesPermitted: 10
+              numberOfEntriesUsed: 9
+          recordedDocumentType: VVV
+          countryOfRegistration: USA
+          countryOfPortOfEntry: PRI
+          presentedAtPort: SJU
+          isCarried: false
+          isBearer: true
+          inputSource:
+            entryMethod: SWIPED
+            isSwipeOverriden: false
+            isOCR: false
+            isHistorical: false
+            scannedMethod: MACHINE_READABLE
+          validForCarrier: 6X
+          usedFor: ARRIVAL
+      previousRecord:
+        - op: replace
+          path: '/segmentDeliveries/0/dcsProductType'
+          value: 'ACTIVE_NOT_SYNCHRONISED'
+      events:
+        recordDomain: 'DCSPASSENGER'
+        recordId: '2501ADE000000001'
+        originFeedTimeStamp: '2018-10-24T14:19:00Z'
+        events:
+          - origin: 'COMPARISON'
+            eventType: 'UPDATED'
+            currentPath: '/segmentDeliveries/0/dcsProductType'
+            previousPath: '/segmentDeliveries/0/dcsProductType'
+
+  DcsPassengerCorrelationsPush:
+    type: object
+    description: >-
+      The Online data push schema for DcsPassenger correlations with other domains
+      and correlation events. It also contains meta data (technical details like version)
+    properties:
+      meta:
+        $ref: '#/definitions/Meta'
+      dcsPassengerCorrelations:
+        $ref: '#/definitions/CorrelationData'
+      events:
+        $ref: '#/definitions/Events'
+    example:
+      meta:
+        triggerEventLog:
+          id: '46541dsfsSDRWFS54'
+        version: '2.2.0'
+      dcsPassengerCorrelations:
+        correlationDcsPassengerTicket:
+          dcsPassengerId: 2501ADE000000001
+          ticketIds:
+            - 1258767935960-2018-08-21
+            - 1258767935961-2018-08-21
+          correlatedData:
+            1258767935960-2018-08-21:
+              - dcsPassengerSegmentDeliveryId: 2101CA1100003431
+                ticketCouponId: 1258767935960-2018-08-21-1
+              - dcsPassengerSegmentDeliveryId: 2202DA1200003432
+                ticketCouponId: 1258767935960-2018-08-21-2
+            1258767935961-2018-08-21:
+              - dcsPassengerSegmentDeliveryId: 2303BA1300003433
+                ticketCouponId: 1258767935961-2018-08-21-1
+        correlationDcsPassengerPnr:
+          dcsPassengerId: 2501ADE000000001
+          pnrIds:
+            - ORY4NY-2018-10-19
+            - KBR849-2018-09-17
+          correlatedData:
+            ORY4NY-2018-10-19:
+              - dcsPassengerSegmentDeliveryId: 2404CA5500003411
+                pnrTravelerId: ORY4NY-2018-10-19-PT-1
+                pnrAirSegmentId: ORY4NY-2018-10-19-ST-1
+              - dcsPassengerSegmentDeliveryId: 2504CA5500003422
+                pnrTravelerId: ORY4NY-2018-10-19-PT-1
+                pnrAirSegmentId: ORY4NY-2018-10-19-ST-2
+            KBR849-2018-09-17:
+              - dcsPassengerSegmentDeliveryId: 2604CA5500003433
+                pnrTravelerId: KBR849-2018-09-17-PT-2
+                pnrAirSegmentId: KBR849-2018-09-17-ST-1
+        correlationDcsPassengerSchedule:
+          dcsPassengerId: 2501ADE000000001
+          scheduleIds:
+            - 6X-5641-2018-10-05
+            - 6X-7861-2018-10-06
+          correlatedData:
+            6X-5641-2018-10-05:
+              - dcsPassengerSegmentDeliveryId: 2404CA5500003411
+                scheduleSegmentId: 2018-10-05-LHR-MAD
+                schedulePartnershipFlightId: 7X-9623-2018-10-05
+                correlatedLegs:
+                  - dcsPassengerLegDeliveryId: LHR
+                    scheduleLegId: LHR-CDG
+                  - dcsPassengerLegDeliveryId: CDG
+                    scheduleLegId: CDG-MAD
+            6X-7861-2018-10-06:
+              - dcsPassengerSegmentDeliveryId: 2504CA5500003422
+                scheduleSegmentId: 2018-10-06-MAD-LHR
+                correlatedLegs:
+                  - dcsPassengerLegDeliveryId: MAD
+                    scheduleLegId: MAD-LHR
+        correlationDcsPassengerEmd:
+          dcsPassengerId: 2501ADE000000001
+          emdIds:
+            - 1721234567891-2018-05-15
+            - 1721234567892-2018-05-15
+          correlatedData:
+            1721234567891-2018-05-15:
+              - dcsPassengerSegmentDeliveryId: 2404CA5500003411
+                dcsPassengerServiceId: 1111000000BC2107
+                emdCouponId: 1721234567891-2018-05-15-1
+              - dcsPassengerSegmentDeliveryId: 2505CA5500003422
+                dcsPassengerServiceId: 1222000000BC2107
+                emdCouponId: 1721234567891-2018-05-15-2
+            1721234567892-2018-05-15:
+              - dcsPassengerSegmentDeliveryId: 2505CA5500003422
+                dcsPassengerServiceId: 1333000000BC2107
+                emdCouponId: 1721234567892-2018-05-15-1
+        correlationDcsPassengerInventory:
+          dcsPassengerId: 2501ADE000000001
+          inventoryIds:
+            - 6X-5641-2018-10-05
+            - 6X-7861-2018-10-06
+          correlatedData:
+            6X-5641-2018-10-05:
+              - dcsPassengerSegmentDeliveryId: 2101ADE0000001
+                inventorySegmentId: 2018-10-05-LHR-MAD
+                inventoryPartnershipFlightId: 7X-9623-2018-10-05
+                correlatedLegs:
+                  - dcsPassengerLegDeliveryId: LHR
+                    inventoryLegId: LHR-CDG
+                  - dcsPassengerLegDeliveryId: CDG
+                    inventoryLegId: CDG-MAD
+            6X-7861-2018-10-06:
+              - dcsPassengerSegmentDeliveryId: 2201ADE0000002
+                inventorySegmentId: 2018-10-06-MAD-LHR
+                correlatedLegs:
+                  - dcsPassengerLegDeliveryId: MAD
+                    inventoryLegId: MAD-LHR
+        correlationDcsPassengerBagsGroup:
+          dcsPassengerId: 2501ADE000000001
+          bagsGroupIds:
+            - AA42BA1395020102
+            - AA41BA1395020413
+          correlatedData:
+            AA42BA1395020102:
+              - dcsPassengerSegmentDeliveryId: 2202DA1200003432
+                correlatedLegs:
+                  - dcsPassengerLegDeliveryId: LHR
+                    bagId: 1101CA1100003431
+                    bagLegDeliveryId: LHR
+            AA41BA1395020413:
+              - dcsPassengerSegmentDeliveryId: 2202DA1200003433
+                correlatedLegs:
+                  - dcsPassengerLegDeliveryId: LHR
+                    bagId: 1101CA1100003432
+                    bagLegDeliveryId: LHR
+        dictionaries:
+          dcsPassengers:
+            2501ADE000000001:
+              type: dcs-passenger
+              id: 2501ADE000000001
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2501ADE000000001'
+          tickets:
+            1258767935960-2018-08-21:
+              type: ticket
+              id: 1258767935960-2018-08-21
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/ticketing/processed-tickets/1258767935960-2018-08-21'
+            1258767935961-2018-08-21:
+              type: ticket
+              id: 1258767935961-2018-08-21
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/ticketing/processed-tickets/1258767935961-2018-08-21'
+          emds:
+            1721234567891-2018-05-15:
+              type: emd
+              id: 1721234567891-2018-05-15
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/ticketing/processed-emds/1721234567891-2018-05-15'
+            1721234567892-2018-05-15:
+              type: emd
+              id: 1721234567892-2018-05-15
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/ticketing/processed-emds/1721234567892-2018-05-15'
+          pnrs:
+            ORY4NY-2018-10-19:
+              type: pnr
+              id: ORY4NY-2018-10-19
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/reservation/processed-pnrs/ORY4NY-2018-10-19'
+            KBR849-2018-09-17:
+              type: pnr
+              id: KBR849-2018-09-17
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/reservation/processed-pnrs/KBR849-2018-09-17'
+          scheduleDatedFlights:
+            6X-5641-2018-10-05:
+              type: dated-flight
+              id: 6X-5641-2018-10-05
+              version: '1536835243'
+              href: 'https://airlines.api.amadeus.com/v2/schedule/processed-flights/6X-5641-2018-10-05'
+            6X-7861-2018-10-06:
+              type: dated-flight
+              id: 6X-7861-2018-10-06
+              version: '1536835243'
+              href: 'https://airlines.api.amadeus.com/v2/schedule/processed-flights/6X-7861-2018-10-06'
+          inventoryDatedFlights:
+            6X-5641-2018-10-05:
+              type: dated-flight
+              id: 6X-5641-2018-10-05
+              version: '1536835243'
+              href: 'https://airlines.api.amadeus.com/v2/inventory/processed-flights/6X-5641-2018-10-05'
+            6X-7861-2018-10-06:
+              type: dated-flight
+              id: 6X-7861-2018-10-06
+              version: '1536835243'
+              href: 'https://airlines.api.amadeus.com/v2/inventory/processed-flights/6X-7861-2018-10-06'
+          bagsGroups:
+            AA42BA1395020102:
+              type: bags-group
+              id: AA42BA1395020102
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-bags-groups/AA42BA1395020102'
+            AA41BA1395020413:
+              type: bags-group
+              id: AA41BA1395020413
+              version: '1'
+              href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-bags-groups/AA41BA1395020413'
+      events:
+        recordDomain: DCSPASSENGER_TICKET
+        recordId: 2501ADE000000001
+        originFeedTimeStamp: '2018-10-24T14:19:00Z'
+        events:
+          - origin: COMPARISON
+            eventType: UPDATED
+            currentPath: /correlationDcsPassengerTicket/correlatedData/0142345676472-2018-09-20/1/ticketCouponId
+            previousPath: /correlationDcsPassengerTicket/correlatedData/0142345676472-2018-09-20/1/ticketCouponId
+
+
+  DcsPassengerApiResponse:
+    type: object
+    description: >-
+      Response of the API "Get DcsPassenger by ID" along with correlations data
+      as included resources. The dictionaries structure has links to get various
+      entities referenced via correlations.
+    properties:
+      data:
+        $ref: '#/definitions/DcsPassengerApiData'
+      included:
+        $ref: '#/definitions/IncludedResources'
+      dictionaries:
+        $ref: '#/definitions/Dictionaries'
+
+  DcsPassengerApiData:
+    allOf:
+      - $ref: '#/definitions/DcsPassenger'
+      - $ref: '#/definitions/CorrelationReferences'
+
+  Events:
+    type: object
+    description: >-
+      Structure of Dynamic Intelligence Hub functional events.
+      It has information about what exactly changed in the current payload as compared
+      to the previous version.
+    properties:
+      recordDomain:
+        type: string
+        description: Functional domain of the record
+        example: DCSPASSENGER
+      recordId:
+        type: string
+        description: Record identifier e.g. UCI
+        example: 2501ADE000000001
+      originFeedTimeStamp:
+        type: string
+        description: Incoming DCS feed time stamp
+        format: datetime
+      events:
+        type: array
+        description: List of events that have been detected on the DCS Passenger document
+        items:
+          type: object
+          properties:
+            origin:
+              type: string
+              description: Type of event e.g. 'COMPARISON' / 'TIME_INITIATED_EVENT'
+              example: COMPARISON
+            eventType:
+              type: string
+              description: >-
+                In case of comparison events, type of operation notified by the event
+              example: CREATED
+              enum:
+                - CREATED
+                - UPDATED
+                - DELETED
+            currentPath:
+              type: string
+              description: >-
+                String containing the JSON Pointer (see IETF RFC6901) that points to the data referenced by the
+                Event in the latest version of the entity. It is only applicable for CREATED and UPDATED events.
+              example: ''
+            previousPath:
+              type: string
+              description: >-
+                String containing the JSON Pointer (see IETF RFC6901) that points to the data referenced by the
+                Event in the previous version of the entity. It is only applicable for DELETED and UPDATED events.
+              example: ''
+    example:
+      recordDomain: 'DCSPASSENGER_TICKET'
+      recordId: '2501ADE000000001'
+      originFeedTimeStamp: '2018-10-24T14:19:00Z'
+      events:
+        - origin: 'COMPARISON'
+          eventType: 'UPDATED'
+          currentPath: '/correlationDcsPassengerTicket/correlatedData/0142345676472-2018-09-20/1/ticketCouponId'
+          previousPath: '/correlationDcsPassengerTicket/correlatedData/0142345676472-2018-09-20/1/ticketCouponId'
+
+  CorrelationReferences:
+    type: object
+    properties:
+      correlations:
+        type: object
+        description: >-
+          Correlation structures are defined in the included section. This
+          section provides links for all the correlation structures
+          pertaining to the current DCS Passenger.
+        properties:
+          dcsPassengerTicket:
+            $ref: '#/definitions/Relationship'
+          dcsPassengerEmd:
+            $ref: '#/definitions/Relationship'
+          dcsPassengerPnr:
+            $ref: '#/definitions/Relationship'
+          dcsPassengerSchedule:
+            $ref: '#/definitions/Relationship'
+          dcsPassengerInventory:
+            $ref: '#/definitions/Relationship'
+          dcsPassengerBagsGroup:
+            $ref: '#/definitions/Relationship'
+        example:
+            dcsPassengerTicket:
+              type: 'correlationDcsPassengerTicket'
+              id: '2501ADE000000001'
+              ref: 'included/correlationDcsPassengerTicket/2501ADE000000001'
+            dcsPassengerEmd:
+              type: 'correlationDcsPassengerEmd'
+              id: '2501ADE000000001'
+              ref: 'included/correlationDcsPassengerEmd/2501ADE000000001'
+            dcsPassengerPnr:
+              type: 'correlationDcsPassengerPnr'
+              id: '2501ADE000000001'
+              ref: 'included/correlationDcsPassengerPnr/2501ADE000000001'
+            dcsPassengerSchedule:
+              type: 'correlationDcsPassengerSchedule'
+              id: '2501ADE000000001'
+              ref: 'included/correlationDcsPassengerSchedule/2501ADE000000001'
+            dcsPassengerInventory:
+              type: 'correlationDcsPassengerInventory'
+              id: '2501ADE000000001'
+              ref: 'included/correlationDcsPassengerInventory/2501ADE000000001'
+            dcsPassengerBagsGroup:
+              type: 'correlationDcsPassengerBagsGroup'
+              id: '2501ADE000000001'
+              ref: 'included/correlationDcsPassengerBagsGroup/2501ADE000000001'
+
+  CorrelationDcsPassengerTicket:
+    type: object
+    description: >-
+      Structure of correlation between a DCS Passenger and a Ticket.
+      Only associated tickets are considered for correlation.
+    properties:
+      dcsPassengerId:
+        type: string
+        description: current DCS Passenger - UCI
+        example: 2501ADE000000001
+      ticketIds:
+        type: array
+        description: >-
+          Identifying ticket(s) correlated with the DCS Passenger - item
+          format is primary ticket number + issuance date
+        items:
+          type: string
+        example: [1258767935960-2018-08-21, 1258767935961-2018-08-21]
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataDcsPassengerTicket'
+    example:
+      dcsPassengerId: '2501ADE000000001'
+      ticketIds:
+        - '1258767935960-2018-08-21'
+        - '1258767935961-2018-08-21'
+      correlatedData:
+        '1258767935960-2018-08-21':
+          - dcsPassengerSegmentDeliveryId: '2101CA1100003431'
+            ticketCouponId: '1258767935960-2018-08-21-1'
+          - dcsPassengerSegmentDeliveryId: '2202DA1200003432'
+            ticketCouponId: '1258767935960-2018-08-21-2'
+        '1258767935961-2018-08-21':
+          - dcsPassengerSegmentDeliveryId: '2303BA1300003433'
+            ticketCouponId: '1258767935961-2018-08-21-1'
+
+
+  CorrelatedDataDcsPassengerTicket:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between DCS Passenger Segment and Ticket Coupon
+    properties:
+      dcsPassengerSegmentDeliveryId:
+        type: string
+        example: 2401CA5500003431
+      ticketCouponId:
+        type: string
+        example: 1258767935960-2018-08-21-3
+
+  CorrelationDcsPassengerEmd:
+    type: object
+    description: >-
+      Structure of correlation between a DCS Passenger and an Electronic Miscellaneous Document.
+      Only associated EMDs (EMD-A's) are considered for correlation.
+    properties:
+      dcsPassengerId:
+        type: string
+        description: current DCS Passenger - UCI
+        example: 2501ADE000000001
+      emdIds:
+        type: array
+        description: >-
+          Identifying EMD(s) correlated with the DCS Passenger - item
+          format is EMD number + issuance date
+        items:
+          type: string
+        example: [1721234567891-2018-05-15, 1721234567892-2018-05-15]
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataDcsPassengerEmd'
+    example:
+      dcsPassengerId: '2501ADE000000001'
+      emdIds:
+        - '1721234567891-2018-05-15'
+        - '1721234567892-2018-05-15'
+      correlatedData:
+        '1721234567891-2018-05-15':
+          - dcsPassengerSegmentDeliveryId: '2404CA5500003411'
+            dcsPassengerServiceId: '1111000000BC2107'
+            emdCouponId: '1721234567891-2018-05-15-1'
+          - dcsPassengerSegmentDeliveryId: '2505CA5500003422'
+            dcsPassengerServiceId: '1222000000BC2107'
+            emdCouponId: '1721234567891-2018-05-15-2'
+        '1721234567892-2018-05-15':
+          - dcsPassengerSegmentDeliveryId: '2505CA5500003422'
+            dcsPassengerServiceId: '1333000000BC2107'
+            emdCouponId: '1721234567892-2018-05-15-1'
+
+  CorrelatedDataDcsPassengerEmd:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between DCS Passenger Service,
+      SegmentDeliveryId (populated only for segment level services) and EMD Coupon
+    properties:
+      dcsPassengerSegmentDeliveryId:
+        type: string
+        example: 2401CA5500003431
+      dcsPassengerServiceId:
+        type: string
+        example: 1000000000BC2107
+      emdCouponId:
+        type: string
+        example: 1721234567891-2018-05-15-1
+
+  CorrelationDcsPassengerPnr:
+    type: object
+    description: >-
+      Structure of correlation between a DCS Passenger and a Passenger Name Record.
+    properties:
+      dcsPassengerId:
+        type: string
+        description: current DCS Passenger - UCI
+        example: 2501ADE000000001
+      pnrIds:
+        type: array
+        description: >-
+          Identifying the PNR(s) correlated with the current DCS Passenger - item
+          format is record locator + creation date
+        items:
+          type: string
+        example: [ORY4NY-2018-10-19, KBR849-2018-09-17]
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataDcsPassengerPnr'
+    example:
+      dcsPassengerId: '2501ADE000000001'
+      pnrIds:
+        - 'ORY4NY-2018-10-19'
+        - 'KBR849-2018-09-17'
+      correlatedData:
+        'ORY4NY-2018-10-19':
+          - dcsPassengerSegmentDeliveryId: '2404CA5500003411'
+            pnrTravelerId: 'ORY4NY-2018-10-19-PT-1'
+            pnrAirSegmentId: 'ORY4NY-2018-10-19-ST-1'
+          - dcsPassengerSegmentDeliveryId: '2504CA5500003422'
+            pnrTravelerId: 'ORY4NY-2018-10-19-PT-1'
+            pnrAirSegmentId: 'ORY4NY-2018-10-19-ST-2'
+        'KBR849-2018-09-17':
+          - dcsPassengerSegmentDeliveryId: '2604CA5500003433'
+            pnrTravelerId: 'KBR849-2018-09-17-PT-2'
+            pnrAirSegmentId: 'KBR849-2018-09-17-ST-1'
+
+  CorrelatedDataDcsPassengerPnr:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a DCS Passenger
+      Segment Delivery (UPI) and a PNR Traveler, Air Segment pair.
+    properties:
+      dcsPassengerSegmentDeliveryId:
+        type: string
+        example: 2401CA5500003431
+      pnrTravelerId:
+        type: string
+        example: KBR849-2018-09-17-PT-1
+      pnrAirSegmentId:
+        type: string
+        example: KBR849-2018-09-17-ST-6
+
+  CorrelationDcsPassengerSchedule:
+    type: object
+    description: >-
+      Structure of correlation between a DCS Passenger and a Schedule Dated Flight record.
+    properties:
+      dcsPassengerId:
+        type: string
+        description: current DCS Passenger - UCI
+        example: 2501ADE000000001
+      scheduleIds:
+        type: array
+        description: >-
+          Identifying the schedule flight(s) correlated with the current DCS Passenger
+          - item is dated flight ID i.e. carrier code + flight number + flight
+          date + operational suffix
+        items:
+          type: string
+        example: [6X-5641-2018-10-05, 6X-7861-2018-10-06]
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataDcsPassengerSchedule'
+    example:
+      dcsPassengerId: '2501ADE000000001'
+      scheduleIds:
+        - '6X-5641-2018-10-05'
+        - '6X-7861-2018-10-06'
+      correlatedData:
+        '6X-5641-2018-10-05':
+          - dcsPassengerSegmentDeliveryId: '2404CA5500003411'
+            scheduleSegmentId: '2018-10-05-LHR-MAD'
+            schedulePartnershipFlightId: '7X-9623-2018-10-05'
+            correlatedLegs:
+              - dcsPassengerLegDeliveryId: 'LHR'
+                scheduleLegId: 'LHR-CDG'
+              - dcsPassengerLegDeliveryId: 'CDG'
+                scheduleLegId: 'CDG-MAD'
+        '6X-7861-2018-10-06':
+          - dcsPassengerSegmentDeliveryId: '2504CA5500003422'
+            scheduleSegmentId: '2018-10-06-MAD-LHR'
+            correlatedLegs:
+              - dcsPassengerLegDeliveryId: 'MAD'
+                scheduleLegId: 'MAD-LHR'
+
+  CorrelatedDataDcsPassengerSchedule:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a DCS Passenger
+      Segment Delivery (UPI) and a Schedule Dated Flight record
+      (schedulePartnershipFlightId represents codeshare)
+    properties:
+      dcsPassengerSegmentDeliveryId:
+        type: string
+        example: 2401CA5500003431
+      scheduleSegmentId:
+        type: string
+        example: 2018-10-05-LHR-CDG
+      schedulePartnershipFlightId:
+        type: string
+        example: 7X-9623-2018-10-05
+      correlatedLegs:
+        type: array
+        items:
+          $ref: '#/definitions/CorrelatedDcsPassengerLegScheduleData'
+
+  CorrelatedDcsPassengerLegScheduleData:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a DCS Passenger
+      Leg Delivery and a Schedule Dated Flight Leg
+    properties:
+      dcsPassengerLegDeliveryId:
+        type: string
+        example: LHR
+      scheduleLegId:
+        type: string
+        example: LHR-CDG
+
+  CorrelationDcsPassengerInventory:
+    type: object
+    description: >-
+      Structure of correlation between a DCS Passenger and a Inventory Dated Flight record.
+    properties:
+      dcsPassengerId:
+        type: string
+        description: current DCS Passenger - UCI
+        example: 2501ADE000000001
+      inventoryIds:
+        type: array
+        description: >-
+          Identifying the inventory flight(s) correlated with the current DCS Passenger
+          - item is dated flight ID i.e. carrier code + flight number + flight
+          date + operational suffix
+        items:
+          type: string
+        example: [6X-5641-2018-10-05, 6X-7861-2018-10-06]
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataDcsPassengerInventory'
+    example:
+      dcsPassengerId: '2501ADE000000001'
+      inventoryIds:
+        - '6X-5641-2018-10-05'
+        - '6X-7861-2018-10-06'
+      correlatedData:
+        '6X-5641-2018-10-05':
+          - dcsPassengerSegmentDeliveryId: '2101ADE0000001'
+            inventorySegmentId: '2018-10-05-LHR-MAD'
+            inventoryPartnershipFlightId: '7X-9623-2018-10-05'
+            correlatedLegs:
+              - dcsPassengerLegDeliveryId: 'LHR'
+                inventoryLegId: 'LHR-CDG'
+              - dcsPassengerLegDeliveryId: 'CDG'
+                inventoryLegId: 'CDG-MAD'
+        '6X-7861-2018-10-06':
+          - dcsPassengerSegmentDeliveryId: '2201ADE0000002'
+            inventorySegmentId: '2018-10-06-MAD-LHR'
+            correlatedLegs:
+              - dcsPassengerLegDeliveryId: 'MAD'
+                inventoryLegId: 'MAD-LHR'
+
+  CorrelatedDataDcsPassengerInventory:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a DCS Passenger
+      Segment Delivery (UPI) and a Inventory Dated Flight record
+      (inventoryPartnershipFlightId represents codeshare)
+    properties:
+      dcsPassengerSegmentDeliveryId:
+        type: string
+        example: 2401CA5500003431
+      inventorySegmentId:
+        type: string
+        example: 2018-10-05-LHR-CDG
+      inventoryPartnershipFlightId:
+        type: string
+        description: codeshare details
+        example: 7X-9623-2018-10-05
+      correlatedLegs:
+        type: array
+        items:
+          $ref: '#/definitions/CorrelatedDcsPassengerLegInventoryData'
+
+  CorrelatedDcsPassengerLegInventoryData:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between a DCS Passenger
+      Leg Delivery and a Inventory Dated Flight Leg
+    properties:
+      dcsPassengerLegDeliveryId:
+        type: string
+        example: LHR
+      inventoryLegId:
+        type: string
+        example: LHR-CDG
+
+  CorrelationDcsPassengerBagsGroup:
+    type: object
+    description: >-
+      Structure of correlation between a DCS Passenger and DCS Bag Group.
+    properties:
+      dcsPassengerId:
+        type: string
+        description: DCS Passenger identifier
+        example: 2501ADE000000001
+      bagsGroupIds:
+        type: array
+        description: DCS Bag groups correlated with the DCS Passenger
+        items:
+          type: string
+        example: [AA42BA1395020102, AA41BA1395020413]
+      correlatedData:
+        type: object
+        additionalProperties:
+          type: array
+          items:
+            $ref: '#/definitions/CorrelatedDataDcsPassengerBagsGroup'
+    example:
+      dcsPassengerId: '2501ADE000000001'
+      bagsGroupIds:
+      - 'AA42BA1395020102'
+      - 'AA41BA1395020413'
+      correlatedData:
+        'AA42BA1395020102':
+        - dcsPassengerSegmentDeliveryId: '2202DA1200003432'
+          correlatedLegs:
+          - dcsPassengerLegDeliveryId: 'LHR'
+            bagId: '1101CA1100003431'
+            bagLegDeliveryId: 'LHR'
+        'AA41BA1395020413':
+        - dcsPassengerSegmentDeliveryId: '2202DA1200003433'
+          correlatedLegs:
+          - dcsPassengerLegDeliveryId: 'LHR'
+            bagId: '1101CA1100003432'
+            bagLegDeliveryId: 'LHR'
+
+  CorrelatedDataDcsPassengerBagsGroup:
+    type: object
+    description: >-
+      Set of data field identifiers defining the correlation between DCS Baggage and DCS Passenger
+    properties:
+      dcsPassengerSegmentDeliveryId:
+        type: string
+        example: 2401CA5500003431
+      correlatedLegs:
+        type: array
+        items:
+          $ref: '#/definitions/CorrelatedDcsPassengerBagsGroupLegData'
+
+  CorrelatedDcsPassengerBagsGroupLegData:
+    type: object
+    description: >-
+      Set of data field identifiers defining "leg level" correlation between DcsBaggage and DcsPassenger
+    properties:
+      dcsPassengerLegDeliveryId:
+        type: string
+        example: LHR
+      bagId:
+        type: string
+        example: 1101CA1100003431
+      bagLegDeliveryId:
+        type: string
+        example: LHR
+
+  IncludedResources:
+    type: object
+    description: >-
+      Correlation data sent as included resources with the "Get DCS Passenger by ID" API response
+    properties:
+      correlationDcsPassengerTicket:
+        type: object
+        description: map of CorrelationDcsPassengerTicket with DCSPassenger Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationDcsPassengerTicket'
+      correlationDcsPassengerPnr:
+        type: object
+        description: map of CorrelationDcsPassengerPnr with DCSPassenger Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationDcsPassengerPnr'
+      correlationDcsPassengerSchedule:
+        type: object
+        description: map of CorrelationDcsPassengerSchedule with DCSPassenger Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationDcsPassengerSchedule'
+      correlationDcsPassengerEmd:
+        type: object
+        description: map of CorrelationDcsPassengerEmd with DCSPassenger Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationDcsPassengerEmd'
+      correlationDcsPassengerInventory:
+        type: object
+        description: map of CorrelationDcsPassengerInventory with DCSPassenger Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationDcsPassengerInventory'
+      correlationDcsPassengerBagsGroup:
+        type: object
+        description: map of CorrelationDcsPassengerBagsGroup with DCSPassenger Id as key
+        additionalProperties:
+          $ref: '#/definitions/CorrelationDcsPassengerBagsGroup'
+
+  CorrelationData:
+    type: object
+    description: >-
+      The Correlation structures have information about how the DCS Passenger
+      correlates with other domains: Schedule, Inventory, PNR, Ticket, EMD, Bag.
+    properties:
+      correlationDcsPassengerTicket:
+        $ref: '#/definitions/CorrelationDcsPassengerTicket'
+      correlationDcsPassengerPnr:
+        $ref: '#/definitions/CorrelationDcsPassengerPnr'
+      correlationDcsPassengerSchedule:
+        $ref: '#/definitions/CorrelationDcsPassengerSchedule'
+      correlationDcsPassengerEmd:
+        $ref: '#/definitions/CorrelationDcsPassengerEmd'
+      correlationDcsPassengerInventory:
+        $ref: '#/definitions/CorrelationDcsPassengerInventory'
+      correlationDcsPassengerBagsGroup:
+        $ref: '#/definitions/CorrelationDcsPassengerBagsGroup'
+      dictionaries:
+        $ref: '#/definitions/Dictionaries'
+
+  Dictionaries:
+    type: object
+    description: >-
+      Links to various entities referenced via correlations
+    properties:
+      dcsPassengers:
+        type: object
+        description: >-
+          Set of key/value pairs with dcsPassenger Id as key.
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      tickets:
+        type: object
+        description: >-
+          Set of key/value pairs with ticketId as key i.e. primary ticket number + issuance date - key example '1721234567890-2018-05-15'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      emds:
+        type: object
+        description: >-
+          Set of key/value pairs with emdId as key i.e. primary EMD number +
+          issuance date - key example '1721234567891-2018-05-15'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      pnrs:
+        type: object
+        description: >-
+          Set of key/value pairs with pnrId as key i.e. record
+          locator + creation date - key example 'ABCDEF-2018-05-15'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      scheduleDatedFlights:
+        type: object
+        description: >-
+          Set of key/value pairs with scheduleDatedFlightId as key i.e. carrier
+          code + flight number + flight date + operational suffix - key example
+          '6X-123-2018-10-05-A'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      inventoryDatedFlights:
+        type: object
+        description: >-
+          Set of key/value pairs with inventoryDatedFlightId as key i.e. carrier
+          code + flight number + flight date + operational suffix - key example
+          '6X-123-2018-10-05-A'
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+      bagsGroups:
+        type: object
+        description: >-
+          Set of key/value pairs with baggage group Id as key
+        additionalProperties:
+          $ref: '#/definitions/Relationship'
+    example:
+      dcsPassengers:
+        '2501ADE000000001':
+          type: 'dcs-passenger'
+          id: '2501ADE000000001'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2501ADE000000001'
+      tickets:
+        '1258767935960-2018-08-21':
+          type: 'ticket'
+          id: '1258767935960-2018-08-21'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/ticketing/processed-tickets/1258767935960-2018-08-21'
+        '1258767935961-2018-08-21':
+          type: 'ticket'
+          id: '1258767935961-2018-08-21'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/ticketing/processed-tickets/1258767935961-2018-08-21'
+      emds:
+        '1721234567891-2018-05-15':
+          type: 'emd'
+          id: '1721234567891-2018-05-15'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/ticketing/processed-emds/1721234567891-2018-05-15'
+        '1721234567892-2018-05-15':
+          type: 'emd'
+          id: '1721234567892-2018-05-15'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/ticketing/processed-emds/1721234567892-2018-05-15'
+      pnrs:
+        'ORY4NY-2018-10-19':
+          type: 'pnr'
+          id: 'ORY4NY-2018-10-19'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/reservation/processed-pnrs/ORY4NY-2018-10-19'
+        'KBR849-2018-09-17':
+          type: 'pnr'
+          id: 'KBR849-2018-09-17'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/reservation/processed-pnrs/KBR849-2018-09-17'
+      scheduleDatedFlights:
+        '6X-5641-2018-10-05':
+          type: 'dated-flight'
+          id: '6X-5641-2018-10-05'
+          version: '1536835243'
+          href: 'https://airlines.api.amadeus.com/v2/schedule/processed-flights/6X-5641-2018-10-05'
+        '6X-7861-2018-10-06':
+          type: 'dated-flight'
+          id: '6X-7861-2018-10-06'
+          version: '1536835243'
+          href: 'https://airlines.api.amadeus.com/v2/schedule/processed-flights/6X-7861-2018-10-06'
+      inventoryDatedFlights:
+        '6X-5641-2018-10-05':
+          type: 'dated-flight'
+          id: '6X-5641-2018-10-05'
+          version: '1536835243'
+          href: 'https://airlines.api.amadeus.com/v2/inventory/processed-flights/6X-5641-2018-10-05'
+        '6X-7861-2018-10-06':
+          type: 'dated-flight'
+          id: '6X-7861-2018-10-06'
+          version: '1536835243'
+          href: 'https://airlines.api.amadeus.com/v2/inventory/processed-flights/6X-7861-2018-10-06'
+      bagsGroups:
+        'AA42BA1395020102':
+          type: 'bags-group'
+          id: 'AA42BA1395020102'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-bags-groups/AA42BA1395020102'
+        'AA41BA1395020413':
+          type: 'bags-group'
+          id: 'AA41BA1395020413'
+          version: '1'
+          href: 'https://airlines.api.amadeus.com/v2/departure-control/processed-bags-groups/AA41BA1395020413'
+
+  DcsPassenger:
+    type: object
+    description: >-
+      The DcsPassenger data comprises of hierarchical structure:
+        - Passenger level data like name, services etc.
+          - Segment level data array for all the flights the passenger has booked
+            containing flight details, tickets, services, regulatory documents etc.
+            - Leg level data array for all the flight legs for a booked flight
+              segment containing details for acceptance, seating, boarding etc.
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: [dcs-passenger]
+        example: dcs-passenger
+      id:
+        type: string
+        description: Unique Customer Identifier (UCI)
+        example: '2501ADE000000001'
+      etag:
+        type: string
+        description: Sequence number for comparison between two passenger images and to know which one is the latest.
+        example: 1602876919851
+      passenger:
+        $ref: '#/definitions/Traveler'
+      recordLocator:
+        type: string
+        description: Record Locator (Unique booking reference number)
+        example: PXT607
+      cprFeedType:
+        type: string
+        description: RES-DCS Synchronisation Feed type as setup on DCS business rule
+        enum:
+          - MARKETING_SBR
+          - MARKETING_PNL
+          - OPERATING_SBR
+          - OPERATING_PNL
+          - BLOCKSPACE
+          - NO_FEED
+          - DUAL
+        example: MARKETING_SBR
+      isSamePhysicalCustomer:
+        type: boolean
+        description: >-
+          Same Physical Customer(passenger) Indicator - indicates if the records are merged on DCS side
+          manually by DCS agent. This can happen when passenger books flights in separate PNRs and
+          requests DCS agent to through-checkin on all flights. Agent has to manually merge the CPRs.
+          Please note that "segmentDeliveries" contains data for all merged records. "id" has UCI of the
+          master CPR and the individual UCI for child CPR is within corresponding segmentDelivery.
+        example: false
+      isSystemMarkedSPC:
+        type: boolean
+        description: >-
+          Indicates if the merge of the record was done by the DCS system automatically (not manually by agent)
+          This typically happens in codeshare scenarios.
+        example: false
+      isMasterRecord:
+        type: boolean
+        description: Indicates whether this record is the master of the merged records ("id" has UCI of the master CPR)
+        example: true
+      groupName:
+        type: string
+        description: Name of the group booking
+        example: Star Travels
+      staff:
+        #description: Staff details at passenger level if this passenger is airline staff
+        $ref: '#/definitions/Staff'
+      segmentDeliveries:
+        description: Booked Segment level details
+        type: array
+        items:
+          $ref: '#/definitions/SegmentDelivery'
+      frequentFlyer:
+        type: array
+        description: Passenger associated Frequent flyer information
+        items:
+          $ref: '#/definitions/FrequentFlyer'
+      services:
+        type: array
+        description: Passenger associated services
+        items:
+          $ref: '#/definitions/Service'
+        example:
+          - code: DOCA
+            address:
+              category: DESTINATION
+              lines:
+                - '203, LAA APARTMENTS'
+              postalCode: '560068'
+              countryCode: IN
+              cityName: BLR
+              stateCode: KAR
+            serviceProvider:
+              code: '6X'
+      passengerLinks:
+        type: array
+        description: References to other passengers linked (travelling together) with this one
+        items:
+          $ref: '#/definitions/Relationships'
+      regulatoryDocuments:
+        type: array
+        description: Passenger associated Regulatory documents
+        items:
+          $ref: '#/definitions/RegulatoryDocument'
+      flightTransfers:
+        type: array
+        description: All activities related to flight transfer for a particular passenger
+        items:
+          $ref: '#/definitions/FlightTransfer'
+
+  Name:
+    type: object
+    description: Full name details
+    properties:
+      firstName:
+        type: string
+        description: First name
+        example: John
+      lastName:
+        type: string
+        description: Last name
+        example: SMITH
+      title:
+        type: string
+        description: Title
+        example: Mr
+
+  SegmentDelivery:
+    type: object
+    description: Booked flight segment details
+    properties:
+      type:
+        type: string
+        description: resource name
+        enum: [segment-delivery]
+        example: segment-delivery
+      id:
+        type: string
+        description: Unique Product Identifier
+        example: 2401CA5500003OID
+      uniqueCustomerIdentifier:
+        type: string
+        description: >-
+          The Unique Customer Identifier (UCI) corresponding to the actual RES booking for this Segment.
+          It could be different from DcsPassenger.id in case DCS has merged multiple passenger records
+          for the same physical passenger (customer).
+        example: 2501ADE000000001
+      segment:
+        $ref: '#/definitions/FlightSegment'
+      recordLocator:
+        type: string
+        description: >-
+          Record locator of the PNR linked to that segment only in case it is different from the main
+          one. Applicable when the DCS passenger record consists of two merged reservation bookings
+        example: PC3XYV
+      dcsProductType:
+        type: string
+        description: >-
+          Product Type in DCS record (CPR) as explained below at higher level:
+
+          - ACTIVE_SYNCHRONISED
+            Fully operational in DCS with interactions with RES on PSS side
+          - ACTIVE_NOT_SYNCHRONISED
+            Fully operational in DCS without any interactions with RES on PSS side
+          - PASSIVE_SYNCHRONISED
+            Future "ACTIVE_SYNCHRONISED" segment which is not yet in DCS window
+          - PASSIVE
+            Flown or cancelled segment
+          - PASSIVE_IATCI
+            Segment is candidate for Inter-Airline-Through-Check-In (IATCI)
+          - PASSIVE_DCS
+            Segment either not handled by DCS originating feed (Informational segment)
+                    or has a corresponding another active segment as part of another CPR
+                    (The two CPRs would be usually automatically merged by DCS system)
+          - NON_OPERATIONAL
+            Segment is not operational in DCS system anymore due to disruption
+        enum:
+          - ACTIVE_SYNCHRONISED
+          - ACTIVE_NOT_SYNCHRONISED
+          - PASSIVE_SYNCHRONISED
+          - PASSIVE
+          - PASSIVE_IATCI
+          - PASSIVE_DCS
+          - NON_OPERATIONAL
+        example: ACTIVE_SYNCHRONISED
+      legDeliveries:
+        type: array
+        description: Booked flight segment leg level details
+        items:
+          $ref: '#/definitions/LegDelivery'
+      associatedPassengerSegments:
+        # description: Any other segment delivery identifies associated with this one like outbound flight segment
+        $ref: '#/definitions/AssociatedPassengerSegments'
+      staff:
+        # description: Staff details at segment level if this passenger is airline staff
+        $ref: '#/definitions/Staff'
+      frequentFlyer:
+        type: array
+        description: Frequent flyer information at segment level
+        items:
+          $ref: '#/definitions/FrequentFlyer'
+      associatedAirTravelDocuments:
+        type: array
+        description: Segment associated/matched E-Ticket/EMDs
+        items:
+          $ref: '#/definitions/AirTravelDocument'
+      previousTicket:
+        # description: Previous ticket number as known by DCS (can be used by agents in case manual association is required after disruption)
+        $ref: '#/definitions/AirTravelDocument'
+      services:
+        type: array
+        description: Segment delivery associated services (SSR/OSI/SK)
+        items:
+          $ref: '#/definitions/Service'
+        example:
+          - code: DOCA
+            address:
+              category: DESTINATION
+              lines:
+                - '101, JENYA'
+              postalCode: '560068'
+              countryCode: IN
+              cityName: BLR
+              stateCode: KAR
+          - id: 1000000000BC2107
+            chargeableServiceId: 10000007896346C1
+            code: BIKE
+            subType: SSR
+            priceCategory:
+              code: C
+              subCode: 99Y
+            status: MCF
+            NIP: 1
+            isSubjectToQuota: true
+            quotaCode: SSRQ123
+            chargeableServiceDocument:
+              documentType: EMD
+              number: '1728200002469'
+              status: REFUNDED
+            paymentStatus: WAIVED
+            isIssuanceRequired: true
+            waiver:
+              authoriser: Check-in agent
+              reasonCode: Technical
+              reasonText: A technical issue occurred at check-in. Agent had to waive the chargeable service
+      contacts:
+        type: array
+        description: Segment associated contact information
+        items:
+          $ref: '#/definitions/Contact'
+        example:
+          - id: '126511237759'
+            addresseeName:
+              firstName: 'John'
+              lastName: 'SMITH'
+            phone:
+              text: '001461415588511'
+            purpose:
+              - EMERGENCY
+            isDeclined: false
+      regulatoryDocuments:
+        type: array
+        description: Segment associated Regulatory documents
+        items:
+          $ref: '#/definitions/RegulatoryDocument'
+      segmentLinks:
+        description: >-
+          References to other Segment deliveries in other DCS passengers linked to this one.
+          These refers to passengers travelling together for part of their journey.
+        type: array
+        items:
+          $ref: '#/definitions/Relationships'
+      revenueIntegrity:
+        # description: Information on Revenue Integrity checks performed for the passenger
+        $ref: '#/definitions/RevenueIntegrityAssessment'
+      passengerDisruption:
+        # description: Passenger Segment Disruption information
+        $ref: '#/definitions/PassengerSegmentDisruption'
+      nationality:
+        type: string
+        description: Nationality of the passenger applied/used for the current segment
+        example: GRC
+      volunteerDowngrade:
+        type: string
+        description: Volunteer Downgrade is a qualifier to the state if passenger have volunteered to be downgraded.
+        enum:
+        - NOT_ASKED
+        - VOLUNTEERED
+        - DECLINED
+      volunteerDeniedBoarding:
+        type: string
+        description: Volunteer Denied Boarding is a qualifier to the state if passenger have volunteered to be deny boarding the flight.
+        enum:
+        - NOT_ASKED
+        - VOLUNTEERED
+        - DECLINED
+  FlightTransfer:
+    type: object
+    description: All activities related to flight transfer for a particular passenger
+    properties:
+      id:
+        type: string
+        description: unique Reaccommodation id
+        example: 1000000001437D6D
+      subType:
+        enum:
+          - STANDBY_TRANSFER
+          - BLOCKSPACE_PARTNER_MOVE
+          - CUSTOMER_TRANSFER_PROCESS
+          - FLOW_FORWARD
+          - UPGRADE_BY_MILES
+          - CUSTOMER_DATA_TRANSFER
+          - CUSTOMER_OPERATIONAL_PROTECTION
+          - STANDBY_UPGRADE_TRANSFER
+          - PAYMENT_TRANSFER
+          - AIRLINE_ANCILLARY_SERVICES_UPGRADE
+          - TRANSFER_REMAINING_CUSTOMERS
+          - TRAVEL_READY_REACCOMODATION
+      dataTransferStatus:
+        enum:
+          - PENDING
+          - ONGOING
+          - SUCCESS
+          - ERROR
+          - REQUIRED
+          - IGNORED
+          - NOT_REQUIRED
+      dcsTransferStatus:
+        enum:
+          - REBOOKED_TO_EXT_SYSTEM
+          - COMPLETED
+          - FLIGHT_NOT_ACTIVE
+          - CUSTOMER_DATA_TRANSFER_FAILED
+          - VALIDATION_FAILED
+          - REBOOKING_FAILED
+          - IN_PROGRESS
+          - REBOOKED
+          - CUSTOMER_DATA_TRANSFER_ACCEPTANCE_FAILED
+          - PNL_NOT_RECEIVED
+      disruptionTransferReason:
+        enum:
+          - FLIGHT_CANCELLED
+          - FLIGHT_DELAYED
+          - MISSED_CONNECTION
+          - DENIED_BOARDING_OVERSALES
+          - DENIED_BOARDING_CONFIGURATION_CHANGE
+          - DENIED_BOARDING_PAYLOAD
+          - FLIGHT_DIVERTED
+          - OTHER
+      fromSegments:
+        type: array
+        description: Details of all the segments, from which the passenger have been disrupted/re-accommodated.
+        items:
+          $ref: '#/definitions/FlightSegment'
+      toSegments:
+        type: array
+        description: Details of all the segments, to which the passenger have been disrupted/re-accommodated.
+        items:
+          $ref: '#/definitions/FlightSegment'
+
+  FlightSegment:
+    type: object
+    description: Booked marketing flight segment details like flight number, cabin, class etc
+    properties:
+      departure:
+        $ref: '#/definitions/FlightEndPoint'
+      arrival:
+        $ref: '#/definitions/FlightEndPoint'
+      number:
+        type: string
+        description: Flight number of the segment
+        example: 807
+      duration:
+        type: string
+        description: Flight duration
+        example: 9
+      carrierCode:
+        type: string
+        description: Carrier code
+        example: 6X
+      suffix:
+        type: string
+        description: Suffix
+        example: A
+      class:
+        type: string
+        description: Booking class
+        example: Y
+      cabin:
+        type: string
+        description: Booked cabin code
+        example: M
+      statusCode:
+        type: string
+        description: Booking status of the segment
+        example: HK
+      operating:
+        $ref: '#/definitions/OperatingFlight'
+    example:
+      departure:
+        iataCode: LHR
+        at: '2018-01-11'
+      arrival:
+        iataCode: SIN
+      number: '1234'
+      carrierCode: '7X'
+      suffix: B
+      class: Q
+      cabin: M
+      statusCode: HK
+      operating:
+        carrierCode: '6X'
+        number: '17'
+
+  FlightEndPoint:
+    type: object
+    description: Departure or arrival information
+    properties:
+      iataCode:
+        description: IATA Airport code
+        type: string
+        example: JFK
+      at:
+        description: "Local date and time in ISO 8601 format \"yyyy-MM-dd'T'HH:mm:ss\" or \"yyyy-MM-dd\"(e.g. 2017-02-10T20:40:00, 2017-02-14)."
+        type: string
+        example: '2018-09-14T10:10:00'
+
+  OperatingFlight:
+    type: object
+    description: Operating flight number details
+    properties:
+      carrierCode:
+        type: string
+        description: Carrier code
+        example: 6X
+      number:
+        type: string
+        description: Airline number
+        example: '741'
+      suffix:
+        type: string
+        description: Operational suffix
+        example: A
+
+  AssociatedPassengerSegments:
+    type: object
+    description: Other segment identifiers associated with the current one via relationship like CBBG, EXST, infant, in/outbound journey
+    properties:
+      onwardId:
+        type: string
+        description: The onward passenger segment identifier
+        example: 2401CA5500003OID
+      infantId:
+        type: string
+        description: The infant passenger segment identifier
+        example: 2401CA5500003JID
+      cbbgId:
+        type: string
+        description: The CBBG passenger segment identifier
+        example: 2401CA5500003CID
+      exstId:
+        type: string
+        description: The EXST passenger segment identifier
+        example: 2401CA5500003EID
+      informativeOnwardId:
+        type: string
+        description: Basic computation at time of CPR creation
+        example: 2401CA5500003CID
+      acceptedOnwardId:
+        type: string
+        description: Recorded at time of acceptance
+        example: 2401CA5500003CID
+      alternateOnwardId:
+        type: string
+        description: Other possible onward Segment
+        example: 2401CA5500003CID
+      disruptedOnwardId:
+        type: string
+        description: Created when an informativeOnwardId is removed
+        example: 2401CA5500003CID
+      misconnectedOnwardId:
+        type: string
+        description: Similar to disruptedOnwardId but also includes misconnections
+        example: 2401CA5500003CID
+      tciOnwardId:
+        type: string
+        description: IATCI SegmentDelivery id
+        example: 2401CA5500003CID
+  Onload:
+    type: object
+    description: >-
+      Onload details (DCS process of accepting standby passengers as per priority as defined by the airline)
+    properties:
+      status:
+        type: string
+        description: the status of this onload
+        example: OK
+      priority:
+        type: string
+        description: Priority
+        example: W31
+      cabinCode:
+        type: string
+        description: Target cabin code post onload recommendation
+        example: C
+      edit:
+        $ref: '#/definitions/OnloadEdit'
+
+  OnloadEdit:
+    type: object
+    description: Details like reason, cabin that are set and used by DCS to compute the Onload recommendation
+    properties:
+      reasonCode:
+        type: string
+        description: the reason code for this onload edit
+        enum:
+          - IGNORE
+          - TO_STANDBY
+          - TO_REMAIN
+          - CLEAR
+        example: IGNORE
+      reasonFreeText:
+        type: string
+        description: Onload edit reason text
+        example: Keep in same cabin
+      cabinCode:
+        type: string
+        description: If Onload Edit is Remain, then this is the cabin to keep passenger in
+        example: Y
+
+  Regrade:
+    type: object
+    description: >-
+      DCS Passengers can be regraded for operational reasons or as a gesture of good will.
+      The regrade depending on the case can be an upper cabin or lower cabin.
+      Amongst the Regrade properties - priority, cabinCode and regradeType will not be
+      populated for regradeDelivered.
+    properties:
+      status:
+        type: string
+        description: the status of this regrade
+        enum:
+          - PENDING
+          - ACTIONED
+          - CANCELED
+          - FAILED
+        example: PENDING
+      priority:
+        type: string
+        description: Regrade priority
+        example: W31
+      cabinCode:
+        type: string
+        description: Regrade cabin code - has value only in case of Regrade Proposed
+        example: C
+      reason:
+        type: string
+        description: The reason code for this regrade
+        enum:
+          - OVER_SOLD_CURRENT_FLIGHT
+          - OVER_SOLD_OTHER_FLIGHT
+          - MISIDENTIFICATION_AT_CHECKIN
+          - PREVIOUS_MISHANDLE
+          - BOOKED_MARKETING_UPGRADE
+          - INVOLUNTARY_DOWNGRADE
+          - TICKETED_IN_HIGHER_CLASS
+          - COURTESY
+          - CUSTOMER_DOWNGRADE_REQUESTED
+          - SPECIAL_OCCASION
+          - AIRCRAFT_CHANGE
+          - CABIN_CONFIG_CHANGE
+          - SPECIAL_REQUESTOR
+          - COMPASSIONATE
+          - AUTHORIZED_BY
+          - MARKETING_INITIATIVE
+          - DISRUPTION_CURRENT_FLIGHT
+          - FREQUENT_FLYER_UPGRADE
+          - DISRUPTION_OTHER_FLIGHT
+          - CREW_CHANGE
+          - TECHNICAL_REASON
+          - CATERING_SHORTFALL
+          - CHECKIN_ERROR
+          - INADMISSIBLE
+          - UNSUITABLE
+          - STAFF
+          - SERVICE_RECOVERY
+          - ONLOAD
+          - CANCEL_ACCEPTANCE
+          - DUPE_PRODUCT
+          - MANAGEMENT_AUTHORIZED
+          - CUSTOMER_DOWNGRADE_REQUIREMENT
+        example: OVER_SOLD_CURRENT_FLIGHT
+      reasonFreeText:
+        type: string
+        description: Regrade reason in free text
+        example: Oversold current flight
+      authoriserReference:
+        type: string
+        description: Regrade authoriser reference
+        example: AU0123
+      regradeType:
+        type: string
+        description: Regrade type
+        enum:
+          - REMAIN_FORCE
+          - INVOLUNTARY
+          - VOLUNTARY
+          - PURCHASED
+        example: VOLUNTARY
+
+  Staff:
+    type: object
+    description: Airline Staff details like ID type, category, joining date etc
+    properties:
+      id:
+        type: string
+        description: Staff Number
+        example: ST0793
+      companyCode:
+        type: string
+        description: IATA code of the airline/company the staff belong to
+        example: WT
+      companyName:
+        type: string
+        description: Company Name
+        example: World Travellers
+      relationshipType:
+        type: string
+        description: Relationship type (Self, Spouse,...)
+        example: Self
+      category:
+        type: string
+        description: Staff Category
+        enum:
+          - BOOKABLE
+          - STANDBY
+        example: BOOKABLE
+      joiningDate:
+        type: string
+        format: date
+        description: Date of joining in ISO 8601 format (yyyy-mm-dd)
+        example: '2011-02-28'
+      retirementDate:
+        type: string
+        format: date
+        description: Date of retirement in ISO 8601 format (yyyy-mm-dd)
+        example: '2011-02-28'
+      idType:
+        type: string
+        description: Staff ID type (e.g. N2, S1)
+        example: N2
+      transfersDuringDay:
+        type: integer
+        description: Number of time the staff was transferred during the current day
+        example: 2
+      transferDays:
+        type: integer
+        description: Number of days the staff has been transferred to the next day flight
+        example: 3
+
+  LegDelivery:
+    type: object
+    description: >
+      A leg delivery corresponds to all the information related to a passenger in the departure control system at a leg
+      level. It represents the level of service that has been delivered to the passenger (check in status, seat
+      delivered, cabin delivered in case of upgrade, etc)
+    properties:
+      id:
+        type: string
+        description: Leg Delivery Identifier
+        example: LHR
+      departure:
+        $ref: '#/definitions/FlightEndPoint'
+      arrival:
+        $ref: '#/definitions/FlightEndPoint'
+      operatingFlight:
+        $ref: '#/definitions/OperatingFlight'
+      travelCabinCode:
+        type: string
+        description: Travel cabin code for that leg
+        example: C
+      acceptance:
+        $ref: '#/definitions/AcceptanceDelivery'
+      seating:
+        $ref: '#/definitions/SeatingDelivery'
+      boarding:
+        $ref: '#/definitions/BoardingDelivery'
+      onload:
+        $ref: '#/definitions/Onload'
+      regradeDelivered:
+        $ref: '#/definitions/Regrade'
+      regradeProposed:
+        $ref: '#/definitions/Regrade'
+      regulatoryChecks:
+        description: Regulatory Checks information for each Regulatory program
+        type: array
+        items:
+          $ref: '#/definitions/RegulatoryChecks'
+      comments:
+        description: Comments created by either an agent or the dcs system and intended for the passenger
+        type: array
+        items:
+          $ref: '#/definitions/Comment'
+      compensations:
+        description: Compensations information
+        type: array
+        items:
+          $ref: '#/definitions/Compensation'
+
+  Compensation:
+    type: object
+    description: Compensations information
+    properties:
+      id:
+        type: string
+        description: 'Unique identifier for this compensation - contains unique product identifier, departure port and compensation reason code'
+        example: 2002EAE0001C08B4-LAX-MCT
+      categoryDescription:
+        type: string
+        description: Compensation category description (as defined by airlines in BZR)
+        enum:
+          - CATERING
+          - ACCOMMODATION
+          - AIRLINE_CASH_CREDIT
+          - GENERAL_SERVICE_VOUCHER
+          - PHYSICAL_TOKENS
+          - MONETARY_COMPENSATION
+          - TRANSPORTATION
+        example: 'CATERING'
+      reason:
+        $ref: '#/definitions/CompensationReason'
+        description: Reason or event that caused this compensation
+      authorisation:
+        $ref: '#/definitions/CompensationAuthorization'
+        description: All the information related to the authorization for this compensation
+      vouchers:
+        description: List of vouchers issued for this compensation
+        type: array
+        items:
+          $ref: '#/definitions/CompensationVoucher'
+
+  CompensationReason:
+    type: object
+    description: Reason or event that caused this compensation
+    properties:
+      code:
+        type: string
+        description: Compensation reason code ((as defined by airlines in BZR)
+        example: FDD
+      label:
+        type: string
+        description: Provides a brief description of the reason which caused the compensation (as defined by airlines in BZR)
+        example: Flight Delayed on Departure
+
+  CompensationAuthorization:
+    type: object
+    description: All the information related to the authorization for this compensation
+    properties:
+      authorizer:
+        type: string
+        description: User id of the agent who authorized the compensation before issuance
+        example: 1100AC
+      status:
+        type: string
+        description: Authorization status
+        enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+          - ISSUED
+          - NOT_NEEDED
+          - PENDING_PRINT
+          - SUITABLE
+      date:
+        type: string
+        description: Date on which the compensation has been authorized
+        example: '2018-08-19'
+      quantity:
+        type: string
+        description: Count of vouchers authorized for compensation. The default value is 1
+        example: 2
+
+  CompensationVoucher:
+    type: object
+    description: Voucher related information for a compensation
+    properties:
+      id:
+        type: string
+        description: Unique identifier of the voucher
+        example: '9423690240'
+      voucherType:
+        type: string
+        description: 'This field provides the type of voucher e.g. GTP, MCO'
+        example: GTP
+      description:
+        type: string
+        description: Provides a short description of the compensation
+        example: Meal Voucher
+      comment:
+        type: string
+        description: free text entered by agent during issuance of this voucher
+        example: Creating meal voucher for customer John SMITH on AC123
+      status:
+        type: string
+        description: Status of the voucher
+        enum:
+          - ACTIVE
+          - EXPIRED
+          - USED
+          - CANCELLED
+          - ISSUED
+          - PENDING_FOR_PRINTING
+          - ELIGIBLE
+          - PENDING
+          - REQUESTED
+      printStatus:
+        type: string
+        description: Denotes voucher printing status
+        enum:
+          - PRINTED
+          - NOT_PRINTED
+          - NEEDS_PRINTING
+          - NOT_PRINTABLE
+      isReprintable:
+        type: boolean
+        description: Denotes if the voucher can be printed more than once
+      providerCode:
+        type: string
+        description: Code for the airline which provided this voucher
+        example: AC
+  AcceptanceDelivery:
+    type: object
+    description: Information related to passenger acceptance (checkin) for a flight leg at the departure control system
+    properties:
+      securityNumber:
+        type: string
+        description: Passenger security number
+        example: '098'
+      status:
+        type: string
+        description: Passenger acceptance status
+        enum:
+        - ACCEPTED
+        - STANDBY
+        - NOT_ACCEPTED
+        - NOT_TRAVELLING
+        example: ACCEPTED
+      acceptanceType:
+        type: string
+        description: Acceptance Type
+        enum:
+        - PRIMARY
+        - OUTBOUND_EXTERNAL_TCI
+        - INBOUND_EXTERNAL_TCI
+        - INTERNAL_TCI
+        - PENDING_IATCI_PROCESS
+        example: PRIMARY
+      isAdvanceAccepted:
+        type: boolean
+        description: Advance acceptance indicator - set when passenger is accepted without being present (this can happen for group bookings)
+        example: false
+      isForceAccepted:
+        type: boolean
+        description: Force Acceptance indicator - indicator set when the agents override some checks like suitability check
+        example: true
+      forceAcceptanceReason:
+        type: string
+        description: Acceptance Reason - given by the DCS agent
+        example: emergency travel request
+      isFrozen:
+        type: boolean
+        description: Freeze indicator - set by the agent to prevent acceptance status to be reassessed during onload
+        example: false
+      channel:
+        type: string
+        description: Acceptance Channel indicator
+        enum:
+        - EXTERNAL_DCS # EXT
+        - CRYPTIC # CRY
+        - JFE # JFE
+        - KIOSK # KSK
+        - MOBILE_PHONE # MOB
+        - SMS # SMS
+        - TELEPHONE # TEL
+        - WEB # WEB
+        - EXTERNAL_FRONTEND # EFE - External Front End
+        example: JFE
+      physicalAcceptanceLocation:
+        type: string
+        description: Physical Acceptance location( ADM - Airline Administration, ATO - Airport Travel Office, BAG - Baggage, BDP - Bag Drop Podium, BMD - Boarding Monitor Desk, BOF - Airport Back Office, CAR - Cargo, CAT - Catering, CID - Check In Desk, CKI - Airport Check In, CRW - Crew, CSD - CustomerServiceDesk, CTO - CityTravelOffice, ENG - Engineering, GTE - Gate, LCO - Load Control, LGE - Lounge, MVC - Movement Control, OFF - Off Airport, PSF - Passenger Services Facilities, RAM - RAM, REG - Regulatory Authorities, RMP - Ramp, SEC - Security, SSH - Self Service Helpdesk, SSK - Self Service Kiosk, TAG - Travel Agency, TBD - Test Bed, TKT - Ticket Desk, TRA - Transfer Desk, TRN - Training, ROM - RoamingAgent)
+        example: BMD
+      standbyReason:
+        type: string
+        description: Standby Reason - given by the DCS agent or by the system
+        enum:
+        - FULL_BLOCKED_SPACE
+        - NO_ADJACENT_SEAT_FOR_EXTRA_SEAT_OR_CABIN_BAG
+        - AIRCRAFT_CHANGE
+        - OFFLOADED_BY_ONLOAD
+        - PET_IN_CABIN_QUOTA_EXCEEDED
+        - MANUAL_OFFLOAD
+        - CAPACITY_EXCEEDED
+        - UNSUITABLE_SEAT
+        - CAPACITY_NOT_AVAILABLE
+        - CHECKIN_CAPACITY_NOT_AVAILABLE
+        - WEIGHT_RESTRICTION
+        - ACCEPTANCE_LIMITS_REACHED
+        - ANIMAL_IN_HOLD_QUOTA_EXCEEDED
+        - OTHER
+        example: FULL_BLOCKED_SPACE
+      cancellationReason:
+        type: string
+        description: Reason provided by agent when an acceptance is cancelled
+        example: "Customer Unwell"
+
+  SeatingDelivery:
+    type: object
+    description: Seating details at leg level
+    properties:
+      seatStatus:
+        type: string
+        description: Seat status
+        enum:
+          - CONFIRMED
+          - REJECTED
+          - GUARANTEED
+          - NOT_GUARANTEED
+        example: CONFIRMED
+      seatProductStatus:
+        type: string
+        description: Seat confirmation status
+        example: HL
+      isChargeableSeat:
+        type: boolean
+        description: Chargeable Seat indicator - true if assigned seat is chargeable
+        example: true
+      emergencyExitSuitability:
+        type: string
+        description: suitability of the passenger to seat in emergency exit row
+        enum:
+          - UNABLE_TO_DETERMINE
+          - SUITABLE
+          - NOT_SUITABLE
+      seat:
+        $ref: '#/definitions/Seat'
+      chargeableSeat:
+        $ref: '#/definitions/Service'
+      seatPreferences:
+        $ref: '#/definitions/Seat'
+    example:
+      seatStatus: NOT_GUARANTEED
+      seatProductStatus: HL
+      isChargeableSeat: true
+      emergencyExitSuitability: UNABLE_TO_DETERMINE
+      seat:
+        number: 12A
+        characteristicsCodes:
+          - CH
+          - W
+      chargeableSeat:
+        chargeableServiceId: 10000007896346C1
+        priceCategory:
+          code: C
+          subCode: 99Y
+        chargeableServiceDocument:
+          documentType: EMD
+          number: '1728200002469'
+          status: REFUNDED
+        paymentStatus: WAIVED
+        isIssuanceRequired: true
+        waiver:
+          authoriser: Check-in agent
+          reasonCode: Technical
+          reasonText: A technical issue occurred at check-in. Agent had to waive the chargeable service
+      seatPreferences:
+        number: 12A
+        characteristicsCodes:
+          - CH
+          - W
+
+
+  Seat:
+    type: object
+    description: Seat details like seat number and characteristics
+    properties:
+      number:
+        type: string
+        description: the seat number
+        example: 12A
+      characteristicsCodes:
+        type: array
+        description: List of seat characteristics codes defined by IATA like CH - chargeable, W - Window etc
+        items:
+          type: string
+        example: [CH, W]
+
+
+  BoardingPassPrint:
+    type: object
+    description: Boarding pass print details at leg level
+    properties:
+      status:
+        type: string
+        description: Boarding pass print status
+        enum:
+        - NEEDS_PRINTING
+        - PRINTED
+        - NOT_PRINTED
+        - RE_PRINTED
+        example: NEEDS_PRINTING
+      channel:
+        type: string
+        description: Boardingpass Print Channel
+        enum:
+        - AIRLINE_AGENT
+        - AUTO_BAG_DROP
+        - AUTO_CHECK_IN
+        - BRS_SCANNER
+        - CRYPTIC
+        - CUSTOMER_PORTAL
+        - EMAIL
+        - EXTERNAL_DCS
+        - EXTERNAL_FRONTEND
+        - GROUND_HANDLING_AGENT
+        - JFE
+        - KIOSK
+        - LOUNGE_ACCESS
+        - MOBILE_PHONE
+        - SMS
+        - TELEPHONE
+        - WEB
+        - WIRELESS_HANDHELD_BOARDING
+        - NONE
+        example: JFE
+
+  BoardingDelivery:
+    type: object
+    description: Boarding details at leg level
+    properties:
+      error:
+        type: string
+        description: Error that is communicated to an agent during boarding
+        example: Unpaid excess exists.
+      warning:
+        type: string
+        description: Warning that is communicated to an agen  t during boarding
+        example: Customer is CBBG.
+      boardingStatus:
+        type: string
+        description: Passenger boarding status
+        enum:
+        - NOT_BOARDED
+        - BOARDED
+        - BOARDED_BY_SWIPE
+        example: BOARDED
+      boardingPassPrint:
+        $ref: '#/definitions/BoardingPassPrint'
+      boardingZone:
+        type: string
+        description: The group in which the passenger is meant to board
+        example: 'B'
+      trackingLog:
+        description: All information related to track the boarding process of a passenger
+        $ref: '#/definitions/TimeLocationTrackingLog'
+
+  TimeLocationTrackingLog:
+    type: object
+    description: All information related to track the boarding process of a passenger
+    properties:
+      deviceId:
+        type: string
+        description: tracking device
+        example: AF5FA7A4
+      referenceDeviceType:
+        type: string
+        description: the type of the device name
+        enum:
+          - CRT
+          - DUMD_GATE_READER
+          - SELF_BOARDING_DEVICE
+          - JFE
+      deviceUser:
+        type: string
+        description: "the agent's sign in who last tracked"
+        example: 116554
+      utcDateTime:
+        type: string
+        description: 'date (dd-mmm-yyy) and time (hh:mm:ss) when last tracked'
+        example: '11-OCT-2018 14:43:59'
+      localDateTime:
+        type: string
+        description: 'date (dd-mmm-yyy) and time (hh:mm:ss) when last tracked'
+        example: '11-OCT-2018 16:43:59'
+      logSource:
+        type: string
+        description: channel how last tracked
+        enum:
+          - EXTERNAL_DCS
+          - CRYPTIC
+          - JFE
+          - KIOSK
+          - MOBILE_PHONE
+          - SMS
+          - TELEPHONE
+          - WEB
+          - AIRLINE_AGENT
+          - GROUND_HANDLING_AGENT
+          - AUTO_CHECKIN
+          - AUTO_BAGDROP
+          - LOUNGE_ACCESS
+          - BRS_SCANNER
+          - WIRELESS_HANDHELD_BOARDING
+          - EXTERNAL_FRONTEND
+          - BAGGAGE RECONCILIATION SYSTEM
+          - BAGGAGE SORTATION SYSTEM
+      trackedLocation:
+        $ref: '#/definitions/InfrastructureLocation'
+
+  FrequentFlyer:
+    type: object
+    description: Frequent flyer details
+    properties:
+      id:
+        type: string
+        description: Unique identifier for frequent flyer in the context of the loyalty program
+        example: FF0001
+      frequentFlyerNumber:
+        type: string
+        description: Loyalty card number
+        example: 6X090807061234
+      serviceCode:
+        type: string
+        description: Service code (FQTV = Mileage program accrual, FQTU = Upgrade and accrual, FQTR = Mileage program redemption, FQTS = Service request)
+        example: FQTU
+      applicableAirlineCode:
+        type: string
+        description: Code of the airline for which frequent traveller data has been added
+        example: 6X
+      confirmationStatus:
+        type: string
+        description: >-
+          Frequent flyer profile status
+          K - validated (implies passenger can claim mileage)
+        example: K
+      airlineLevel:
+        $ref: '#/definitions/Tier'
+      allianceLevel:
+        $ref: '#/definitions/Tier'
+      customerValue:
+        type: integer
+        description: Passenger(customer) value (ACV) coming from loyalty system
+        example: 2
+
+  Tier:
+    type: object
+    description: Description of a Tier in the context of the loyalty program
+    properties:
+      name:
+        type: string
+        description: >-
+          Provides the name or description of the tier such as Gold, Silver or Platinum
+        example: Gold
+      code:
+        type: string
+        description: Code associated to the tier (e.g. <G> for Gold)
+        example: G
+      priorityCode:
+        type: string
+        description: >-
+          Priority code used to synchronize with external systems. Should have a clear
+          correspondence to the code.
+        example: 1
+      companyCode:
+        type: string
+        description: Alliance code or airline code of the loyalty program
+        example: 6X
+
+  AirTravelDocument:
+    type: object
+    description: Air travel document details like ETKT, EMD
+    properties:
+      id:
+        type: string
+        description: Unique identifier for Air Travel Document
+        example: '1234556677812'
+      documentType:
+        type: string
+        description: Document type
+        enum:
+          - ETICKET
+          - EMD
+          - EMD_STANDALONE
+          - EMD_ASSOCIATED
+          - PAPER_TICKET
+          - PAPER_MD
+          - VIRTUAL_TICKET
+          - VIRTUAL_MD
+          - TICKETLESS_DOCUMENT
+          - TICKET
+          - MD
+        example: ETICKET
+      primaryDocumentNumber:
+        type: string
+        description: ticket primary number or emd primary number
+        example: '1234556677812'
+      conjunctiveDocumentNumbers:
+        type: array
+        items:
+          type: string
+          description: The list of conjunctive document numbers (primary and conjunctives)
+          example: '1234556677822'
+      associatedDocuments:
+        type: array
+        items:
+          $ref: '#/definitions/AirTravelDocument'
+          description: >-
+            list of Associated Ticket or Associated EMD for the current
+            document,e.g. EMD-A associated to an ETKT.
+      validatingCarrierCode:
+        type: string
+        description: ticket validating carrier code
+        example: 6X
+      associationStatus:
+        type: string
+        description: Association status
+        enum:
+          - ASSOCIATED
+          - MULTIPLE_ASSOCIATED
+          - E_STAPLE
+          - DISASSOCIATED
+          - ETS_UNAVAILABLE
+          - ETICKET_NOT_FOUND
+          - UNMATCHED
+          - UNASSOCIATED
+        example: ASSOCIATED
+      blacklistCategory:
+        type: string
+        description: Blacklist category
+        example: Fraud
+      airCoupons:
+        type: array
+        description: List of coupons
+        items:
+          $ref: '#/definitions/Coupon'
+
+  Coupon:
+    type: object
+    description: >-
+      A coupon refers to a product that has been issued in the current
+      travel document. In tickets, a coupon refers to a flight segment. An
+      airline ticket portion that bears the notion "good for passage", or in
+      the case of an electronic ticket, the electronic coupon indicates the
+      particular places a passenger is entitled to be carried. A single
+      ticket/document number may contain up to 4 segments. For
+      tickets/documents with more than 4 segments of travel, a conjunction
+      ticket is required to continue the itinerary.  In EMDs, a coupon can
+      refer to an ancillary service, an upgrade, a fee or a residual value.
+      * soldSegment - Original image of the coupon at first issuance of the
+      document. * currentSegment - Latest image of the coupon in case it has
+      been subject to modification[s] such as revalidation e.g. change of
+      flight number. * usedSegment - Image of the coupon when its status is
+      considered as used i.e. either flown [B] or exchanged [E], refunded
+      [RF], printed [PR], print exchange [PE], converted to Flight
+      Interruption Manifest [G], closed [CLO], voided [V].
+    properties:
+      id:
+        type: string
+        description: identifier of the coupon
+        example: '1'
+      number:
+        type: integer
+        description: >-
+          The coupon number inside this conjunctive ticket should be the
+          same as the coupon number in case of non conjunctive tickets (from 1 to 4).
+        example: 1
+      status:
+        type: string
+        description: >-
+          coupon operational status. It follows IATA PADIS Code List for
+          data element 4405
+        enum:
+          - EXCHANGED
+          - FLOWN
+          - EXCHANGED_TO_FIM
+          - COUPON_NOTIFICATION
+          - OPEN_FOR_USE
+          - REFUNDED
+          - SUSPENDED
+          - VOID
+          - CLOSED
+          - REVOKED
+          - PRINTED
+          - PRINT_EXCHANGE
+          - NOT_AVAILABLE
+          - BOARDED
+          - IRREGULAR_OPERATIONS
+          - ORIGINAL_ISSUE
+          - CHECKED_IN
+          - AIRPORT_CONTROL
+          - UNAVAILABLE
+          - REFUND_TAXES_AND_FEES
+          - PAPER_TICKET
+        example: CHECKED_IN
+      documentNumber:
+        type: string
+        description: >-
+          Document number for the Segment
+        example: '1234556677813'
+      associatedDocuments:
+        type: array
+        items:
+          $ref: '#/definitions/AirTravelDocument'
+          description: >-
+            list of Associated Tickets
+      reasonForIssuance:
+        $ref: '#/definitions/PriceCategory'
+
+  PriceCategory:
+    type: object
+    description: >-
+      An EMD is categorised based on its reason for issuance code (RFIC), which
+      defines the group of services it belongs to. There can only be one RFIC
+      code per EMD. Some codes are defined by IATA, however, others can be
+      defined by individual airlines.  An EMD, and each RFIC, can have multiple
+      reason for issuance sub-codes (RFISC). There is one RFISC in each EMD
+      coupon and they are airline-specific.
+    properties:
+      code:
+        type: string
+        description: >-
+          The reason for issuance code (RFIC) chargeability indicator defined
+          for the sellable object
+        example: C
+      subCode:
+        type: string
+        description: >-
+          The reason for issurance sub code (RFISC) chargeability indicator
+          defined for the sellable object
+        example: 99Y
+      rfiscDescription:
+        type: string
+        description: description of reason for issuance sub code
+        example: 'BAG- EXCESS PC ALLOWANCE'
+
+  Contact:
+    description: Represents Contact information like Phone or Email for a Passenger. Also used to represent an Emergency Contact for the Passenger.
+    type: object
+    properties:
+      id:
+        type: string
+        description: the identifier of the contact
+        example: '126511237759'
+      addresseeName:
+        # description: The name of the person addressed by these contact details
+        $ref: '#/definitions/Name'
+      phone:
+        $ref: '#/definitions/Phone'
+      address:
+        $ref: '#/definitions/Address'
+      purpose:
+        description: The purpose for which this contact is to be used
+        type: array
+        items:
+          type: string
+          enum:
+            - STANDARD
+            - NOTIFICATION
+            - EMERGENCY
+        example: [STANDARD, NOTIFICATION]
+      carrierCode:
+        description: The airline code to which the Contact is associated
+        type: string
+        example: 6X
+      isDeclined:
+        description: Whether the Passenger declined to provide Contact information
+        type: boolean
+        example: false
+
+  Phone:
+    description: Phone information
+    type: object
+    properties:
+      text:
+        type: string
+        description: Phone number
+        example: +61415588511
+
+  Address:
+    type: object
+    description: Address information
+    properties:
+      category:
+        description: Category of the address element
+        type: string
+        enum:
+          - BUSINESS
+          - PERSONAL
+          - DESTINATION
+          - HOME
+          - OTHER
+        example: BUSINESS
+      lines:
+        type: array
+        description: "Line 1 = Street address, Line 2 = Apartment, suite, unit, building, floor, etc"
+        example: ["2203 Brooklyn", "Floor 2"]
+        items:
+          type: string
+      postalCode:
+        type: string
+        description: The postal code
+        example: '74130'
+      countryCode:
+        type: string
+        description: ISO 3166-1 country code
+        example: GRC
+      cityName:
+        type: string
+        description: Full city name
+        example: 'Dublin'
+      stateCode:
+        type: string
+        description: State code (two character standard IATA state code)
+        example: 'VA'
+
+  Comment:
+    type: object
+    description: Comment as added by DCS agent and details like priority, usage etc.
+    properties:
+      id:
+        type: string
+        description: the identifier of the comment
+        example: '1000000000810D86'
+      text:
+        type: string
+        description: the text of the comment (ASCII)
+        example: One cabin bag to be taken on the hold
+      priority:
+        type: string
+        description: >-
+          the priority of the comment
+          - HIGH : comment priority is high
+          - MEDIUM: comment priority is medium
+          - NORMAL : comment priority is normal
+          - NOT_APPLICABLE : no priority applicable
+        enum:
+          - HIGH
+          - MEDIUM
+          - NORMAL
+          - NOT_APPLICABLE
+        example: HIGH
+      usage:
+        type: string
+        description: >-
+          when to action on the comment
+          - AT_BP_REPRINT : At boarding pass re-print
+          - AT_CHECKIN : At check-in
+          - AT_GATE : At the gate
+          - LIST_ONLY : List only
+          - NEXT_TIME : Next time
+          - PRINT_ON_BP : Print on boarding pass
+          - PRINT_ON_ONBOARD_SERVICE_LIST : Print on onboard service list
+          - PRINT_ON_ONBOARD_SERVICE_LIST_AND_BP : Print on onboard service
+          list and boarding pass
+          - BAGGAGE: Baggage
+          - NORMAL: Normal
+          - CABIN: Cabin
+        enum:
+          - AT_BP_REPRINT
+          - AT_CHECKIN
+          - AT_GATE
+          - LIST_ONLY
+          - NEXT_TIME
+          - PRINT_ON_BP
+          - PRINT_ON_ONBOARD_SERVICE_LIST
+          - PRINT_ON_ONBOARD_SERVICE_LIST_AND_BP
+          - BAGGAGE
+          - NORMAL
+          - CABIN
+        example: AT_BP_REPRINT
+      delivery:
+        $ref: '#/definitions/CommentDelivery'
+
+  CommentDelivery:
+    type: object
+    description: Comment delivery status details
+    properties:
+      status:
+        type: string
+        description: |
+          delivery status of the comment
+          - DELIVERED : comment is delivered
+          - NOT_DELIVERED : comment is not delivered
+          - UNABLE_TO_DELIVER: delivery attempted, but unsuccessful
+        enum:
+          - DELIVERED
+          - NOT_DELIVERED
+          - UNABLE_TO_DELIVER
+        example: DELIVERED
+
+  RegulatoryChecks:
+    type: object
+    description: Details about the regulatory checks done for a given flight segment leg
+    properties:
+      id:
+        type: string
+        description: Regulatory Checks Identifier
+        example: '1255477819'
+      regulatoryProgram:
+        $ref: '#/definitions/RegulatoryProgram'
+      statuses:
+        description: Regulatory statuses
+        type: array
+        items:
+          $ref: '#/definitions/RegulatoryStatus'
+      assesmentTime:
+        description: Time at which Regulatory Transaction was performed
+        type: string
+        example: '2018-07-31T11:23:20Z'
+
+  RegulatoryProgram:
+    type: object
+    description: >-
+      Regulatory program defines the requirements issued by the governments regarding travel to and from their
+      countries. Using this information they indicate from a security and vetting perspective, if they are happy
+      to allow the travel for the passenger in question.
+    properties:
+      name:
+        type: string
+        description: Name of the regulatory program (AQQ, IAPP, APP, ADC, CANADIAN_PPP, PRIVATE_LIST, MANUAL_SELECTEE)
+        example: APP
+      countryCode:
+        type: string
+        description: Code of the country the program applies to in the ISO 3166-1 alpha-3 format
+        example: CAN
+
+  RegulatoryStatus:
+    type: object
+    description: Regulatory statuses along with any override details
+    properties:
+      id:
+        type: string
+        description: Regulatory Status Identifier
+        example: '1255477820'
+      statusType:
+        type: string
+        description: Types of Status
+        enum:
+          - SECURITY
+          - IMMIGRATION
+          - DIRECTIVE
+        example: SECURITY
+      statusCode:
+        type: string
+        description: |
+          Code of the Status, the value and meaning is based on program
+          Codeset | Description
+          --------|-------------
+          I       | AQQ Inhibited To Board/ADC Perfomed Not OK/iAPP Not Cleared/CAS Do not Board
+          N       | False/APP Not Required/Not Performed (ADC/iAPP)/Preflight Screening Not Screened Override/SSCI Visa Check Not Performed/CAS Not Performed
+          NI      | Not processed - Insufficient Information (TSA/Airline Blacklist Status)
+          D       | ADC performed Conditional Not OK/ESTA Document not on File
+          B       | ESTA Not Present/Bypassed (ADC/Preflight Screening)/CAI Document not on file
+          C       | ESTA Denied/ADC performed Conditional OK
+          E       | Data Error (AQQ/ADC/iAPP/Preflight Screening/CAS)/EVUS not on file
+          F       | APP Failed
+          1       | True
+          0       | False
+          AIY     | APIS Data - Complete
+          AIR     | APIS Data - Agent Reval Required
+          AIQ     | APIS Data - Not Required
+          AIP     | APIS Data - Not Performed
+          AIN     | APIS Data - Not Complete
+          A       | ESTA Valid/CAI Valid document on file
+          3       | AQQ PreChecked
+          Z       | ESTA Not Required / ADC Not Applicable/CAI Document not required
+          SM      | Soft Match
+          U       | Preflight Screening Not Screened
+          T       | ESTA Time-out/CAI Time out
+          Y       | True/ESTA Bypassed/CAI Bypassed
+          X       | ESTA Insufficient Information/Not Required (ADC/iAPP)/Preflight Screening Revised/SSCI Visa Check Not Required/CAI Insufficient information/CAS Not Required
+          NS      | Not Supported
+          O       | AQQ Ok To Board/ADC Performed OK/iAPP Cleared/Preflight Screening Screened/CAS Ok to Board
+          NL      | Not Processed - Link Down (TSA/Airline Blacklist Status)
+          NP      | Not Performed (ABL)
+          Q       | Preflight Screening Not Required
+          P       | Preflight Screening Not responded/SSCI Visa Check Performed/iAPP Bypassed/ESTA Pending Review/CAS Bypassed
+          R       | APP Required/Preflight Screening Selectee Override/ESTA Do not Board/CAI Do not board
+          S       | Selectee (AQQ/TSA/iAPP/Preflight Screening/ABL) / APP Successful/CAS Selectee
+          RR      | Restricted (TSA/Airline Blacklist STatus and Override/AQQ/iAPP)
+          APC     | ClearToBoard (APP)
+          APX     | Cancelled (APP)
+          APN     | NotFound (APP)
+          APT     | Timeout (APP)
+          APE     | ErrorCondition (APP)
+          APD     | DuplicateName (APP)
+          API     | InsufficientData (APP)
+          APF     | DoNotBoard (APP)
+        example: S
+      override:
+        $ref: '#/definitions/RegulatoryComment'
+      message:
+        $ref: '#/definitions/RegulatoryComment'
+      isVerifiedId:
+        type: boolean
+        description: Verified Id indicator applicable only for AQQ and IAPP programs
+        example: false
+
+  RegulatoryComment:
+    type: object
+    description: Details about any override comments (e.g. for manual selectee) added by DCS agent or message received from regulatory authority
+    properties:
+      commentType:
+        type: string
+        description: >-
+          Indicates the type of comment from Regulatory System
+          ("DIRECTIVE" in case of APP, "OVERRIDE_AUTHORIZER" for APP and iAPP, "SPECIAL_INSTRUCTIONS" for iAPP, "REASON" for ADC)'
+        enum:
+          - DIRECTIVE
+          - OVERRIDE_AUTHORIZER
+          - SPECIAL_INSTRUCTIONS
+          - REASON
+        example: REASON
+      code:
+        type: string
+        description: '4 digit code for directive type comment or G=Government, A=Airline for APP authorizer'
+        example: 8517
+      description:
+        type: string
+        description: 'The comment or override authoriser'
+        example: TIMEOUT
+
+  RevenueIntegrityAssessment:
+    type: object
+    description: This object provides information about Revenue Integrity Checks performed for a passenger
+    properties:
+      checks:
+        type: array
+        description: List of Revenue Integrity checks performed
+        items:
+          $ref: '#/definitions/RevenueIntegrityCheck'
+      comments:
+        type: array
+        description: List of Passenger(customer) Check Comments
+        items:
+          $ref: '#/definitions/RevenueIntegrityComment'
+
+  RevenueIntegrityCheck:
+    type: object
+    description: Provides information Revenue Integrity checks and its status
+    properties:
+      id:
+        type: string
+        description: Revenue Integrity Check identifier
+        example: '1231432422234'
+      checkType:
+        type: string
+        description: Types of check
+        enum:
+          - BOARD_OFF_POINTS_CHECK
+          - CLASS_CHECK
+          - EXACT_FLIGHT_CHECK
+          - FULL_FIRST_NAME_CHECK
+          - FLIGHT_NUMBER_CHECK
+          - GO_SHOW_CHECK
+          - NO_SHOW_CHECK
+          - STOPOVER_CHECK
+          - SEQUENCE_CHECK
+          - TRAVEL_DATE_CHECK
+          - CUSTOMER_TYPE_CHECK
+          - VALIDITY_DATE_CHECK
+          - TICKET_CHECKS
+          - CARRIER_CHECK
+          - FARE_BASIS_CHECK
+        example: CUSTOMER_TYPE_CHECK
+      status:
+        type: string
+        description: Status of Revenue Integrity Check
+        enum:
+          - IGNORED
+          - NON_PRIME
+          - NOT_REQUIRED
+          - OVERRIDDEN
+          - BYPASSED
+          - DISRUPTED
+          - FAILED
+          - PASSED
+          - REQUIRED
+          - UNDEFINED
+        example: PASSED
+
+  RevenueIntegrityComment:
+    type: object
+    description: Comments on Revenue Integrity Checks
+    properties:
+      id:
+        type: string
+        description: Revenue Integrity Comment identifier
+        example: '1255477819'
+      commentType:
+        type: string
+        description: Type of comment
+        enum:
+          - OVERRIDE_TICKET_CHECKS_REASON
+          - OVERRIDE_STOPOVER_CHECK_REASON
+          - OVERRIDE_SEQUENCE_CHECK_REASON
+          - OUTSTANDING_CUSTOMER_TYPE
+          - PASSED_CUSTOMER_TYPES
+        example: PASSED_CUSTOMER_TYPES
+      description:
+        type: string
+        description: Contains actual comment
+        example: STUDENT1
+
+  PassengerSegmentDisruption:
+    type: object
+    description: >-
+      This structure is to hold passenger disruption information. In case of events like flight cancellation/delay/diversion/etc.,
+      when a passenger is transferred to an alternative one - then disruption status/reason are added to the products involved in
+      transfer (also called disruption marking). Additionally, the transferred FROM and TO products are linked.
+    properties:
+      originalDestination:
+        type: string
+        description: Original destination. Contains IATA location code
+        example: 'LHR'
+      productState:
+        $ref: '#/definitions/DisruptionState'
+        # description: Product Disruption State, this is the Disruption state of the Segment.
+
+  DisruptionState:
+    type: object
+    properties:
+      status:
+        type: string
+        description: >-
+          Process/Product disruption status.
+          - The Product Disruption state refers to the disruption state on this product.
+            If the flight is cancelled, it will be 'DISRUPTED'.
+          - When a passenger is transferred, the FROM and TO flights are linked; for example
+            the passenger was transferred from 6X101/FRA/MUC to 6X103/FRA/MUC. 6X101 will have
+            a Product Disruption state of 'DISRUPTED' before the transfer. After the transfer,
+            the Product Disruption state of 6X103 will be 'NOT_DISRUPTED', and the Product
+            disruption state of 6X101 will be 'WAS_DISRUPTED' (as 6X101 and 6X103 have the same
+            offpoint the passenger is no longer disrupted). The Process Disruption state for 6X103
+            is the highest of the Product Disruption state of the 6X101 and the Product Disruption
+            state of 6X103, which is 'WAS_DISRUPTED'.
+        enum:
+        - NOT_DISRUPTED
+        - DISRUPTED
+        - WAS_DISRUPTED
+        example: 'DISRUPTED'
+      reason:
+        type: array
+        description: Process/Product disruption reason
+        items:
+          type: string
+          enum:
+          - FLIGHT_CANCELLATION
+          - FLIGHT_SUSPENDED
+          - LEG_SUSPENDED
+          - FLIGHT_DIVERSION
+          - MANUAL_DISRUPTION
+          - FLIGHT_DELAY
+          - MISCONNECTION_INBOUND_DISRUPTION
+          - MISCONNECTION_OUTBOUND_DISRUPTION
+          - DISRUPTION_TRANSFER
+          - DISRUPTED_FROM_FLIGHT
+        example: 'FLIGHT_CANCELLATION'
+
+  RegulatoryDocument:
+    type: object
+    description: >-
+      Document for booked flight segment used for regulatory purpose E.g. Visas, Passports, Resident Cards, etc, along
+      with information like source of entry and usage of the document.
+    properties:
+      id:
+        type: string
+        description: unique ID of the document image
+        example: 100000001AFC111A
+      document:
+        $ref: '#/definitions/IdentityDocument'
+      recordedDocumentType:
+        type: string
+        description: Free text Qualifier or sub type for the document E.g. VVV is default for Visa and PPP for passport
+        example: VVV
+      countryOfRegistration:
+        type: string
+        description: Country of registration
+        example: USA
+      countryOfPortOfEntry:
+        type: string
+        description: Country the port of entry is part of
+        example: PRI
+      presentedAtPort:
+        type: string
+        description: Port where the document was shown
+        example: SJU
+      inputSource:
+        $ref: '#/definitions/InputSource'
+      validForCarrier:
+        type: string
+        description: Document is valid for this carrier. This is required when there are multiple documents to be used in a passenger journey.
+        example: 6X
+      usedFor:
+        type: string
+        description: Document is only used for arrival, departure or transit
+        enum:
+          - ARRIVAL
+          - DEPARTURE
+          - TRANSIT
+        example: ARRIVAL
+      isCarried:
+        type: boolean
+        description: Indicates whether the passenger is carrying the document
+        example: false
+      isBearer:
+        type: boolean
+        description: "Indicates whether it is the bearer's or dependent's the document"
+        example: true
+
+  IdentityDocument:
+    type: object
+    description: The information that are found on an ID document.
+    properties:
+      documentType:
+        type: string
+        description: The nature/type of the document.
+        enum:
+          - VISA
+          - PASSPORT
+          - DRIVER_LICENSE
+          - IDENTITY_CARD
+          - RESIDENCE_PERMIT
+          - VOTER_ID_CARD
+          - WORK_PERMIT
+          - MILITARY_ID_CARD
+          - AIR_ATTENDANCE_LICENCE
+          - FLIGHT_MECHANICAL_LICENCE
+          - OPERATIONAL_DISPATCHER_LICENCE
+          - LOYAL_ATTORNEY_IDENTIFICATION
+          - FOREIGN_NATIONAL_REGISTRATION
+          - KNOWN_TRAVELER
+          - PILOT_LICENCE
+          - NEXUS_CARD
+          - APPROVED_NON_STANDARD_ID
+          - TWN_RESIDENTS_TRAVEL_PERMIT_TO_FROM_CHN
+          - CHN_RESIDENTS_TRAVEL_PERMIT_TO_FROM_TWN_AND_CHN
+          - EXIT_AND_ENTRY_PERMIT_TWN
+          - TRAVEL_PERMIT_TO_FROM_HKG_MAC_PUBLIC_AFFAIRS
+          - HOME_RE_ENTRY_PERMIT_HUI_XIANG_ZHENG
+          - BORDER_CROSSING_CARD
+          - BIRTH_CERTIFICATE
+          - ALIEN_PERMIT
+          - CHN_RESIDENT_TRAVEL_PERMIT_TO_FROM_HKG_AND_MAC
+          - REFUGEE_OR_RE_ENTRY_PERMIT
+          - SEAFARERS_PASSPORT_SEAMEN
+          - REDRESS
+          - CHN_RESIDENT_TRAVEL_PERMIT_TO_HKG_AND_MAC
+          - CHN_TRAVEL_PERMIT
+          - CHN_EXIT_AND_ENTRY_PERMIT
+          - OTHER_DOCUMENT
+          - US_NATURALISED
+        example: PASSPORT
+      number:
+        type: string
+        description: The document number (shown on the document) . E.g. QFU514563221J
+        example: GB12345
+      issuanceDate:
+        type: string
+        format: date
+        description: Date at which the document has been issued in ISO 8601 format (yyyy-mm-dd)
+        example: '2018-08-15'
+      expiryDate:
+        type: string
+        format: date
+        description: Date after which the document is not valid anymore in ISO 8601 format (yyyy-mm-dd)
+        example: '2025-08-15'
+      effectiveDate:
+        type: string
+        format: date
+        description: Date at which the document starts to be valid. It may be different from the issuance date ("issuanceDate"), in ISO 8601 format (yyyy-mm-dd).
+        example: '2018-09-15'
+      issuanceCountry:
+        type: string
+        description: ISO code (2-letters) of the country that issued the document.
+        example: GB
+      issuanceLocation:
+        type: string
+        description: "A more precise information concerning the place where the document has been issued, when available. It may be a country, a state, a city or any other type of location. e.g. New-York"
+        example: GBR
+      gender:
+        type: string
+        description: Gender as it appears on the document
+        enum: &GENDER
+          - MALE
+          - FEMALE
+          - UNKNOWN
+          - OTHER
+        example: MALE
+      name:
+        $ref: "#/definitions/Name"
+      birthDate:
+        type: string
+        format: date
+        description: Birth date in ISO 8601 format (yyyy-mm-dd)
+        example: '2000-10-20'
+      remarks:
+        type: array
+        description: Any kind of special conditions/remarks that can be found on the document. E.g. "Valid during 1 month after arrival in the country", "Not valid to go to United states"
+        items:
+          type: string
+        example: ["Valid for entries - 10"]
+      age:
+        type: integer
+        description: Age (in years for adult and in months for infant)
+        example: 33
+      validToDate:
+        type: string
+        format: date
+        description: Document is valid until this date in ISO 8601 format (yyyy-mm-dd)
+        example: '2019-08-14'
+
+  InputSource:
+    type: object
+    description: Means of adding a Regulatory Document for a given flight segment
+    properties:
+      entryMethod:
+        type: string
+        description: Indicates whether the document was swiped or manually entered or historical
+        enum:
+          - SWIPED
+          - MANUAL
+          - HISTORICAL
+        example: SWIPED
+      isSwipeOverriden:
+        type: boolean
+        description: Indicates whether the document swipe was overriden
+        example: false
+      isOCR:
+        type: boolean
+        description: Indicates whether the document information was populated using Optical Character Recognition technology
+        example: false
+      isHistorical:
+        type: boolean
+        description: Indicates whether the document is historical
+        example: false
+      scannedMethod:
+        type: string
+        description: Indicates the document scanning method
+        enum:
+          - BIOMETRIC_DOCUMENT_OR_EPASSPORT
+          - DIGITAL_PHOTO_DOCUMENT
+          - MACHINE_READABLE
+        example: MACHINE_READABLE
+
+  Traveler:
+    type: object
+    description: Traveler details (passenger possibly with CBBG/EXST)
+    allOf:
+    - $ref: '#/definitions/Stakeholder'
+    - type: object
+      properties:
+        specialSeat:
+          type: string
+          description: CBBG (Cabin Baggage) or EXST (Extra Seat)
+          enum:
+            - CBBG
+            - EXST
+          example: CBBG
+      example:
+        name:
+          firstName: 'John'
+          lastName: 'Smith'
+          title: 'Mr'
+        age: '45'
+        dateOfBirth: '1980-01-30'
+        gender: MALE
+        flightPassengerType: ADULT
+
+  Stakeholder:
+    type: object
+    description: Person details who may or may not be a traveler (the structure can be used for representing a non-traveler)
+    properties:
+      id:
+        type: string
+        description: The identifier
+        example: 'DDD78FG'
+      name:
+        $ref: '#/definitions/Name'
+      contacts:
+        type: array
+        description: Passenger associated contact information
+        items:
+          $ref: '#/definitions/Contact'
+        example:
+          - id: '126511237759'
+            email:
+              address: contact@contactstandard.xyz
+            language: EN
+            purpose:
+              - STANDARD
+            carrierCode: 6X
+          - id: '762636429911'
+            phone:
+              text: '00446716216622'
+              countryCode: GB
+            language: FR
+            purpose:
+              - STANDARD
+            carrierCode: 6X
+      age:
+        type: integer
+        description: Age (in years for Adult and in months for Infant - refer flightPassengerType)
+        example: 32
+      dateOfBirth:
+        type: string
+        format: date
+        description: The date of birth in ISO 8601 format (yyyy-mm-dd)
+        example: '2010-10-10'
+      gender:
+        type: string
+        description: The gender
+        enum: *GENDER
+        example: FEMALE
+      placeOfBirth:
+        type: string
+        description: Place of birth
+        example: London
+      countryOfResidence:
+        type: string
+        description: Country of residence
+        example: Portugal
+      nationality:
+        type: string
+        description: Nationality
+        example: GRC
+      flightPassengerType:
+        type: string
+        description: Specifies passenger type
+        enum:
+          - ADULT
+          - CHILD
+          - INFANT
+          - INFANT_WITH_SEAT
+        example: ADULT
+
+  Relationships:
+    type: object
+    description: Indicate relationships from one Passenger or one Segment to many Passengers or Segments
+    properties:
+      id:
+        type: string
+        description: identifier of the relationship collection
+        example: '17236616612311'
+      collection:
+        type: array
+        description: The details of the related items
+        items:
+          $ref: '#/definitions/Relationship'
+
+  Relationship:
+    type: object
+    description: Details of a relationship
+    properties:
+      id:
+        type: string
+        description: Identifier of the related resource
+        example: 2002CAE00036002D
+      type:
+        type: string
+        description: The type of the related resource
+        example: dcs-passenger
+      ref:
+        type: string
+        description: The reference to the related resource if this latter exists in the same document
+        example: 'included/correlationDcsPassengerTicket/2002CAE00036002D'
+      version:
+        type: string
+        description: Only populated for correlated resources defined in Dictionaries
+        example: '1'
+      href:
+        description: The URI of the related resource
+        type: string
+        example: 'https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2721234567890726'
+      methods:
+        $ref: '#/definitions/Methods'
+
+  Methods:
+    type: array
+    description: Accepted Methods
+    items:
+      type: string
+      enum:
+      - GET
+
+  Service:
+    type: object
+    description: Service representation (SSR/SK/OSI/SVC)
+    properties:
+      id:
+        type: string
+        description: Service Item unique identifier
+        example: '1000000000BC2107'
+      chargeableServiceId:
+        type: string
+        description: The unique identifier of the chargeable service.
+        example: '10000007896346C1'
+      code:
+        type: string
+        description: This code is used to identify the type of the services
+        maxLength: 4
+        example: 'VGML'
+      subType:
+        type: string
+        description: This field is used to indicate if we are dealing with an SSR/SK/OSI element
+        enum:
+          - SPECIAL_SERVICE_REQUEST
+          - SPECIAL_KEYWORD
+          - OTHER_SERVICE_INFORMATION
+          - MANUAL_AUXILIARY_SEGMENT
+        example: SPECIAL_SERVICE_REQUEST
+      description:
+        type: string
+        description: This field is used to describe the service free text
+        example: 'Passenger/Crew primary travel document information'
+      text:
+        $ref: '#/definitions/ServiceDescription'
+      address:
+        # description: This field is used to structure SSR DOCA address when possible
+        $ref: "#/definitions/Address"
+      document:
+        # description: This field is used to structure SSR DOCS identification document or the SSR DOCO visa when possible
+        $ref: "#/definitions/IdentityDocument"
+      priceCategory:
+        $ref: '#/definitions/PriceCategory'
+      serviceProvider:
+        $ref: '#/definitions/ServiceProvider'
+      statusCode:
+        type: string
+        description: Service Status
+        example: 'HK'
+      numberInParty:
+        type: integer
+        description: Number in party
+        example: 1
+      stakeholders:
+        $ref: '#/definitions/Relationship'
+      products:
+        $ref: '#/definitions/Relationship'
+      isSubjectToQuota:
+        type: boolean
+        description: Whether the service is subject to quota
+        example: true
+      quotaCode:
+        type: string
+        description: The quota code of the service subject to quota as defined in Inventory
+        example: 'SSRQ'
+      chargeableServiceDocument:
+        $ref: '#/definitions/ChargeableServiceDocument'
+      paymentStatus:
+        type: string
+        description: Status of payment made for this service
+        enum:
+          - PAID
+          - UNPAID
+          - WAIVED
+          - EXEMPTED
+        example: WAIVED
+      isIssuanceRequired:
+        type: boolean
+        description: Whether issuance is required for this chargeable service
+        example: true
+      waiver:
+        $ref: '#/definitions/Waiver'
+
+  ChargeableServiceDocument:
+    type: object
+    description: >-
+      A reference to either MCO or EMD document by number and type. A chargeable service document represents the document
+      issued as a result of the chargeable service payment. The document status stores the state of the document as either
+      refunded, voided, or flown (used).
+    properties:
+      documentType:
+        type: string
+        description: >-
+          The type of document for the chargeable service. Either MCO for
+          Miscellaneous Charge Order or EMD for Electronic Miscellaneous
+          Document
+        enum:
+          - EMD
+          - MCO
+        example: EMD
+      number:
+        type: string
+        description: The document number
+        example: '1728200002469'
+      status:
+        type: string
+        description: The status of the document
+        enum:
+          - VOIDED
+          - REFUNDED
+          - FLOWN
+        example: REFUNDED
+  ServiceProvider:
+    type: object
+    properties:
+      code:
+        type: string
+        description: >-
+          This field is used to represent carrier for pax level service.
+          Can be YY meaning applies to all products in PNR
+        example: 'YY'
+  ServiceDescription:
+    type: object
+    properties:
+      value:
+        type: string
+        description: >-
+          This field is used for Service level description
+        example: 'P/GBR/012345678/GBR/30JUN73/M/14APR09/JOHNSON/SIMON/JEAN PAUL/H'
+      label:
+        type: string
+        description: >-
+          Description Label
+        example: 'A description label'
+
+  Waiver:
+    type: object
+    description: Holds details of payment waiver. A waiver represents the airlines approval for dropping the requirement to pay for a service.
+    properties:
+      authoriser:
+        type: string
+        description: The authoriser of the waiver
+        example: 'Check-in agent'
+      reasonCode:
+        type: string
+        description: The reason code of the waiver
+        example: 'Passenger had to wait for check-in due to malfunction of the system'
+      reasonText:
+        type: string
+        description: The reason text of the waiver
+        example: 'A situation at the check-in agent and had to waive the chargeable service'
+
+  EventLog:
+    type: object
+    description: >-
+      Details about the original event triggering the current datapush feed
+      Used by Meta.triggerEventLog and DcsPassengerPush.lastModification
+    properties:
+      id:
+        description: Identifier of the change
+        type: string
+        example: '46541dsfsSDRWFS54'
+      triggerEventName:
+        description: >-
+          The name of the trigger event.
+          - Meta.triggerEventLog
+            Set to 'DATA_INIT' for initialization messages
+          - DcsPassengerPush.lastModification
+            Set in format "CCKXUQ - Cancel Acceptance" for DCS agent initiated actions
+            and set to "1AINTERNAL" for DCS system initiated actions
+        type: string
+        example: 'DATA_INIT'
+      dateTime:
+        type: string
+        format: date-time
+        description: UTC date & time
+        example: '2015-10-05T10:00:00Z'
+      user:
+        $ref: '#/definitions/User'
+
+  User:
+    type: object
+    description: The user that initiated/performed the change in case of user initiated events
+    properties:
+      id:
+        type: string
+        description: Identifier of the User
+        example: "3355KJ"
+      officeID:
+        type: string
+        description: Office Id of the User. Defaulted to "LON1A0955" in case of DCS system initiated actions
+        example: "FRALH04SS"
+      workStation:
+        $ref: '#/definitions/WorkStation'
+
+  WorkStation:
+    type: object
+    description: Workstation details from where the change was done
+    properties:
+      id:
+        type: string
+        description: Identifier of the Workstation in format 'qualifier - address'
+        example: "J-04SS"
+      fullLocation:
+        $ref: '#/definitions/InfrastructureLocation'
+
+  InfrastructureLocation:
+    type: object
+    description: Full location details of the DCS agent/device
+    properties:
+      airportCode:
+        type: string
+        description: IATA three-digit airport code (exclusive with cityCode)
+        example: 'LHR'
+      cityCode:
+        type: string
+        description: IATA three-digit metro area code (exclusive with airportCode)
+        example: 'LON'
+      terminalId:
+        type: string
+        description: Terminal identifier as in appendix of the SSM manual (exclusive with buildingId)
+        example: '2E'
+      buildingId:
+        type: string
+        description: Building identifier - non verified or regulated (exclusive with terminalId)
+        example: 1
+      areaCode:
+        type: string
+        description: Category of the location
+        example: 'CKI'
+      identifier:
+        type: string
+        description: Identifier of the closer location / zone
+        example: 1
+      description:
+        type: string
+        description: Admin user defined non structured free-flow text
+        example: 'LHR TERM-2E'
+
+  PatchOperation:
+    description: A single JSON Patch operation as defined by RFC 6902 (see https://tools.ietf.org/html/rfc6902)
+    type: object
+    required:
+      - "op"
+      - "path"
+    properties:
+      op:
+        type: string
+        description: The operation to be performed
+        enum:
+          - "ADD"
+          - "REMOVE"
+          - "REPLACE"
+          - "MOVE"
+          - "COPY"
+          - "TEST"
+      path:
+        type: string
+        description: A JSON Pointer as defined by RFC 6901 (see https://tools.ietf.org/html/rfc6901)
+      value:
+        type: object
+        description: The value to be used within the operations
+      from:
+        type: string
+        description: A JSON Pointer as defined by RFC 6901 (see https://tools.ietf.org/html/rfc6901)

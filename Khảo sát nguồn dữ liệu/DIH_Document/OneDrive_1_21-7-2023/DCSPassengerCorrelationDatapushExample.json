@@ -1,0 +1,307 @@
+{
+        "meta": {
+          "triggerEventLog": {
+            "id": "46541dsfsSDRWFS54"
+          },
+          "version": "2.2.0"
+        },
+        "dcsPassengerCorrelations": {
+          "correlationDcsPassengerTicket": {
+            "dcsPassengerId": "2501ADE000000001",
+            "ticketIds": [
+              "1258767935960-2018-08-21",
+              "1258767935961-2018-08-21"
+            ],
+            "correlatedData": {
+              "1258767935960-2018-08-21": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2101CA1100003431",
+                  "ticketCouponId": "1258767935960-2018-08-21-1"
+                },
+                {
+                  "dcsPassengerSegmentDeliveryId": "2202DA1200003432",
+                  "ticketCouponId": "1258767935960-2018-08-21-2"
+                }
+              ],
+              "1258767935961-2018-08-21": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2303BA1300003433",
+                  "ticketCouponId": "1258767935961-2018-08-21-1"
+                }
+              ]
+            }
+          },
+          "correlationDcsPassengerPnr": {
+            "dcsPassengerId": "2501ADE000000001",
+            "pnrIds": [
+              "ORY4NY-2018-10-19",
+              "KBR849-2018-09-17"
+            ],
+            "correlatedData": {
+              "ORY4NY-2018-10-19": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2404CA5500003411",
+                  "pnrTravelerId": "ORY4NY-2018-10-19-PT-1",
+                  "pnrAirSegmentId": "ORY4NY-2018-10-19-ST-1"
+                },
+                {
+                  "dcsPassengerSegmentDeliveryId": "2504CA5500003422",
+                  "pnrTravelerId": "ORY4NY-2018-10-19-PT-1",
+                  "pnrAirSegmentId": "ORY4NY-2018-10-19-ST-2"
+                }
+              ],
+              "KBR849-2018-09-17": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2604CA5500003433",
+                  "pnrTravelerId": "KBR849-2018-09-17-PT-2",
+                  "pnrAirSegmentId": "KBR849-2018-09-17-ST-1"
+                }
+              ]
+            }
+          },
+          "correlationDcsPassengerSchedule": {
+            "dcsPassengerId": "2501ADE000000001",
+            "scheduleIds": [
+              "6X-5641-2018-10-05",
+              "6X-7861-2018-10-06"
+            ],
+            "correlatedData": {
+              "6X-5641-2018-10-05": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2404CA5500003411",
+                  "scheduleSegmentId": "2018-10-05-LHR-MAD",
+                  "schedulePartnershipFlightId": "7X-9623-2018-10-05",
+                  "correlatedLegs": [
+                    {
+                      "dcsPassengerLegDeliveryId": "LHR",
+                      "scheduleLegId": "LHR-CDG"
+                    },
+                    {
+                      "dcsPassengerLegDeliveryId": "CDG",
+                      "scheduleLegId": "CDG-MAD"
+                    }
+                  ]
+                }
+              ],
+              "6X-7861-2018-10-06": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2504CA5500003422",
+                  "scheduleSegmentId": "2018-10-06-MAD-LHR",
+                  "correlatedLegs": [
+                    {
+                      "dcsPassengerLegDeliveryId": "MAD",
+                      "scheduleLegId": "MAD-LHR"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "correlationDcsPassengerEmd": {
+            "dcsPassengerId": "2501ADE000000001",
+            "emdIds": [
+              "1721234567891-2018-05-15",
+              "1721234567892-2018-05-15"
+            ],
+            "correlatedData": {
+              "1721234567891-2018-05-15": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2404CA5500003411",
+                  "dcsPassengerServiceId": "1111000000BC2107",
+                  "emdCouponId": "1721234567891-2018-05-15-1"
+                },
+                {
+                  "dcsPassengerSegmentDeliveryId": "2505CA5500003422",
+                  "dcsPassengerServiceId": "1222000000BC2107",
+                  "emdCouponId": "1721234567891-2018-05-15-2"
+                }
+              ],
+              "1721234567892-2018-05-15": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2505CA5500003422",
+                  "dcsPassengerServiceId": "1333000000BC2107",
+                  "emdCouponId": "1721234567892-2018-05-15-1"
+                }
+              ]
+            }
+          },
+          "correlationDcsPassengerInventory": {
+            "dcsPassengerId": "2501ADE000000001",
+            "inventoryIds": [
+              "6X-5641-2018-10-05",
+              "6X-7861-2018-10-06"
+            ],
+            "correlatedData": {
+              "6X-5641-2018-10-05": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2101ADE0000001",
+                  "inventorySegmentId": "2018-10-05-LHR-MAD",
+                  "inventoryPartnershipFlightId": "7X-9623-2018-10-05",
+                  "correlatedLegs": [
+                    {
+                      "dcsPassengerLegDeliveryId": "LHR",
+                      "inventoryLegId": "LHR-CDG"
+                    },
+                    {
+                      "dcsPassengerLegDeliveryId": "CDG",
+                      "inventoryLegId": "CDG-MAD"
+                    }
+                  ]
+                }
+              ],
+              "6X-7861-2018-10-06": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2201ADE0000002",
+                  "inventorySegmentId": "2018-10-06-MAD-LHR",
+                  "correlatedLegs": [
+                    {
+                      "dcsPassengerLegDeliveryId": "MAD",
+                      "inventoryLegId": "MAD-LHR"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "correlationDcsPassengerBagsGroup": {
+            "dcsPassengerId": "2501ADE000000001",
+            "bagsGroupIds": [
+              "AA42BA1395020102",
+              "AA41BA1395020413"
+            ],
+            "correlatedData": {
+              "AA42BA1395020102": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2202DA1200003432",
+                  "correlatedLegs": [
+                    {
+                      "dcsPassengerLegDeliveryId": "LHR",
+                      "bagId": "1101CA1100003431",
+                      "bagLegDeliveryId": "LHR"
+                    }
+                  ]
+                }
+              ],
+              "AA41BA1395020413": [
+                {
+                  "dcsPassengerSegmentDeliveryId": "2202DA1200003433",
+                  "correlatedLegs": [
+                    {
+                      "dcsPassengerLegDeliveryId": "LHR",
+                      "bagId": "1101CA1100003432",
+                      "bagLegDeliveryId": "LHR"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "dictionaries": {
+            "dcsPassengers": {
+              "2501ADE000000001": {
+                "type": "dcs-passenger",
+                "id": "2501ADE000000001",
+                "version": "1",
+                "href": "https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2501ADE000000001"
+              }
+            },
+            "tickets": {
+              "1258767935960-2018-08-21": {
+                "type": "ticket",
+                "id": "1258767935960-2018-08-21",
+                "version": "1",
+                "href": "https://airlines.api.amadeus.com/v2/ticketing/processed-tickets/1258767935960-2018-08-21"
+              },
+              "1258767935961-2018-08-21": {
+                "type": "ticket",
+                "id": "1258767935961-2018-08-21",
+                "version": "1",
+                "href": "https://airlines.api.amadeus.com/v2/ticketing/processed-tickets/1258767935961-2018-08-21"
+              }
+            },
+            "emds": {
+              "1721234567891-2018-05-15": {
+                "type": "emd",
+                "id": "1721234567891-2018-05-15",
+                "version": "1",
+                "href": "https://airlines.api.amadeus.com/v2/ticketing/processed-emds/1721234567891-2018-05-15"
+              },
+              "1721234567892-2018-05-15": {
+                "type": "emd",
+                "id": "1721234567892-2018-05-15",
+                "version": "1",
+                "href": "https://airlines.api.amadeus.com/v2/ticketing/processed-emds/1721234567892-2018-05-15"
+              }
+            },
+            "pnrs": {
+              "ORY4NY-2018-10-19": {
+                "type": "pnr",
+                "id": "ORY4NY-2018-10-19",
+                "version": "1",
+                "href": "https://airlines.api.amadeus.com/v2/reservation/processed-pnrs/ORY4NY-2018-10-19"
+              },
+              "KBR849-2018-09-17": {
+                "type": "pnr",
+                "id": "KBR849-2018-09-17",
+                "version": "1",
+                "href": "https://airlines.api.amadeus.com/v2/reservation/processed-pnrs/KBR849-2018-09-17"
+              }
+            },
+            "scheduleDatedFlights": {
+              "6X-5641-2018-10-05": {
+                "type": "dated-flight",
+                "id": "6X-5641-2018-10-05",
+                "version": "1536835243",
+                "href": "https://airlines.api.amadeus.com/v2/schedule/processed-flights/6X-5641-2018-10-05"
+              },
+              "6X-7861-2018-10-06": {
+                "type": "dated-flight",
+                "id": "6X-7861-2018-10-06",
+                "version": "1536835243",
+                "href": "https://airlines.api.amadeus.com/v2/schedule/processed-flights/6X-7861-2018-10-06"
+              }
+            },
+            "inventoryDatedFlights": {
+              "6X-5641-2018-10-05": {
+                "type": "dated-flight",
+                "id": "6X-5641-2018-10-05",
+                "version": "1536835243",
+                "href": "https://airlines.api.amadeus.com/v2/inventory/processed-flights/6X-5641-2018-10-05"
+              },
+              "6X-7861-2018-10-06": {
+                "type": "dated-flight",
+                "id": "6X-7861-2018-10-06",
+                "version": "1536835243",
+                "href": "https://airlines.api.amadeus.com/v2/inventory/processed-flights/6X-7861-2018-10-06"
+              }
+            },
+            "bagsGroups": {
+              "AA42BA1395020102": {
+                "type": "bags-group",
+                "id": "AA42BA1395020102",
+                "version": "1",
+                "href": "https://airlines.api.amadeus.com/v2/departure-control/processed-bags-groups/AA42BA1395020102"
+              },
+              "AA41BA1395020413": {
+                "type": "bags-group",
+                "id": "AA41BA1395020413",
+                "version": "1",
+                "href": "https://airlines.api.amadeus.com/v2/departure-control/processed-bags-groups/AA41BA1395020413"
+              }
+            }
+          }
+        },
+        "events": {
+          "recordDomain": "DCSPASSENGER_TICKET",
+          "recordId": "2501ADE000000001",
+          "originFeedTimeStamp": "2018-10-24T14:19:00Z",
+          "events": [
+            {
+              "origin": "COMPARISON",
+              "eventType": "UPDATED",
+              "currentPath": "/correlationDcsPassengerTicket/correlatedData/0142345676472-2018-09-20/1/ticketCouponId",
+              "previousPath": "/correlationDcsPassengerTicket/correlatedData/0142345676472-2018-09-20/1/ticketCouponId"
+            }
+          ]
+        }
+      }

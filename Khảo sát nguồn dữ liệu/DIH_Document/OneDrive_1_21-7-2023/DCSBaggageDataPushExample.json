@@ -1,0 +1,256 @@
+{
+	"meta": {
+		"triggerEventLog": {
+			"id": "46541dsfsSDRWFS54"
+		},
+		"version": "2.1.0"
+	},
+	"lastModification": {
+		"dateTime": "2015-10-05T10:00:00.043Z",
+		"triggerEventName": "BBTGPQ-Print Baggage Tag",
+		"user": {
+			"id": "USR0001",
+			"officeId": "NCE6X08AA",
+			"workstation": {
+				"id": "A/LHR/T/2/CKI/1/1",
+				"fullLocation": {
+					"airportCode": "LHR",
+					"cityCode": "LON",
+					"terminalId": "2E",
+					"buildingId": "1",
+					"areaCode": "CKI",
+					"identifier": "1",
+					"description": "LHR TERM-2E"
+				}
+			}
+		}
+	},
+	"processedBagsGroup": {
+		"type": "bags-group",
+		"id": "10FBC42026758291",
+		"eTag": "1602876919851",
+		"checkedBagsCount": 1,
+		"checkedBagsWeight": {
+			"value": 125,
+			"unit": "KILOGRAMS"
+		},
+		"handBagsCount": 1,
+		"handBagsWeight": {
+			"value": 125,
+			"unit": "KILOGRAMS"
+		},
+		"responsiblePassenger": {
+			"id": 1200000000000001,
+			"type": "dcs-passenger",
+			"href": "https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/1200000000000001",
+			"methods": [
+				"GET"
+			]
+		},
+		"checkedBags": {
+			"collection": [
+				{
+					"id": "1101CA1100003431",
+					"type": "bag",
+					"ref": "processedBags"
+				}
+			]
+		},
+		"pooledPassengers": {
+			"collection": [
+				{
+					"id": 1200000000000001,
+					"type": "dcs-passenger",
+					"href": "https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/1200000000000001",
+					"methods": [
+						"GET"
+					]
+				}
+			]
+		},
+		"itinerary": [
+			{
+				"id": "JFK",
+				"boardPoint": {
+					"iataCode": "JFK"
+				},
+				"offPoint": {
+					"iataCode": "LHR"
+				}
+			}
+		]
+	},
+	"processedBags": [
+		{
+			"id": "1101CA1100003431",
+			"bagType": "STANDARD",
+			"bagTag": {
+				"licensePlate": "0057483945",
+				"issuingCarrier": "6X",
+				"finalDestination": "JFK",
+				"systemSource": "AUTOMATIC"
+			},
+			"linkedBagTag": {
+				"licensePlate": "0057483946",
+				"issuingCarrier": "6X",
+				"finalDestination": "JFK",
+				"issuanceDay": 2
+			},
+			"lastSeenLocation": {
+				"deviceId": "AF5FA7A4",
+				"deviceUser": 116554,
+				"localDateTime": "2018-10-30T16:43",
+				"logSource": "BAGGAGE_RECONCILIATION_SYSTEM"
+			},
+			"systemSource": "AUTOMATIC",
+			"weight": {
+				"value": 125,
+				"unit": "KILOGRAMS"
+			},
+			"owner": {
+				"id": 1200000000000001,
+				"type": "dcs-passenger",
+				"href": "https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/1200000000000001",
+				"methods": [
+					"GET"
+				]
+			},
+			"legs": [
+				{
+					"id": "JFK",
+					"boardPoint": {
+						"iataCode": "JFK",
+						"localDateTime": "2018-11-29"
+					},
+					"offPoint": {
+						"iataCode": "LHR"
+					},
+					"operatingFlight": {
+						"carrierCode": "6X",
+						"flightNumber": 1011,
+						"operationalSuffix": "A"
+					},
+					"acceptanceStatus": "FULLY_ACCEPTED",
+					"activationStatus": "ACTIVE",
+					"travelClassCode": "Y",
+					"authorityToLoad": true,
+					"authorityToTransport": true,
+					"offloaded": false,
+					"checkinLocation": {
+						"trackedLocation": {
+							"identifier": "CKIN"
+						}
+					},
+					"specialBagHandlingItems": [
+						{
+							"id": "GOLF",
+							"service": {
+								"code": "GOLF",
+								"subType": "SPECIAL_SERVICE_REQUEST",
+								"description": "Golf Bag",
+								"statusCode": "HK"
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"processedExcessBaggageCharges": [
+		{
+			"id": 1000000000000001,
+			"paymentStatus": "PAID",
+			"waiverReason": {
+				"text": "Excess Waived by Admin"
+			},
+			"responsiblePassenger": {
+				"id": 1200000000000001,
+				"type": "dcs-passenger",
+				"href": "https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/1200000000000001",
+				"methods": [
+					"GET"
+				]
+			},
+			"segments": {
+				"collection": [
+					{
+						"id": "2401CA5500003431",
+						"type": "segment-delivery"
+					}
+				]
+			},
+			"totalCharge": {
+				"total": "150.50",
+				"currency": "GBP"
+			},
+			"calculations": [
+				{
+					"id": "10DF2D0000BD64F4",
+					"boardPoint": {
+						"iataCode": "JFK"
+					},
+					"offPoint": {
+						"iataCode": "LHR"
+					},
+					"items": [
+						{
+							"id": "1000000000A21C1B",
+							"itemType": "WEIGHT",
+							"quantity": 1,
+							"weight": {
+								"value": 125,
+								"unit": "KILOGRAMS"
+							},
+							"boardPoint": {
+								"iataCode": "JFK"
+							},
+							"offPoint": {
+								"iataCode": "LHR"
+							},
+							"rate": {
+								"total": "15.50",
+								"currency": "GBP"
+							},
+							"charge": {
+								"total": "150.50",
+								"currency": "GBP"
+							},
+							"bag": {
+								"id": "1101CA1100003431",
+								"type": "bag",
+								"ref": "processedBags"
+							},
+							"paymentDocument": {
+								"documentType": "EMD",
+								"number": "1728200002469"
+							},
+							"waiverReason": {
+								"text": "Excess Waived by Admin"
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"previousRecord": [
+		{
+			"op": "replace",
+			"path": "/processedBagsGroup/responsiblePassenger/id",
+			"value": "2501ADE000000000"
+		}
+	],
+	"events": {
+		"recordDomain": "DCSBAGGAGE",
+		"recordId": "2501ADE000000001",
+		"originFeedTimeStamp": "2018-10-24T14:19:00Z",
+		"events": [
+			{
+				"origin": "COMPARISON",
+				"eventType": "UPDATED",
+				"currentPath": "/processedBagsGroup/responsiblePassenger/id",
+				"previousPath": "/processedBagsGroup/responsiblePassenger/id"
+			}
+		]
+	}
+}

@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "triggerEventLog": {
+      "id": "46541dsfsSDRWFS54"
+    },
+    "version": "2.0.0"
+  },
+  "dcsBaggageCorrelations": {
+    "correlationBagsGroupDcsPassenger": {
+      "bagsGroupId": "AA42BA1395020102",
+      "dcsPassengerIds": [
+        "2401CA5500003431"
+      ],
+      "correlatedData": {
+        "2401CA5500003431": [
+          {
+            "bagId": "1101CA1100003431",
+            "bagLegCorrelations": [
+              {
+                "bagLegDeliveryId": "LHR",
+                "dcsPassengerLegDeliveryId": "LHR",
+                "dcsPassengerSegmentDeliveryId": "2202DA1200003432"
+              },
+              {
+                "bagLegDeliveryId": "BKK",
+                "dcsPassengerLegDeliveryId": "BKK",
+                "dcsPassengerSegmentDeliveryId": "2202DA1200003432"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "correlationBagsGroupPnr": {
+      "bagsGroupId": "AA42BA1395020102",
+      "pnrIds": [
+        "ORY4NY-2018-10-19"
+      ],
+      "correlatedData": {
+        "ORY4NY-2018-10-19": [
+          {
+            "bagId": "1101CA1100003431",
+            "pnrTravelerId": "ORY4NY-2018-10-19-PT-1",
+            "bagLegCorrelations": [
+              {
+                "bagLegDeliveryId": "ORY",
+                "pnrAirSegmentId": "ORY4NY-2018-10-19-ST-1"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dictionaries": {
+      "bagsGroups": {
+        "AA42BA1395020102": {
+          "type": "bags-group",
+          "id": "AA42BA1395020102",
+          "version": "1",
+          "href": "https://airlines.api.amadeus.com/v2/departure-control/processed-bags-groups/AA42BA1395020102"
+        }
+      },
+      "dcsPassengers": {
+        "2401CA5500003431": {
+          "type": "dcs-passenger",
+          "id": "2401CA5500003431",
+          "version": "1",
+          "href": "https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2401CA5500003431"
+        }
+      },
+      "pnrs": {
+        "ORY4NY-2018-10-19": {
+          "type": "pnr",
+          "id": "ORY4NY-2018-10-19",
+          "version": "1",
+          "href": "https://airlines.api.amadeus.com/v1/reservation/processed-pnrs/ORY4NY-2018-10-19"
+        }
+      }
+    }
+  },
+  "events": {
+    "recordDomain": "DCSBAGGAGE_DCSPASSENGER",
+    "recordId": "AA42BA1395020102",
+    "originFeedTimeStamp": "2018-10-24T14:19:00Z",
+    "events": [
+      {
+        "origin": "COMPARISON",
+        "eventType": "UPDATED",
+        "currentPath": "/dcsBaggageCorrelations/correlationBagsGroupDcsPassenger/correlatedData/bagsGroupId/AA42BA1395020102",
+        "previousPath": "/dcsBaggageCorrelations/correlationBagsGroupDcsPassenger/correlatedData/bagsGroupId/AA42BA1395020102"
+      }
+    ]
+  }
+}

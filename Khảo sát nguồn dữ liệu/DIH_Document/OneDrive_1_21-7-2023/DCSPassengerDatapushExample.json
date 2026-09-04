@@ -1,0 +1,722 @@
+{
+  "meta": {
+    "triggerEventLog": {
+      "id": "46541dsfsSDRWFS54"
+    },
+    "version": "2.2.0"
+  },
+  "lastModification": {
+    "dateTime": "2015-10-05T10:00:00.000Z",
+    "triggerEventName": "Customer Acceptance",
+    "user": {
+      "id": "USR0001",
+      "officeID": "NCE6X08AA",
+      "workStation": {
+        "id": "A/LHR/T/2/CKI/1/1",
+        "fullLocation": {
+          "airportCode": "LHR",
+          "cityCode": "LON",
+          "terminalId": "2E",
+          "buildingId": "1",
+          "areaCode": "CKI",
+          "identifier": "1",
+          "description": "LHR TERM-2E"
+        }
+      }
+    }
+  },
+  "processedDcsPassenger": {
+    "type": "dcs-passenger",
+    "id": "2501ADE000000001",
+    "etag": 1602876919851,
+    "segmentDeliveries": [
+      {
+        "id": "2401CA5500003OID",
+        "type": "segment-delivery",
+        "uniqueCustomerIdentifier": "2501ADE000000001",
+        "segment": {
+          "departure": {
+            "iataCode": "LHR",
+            "at": "2018-01-11"
+          },
+          "arrival": {
+            "iataCode": "SIN"
+          },
+          "number": "1234",
+          "carrierCode": "7X",
+          "suffix": "B",
+          "class": "Q",
+          "cabin": "M",
+          "statusCode": "HK",
+          "operating": {
+            "carrierCode": "6X",
+            "number": "17"
+          }
+        },
+        "recordLocator": "PC3XYV",
+        "dcsProductType": "ACTIVE_SYNCHRONISED",
+        "legDeliveries": [
+          {
+            "id": "LHR",
+            "departure": {
+              "iataCode": "LHR",
+              "at": "2018-09-14T10:10:00"
+            },
+            "arrival": {
+              "iataCode": "SIN",
+              "at": "2018-09-14T10:10:00"
+            },
+            "operatingFlight": {
+              "carrierCode": "6X",
+              "number": "741",
+              "suffix": "A"
+            },
+            "travelCabinCode": "C",
+            "acceptance": {
+              "securityNumber": "098",
+              "status": "CAC",
+              "acceptanceType": "PRM",
+              "isAdvanceAccepted": false,
+              "isForceAccepted": true,
+              "forceAcceptanceReason": "emergency travel request",
+              "isFrozen": false,
+              "channel": "JFE",
+              "physicalAcceptanceLocation": "BMD",
+              "standbyReason": "CSAX",
+              "cancellationReason": "Customer Unwell"
+            },
+            "seating": {
+              "seatStatus": "NOT_GUARANTEED",
+              "seatProductStatus": "HL",
+              "isChargeableSeat": true,
+			  "emergencyExitSuitability": "UNABLE_TO_DETERMINE",
+              "seat": {
+                "number": "12A",
+                "characteristicsCodes": [
+                  "CH",
+                  "W"
+                ]
+              },
+              "chargeableSeat": {
+                "chargeableServiceId": "10000007896346C1",
+                "priceCategory": {
+                  "code": "C",
+                  "subCode": "99Y"
+                },
+                "chargeableServiceDocument": {
+                  "documentType": "EMD",
+                  "number": "1728200002469",
+                  "status": "REFUNDED"
+                },
+                "paymentStatus": "WAIVED",
+                "isIssuanceRequired": true,
+                "waiver": {
+                  "authoriser": "Check-in agent",
+                  "reasonCode": "Technical",
+                  "reasonText": "A technical issue occurred at check-in. Agent had to waive the chargeable service"
+                }
+              },
+              "seatPreferences": {
+                "number": "12A",
+                "characteristicsCodes": [
+                  "CH",
+                  "W"
+                ]
+              }
+            },
+            "boarding": {
+              "error": "Unpaid excess exists",
+              "warning": "Customer is CBBG",
+              "boardingStatus": "NBD",
+              "boardingPassPrint": {
+                "status": "PPT",
+                "channel": "JFE"
+              },
+              "boardingZone": "B",
+              "trackingLog": {
+                "deviceId": "AF5FA7A4",
+                "referenceDeviceType": "SELF_BOARDING_DEVICE",
+                "deviceUser": 116554,
+                "utcDateTime": {},
+                "localDateTime": {},
+                "logSource": "MOBILE_PHONE",
+                "trackedLocation": {
+                  "airportCode": "LHR",
+                  "cityCode": "LON",
+                  "terminalId": "2E",
+                  "buildingId": 1,
+                  "areaCode": "CKI",
+                  "identifier": 1,
+                  "description": "CDG TERM-2F LGE TRCK2 Lounge 2F2"
+                }
+              }
+            },
+            "onload": {
+              "status": "OK",
+              "priority": "W31",
+              "cabinCode": "C",
+              "edit": {
+                "reasonCode": "TO_REMAIN",
+                "reasonFreeText": "Keep in same cabin",
+                "cabinCode": "Y"
+              }
+            },
+            "regradeDelivered": {
+              "status": "ACTIONED",
+              "priority": "W31",
+              "cabinCode": "C",
+              "reason": "OVER_SOLD_CURRENT_FLIGHT",
+              "reasonFreeText": "Oversold current flight",
+              "authoriserReference": "AU0123",
+              "regradeType": "REMAIN_FORCE"
+            },
+            "regradeProposed": {
+              "status": "ACTIONED",
+              "priority": "W31",
+              "cabinCode": "C",
+              "reason": "OVER_SOLD_CURRENT_FLIGHT",
+              "reasonFreeText": "Oversold current flight",
+              "authoriserReference": "AU0123",
+              "direction": "RGH",
+              "regradeType": "REMAIN_FORCE"
+            },
+            "regulatoryChecks": [
+              {
+                "id": 1255477819
+              },
+              {
+                "regulatoryProgram": {
+                  "name": "AQQ",
+                  "countryCode": "USA"
+                },
+                "statuses": [
+                  {
+                    "id": 1255477820
+                  },
+                  {
+                    "statusType": "SECURITY",
+                    "statusCode": "S",
+                    "override": {
+                      "commentType": "OVERRIDE_AUTHORIZER",
+                      "description": "Authorized by Mr. John Smith"
+                    },
+                    "message": {
+                      "commentType": "SPECIAL_INSTRUCTIONS",
+                      "code": 8517,
+                      "description": "TIMEOUT"
+                    },
+                    "isVerifiedId": false
+                  }
+                ],
+                "assesmentTime": "2018-07-31T11:23:20Z"
+              }
+            ],
+            "comments": [
+              {
+                "id": "1000000000810D86",
+                "text": "One cabin bag to be taken on the hold",
+                "priority": "HIGH",
+                "usage": "AT_BP_REPRINT",
+                "delivery": {
+                  "status": "DELIVERED"
+                }
+              }
+            ],
+            "compensations": [
+              {
+                "id": null,
+                "categoryDescription": "ACCOMODATION",
+                "reason": {
+                  "code": "FDD",
+                  "label": "Flight Delayed on Departure"
+                },
+                "authorisation": {
+                  "authorizer": "1100AC",
+                  "status": "AUTHORIZED",
+                  "date": {},
+                  "quantity": 2
+                },
+                "vouchers": [
+                  {
+                    "id": 9423690240,
+                    "voucherType": "GTP",
+                    "form": "Cash",
+                    "description": "Meal Voucher",
+                    "comment": "Creating meal voucher for customer John SMITH on AC123",
+                    "status": "ACTIVE",
+                    "printStatus": "PRINTED",
+                    "isReprintable": true,
+                    "providerCode": "AC"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "associatedPassengerSegments": {
+          "onwardId": "2401CA5500003OID",
+          "infantId": "2401CA5500003JID",
+          "cbbgId": "2401CA5500003CID",
+          "exstId": "2401CA5500003EID",
+          "informativeOnwardId": "2401CA5500003CID",
+          "acceptedOnwardId": "2401CA5500003CID",
+          "alternateOnwardId": "2401CA5500003CID",
+          "misconnectedOnwardId": "2401CA5500003CID",
+          "tciOnwardId": "2401CA5500003CID",
+          "disruptedOnwardId": "2401CA5500003CID"
+        },
+        "staff": {
+          "idType": "N2",
+          "transfersDuringDay": 2,
+          "transferDays": 3
+        },
+        "frequentFlyer": [
+          {
+            "id": "FF0001",
+            "frequentFlyerNumber": "6X090807061234",
+            "serviceCode": "FQTU",
+            "applicableAirlineCode": "6X",
+            "confirmationStatus": "K",
+            "airlineLevel": {
+              "name": "Gold",
+              "code": "G",
+              "priorityCode": 1,
+              "companyCode": "6X"
+            },
+            "allianceLevel": {
+              "name": "Gold",
+              "code": "G",
+              "priorityCode": 1,
+              "companyCode": "6X"
+            },
+            "isValidationOverriden": false
+          }
+        ],
+        "associatedAirTravelDocuments": [
+          {
+            "id": "1234556677812",
+            "documentType": "ETICKET",
+            "primaryDocumentNumber": "1234556677812",
+            "conjunctiveDocumentNumbers": [
+              "1234556677812",
+              "1234556677813"
+            ],
+            "validatingCarrierCode": "6X",
+            "associationStatus": "ASSOCIATED",
+            "blacklistCategory": "Fraud",
+            "airCoupons": [
+              {
+                "id": "1",
+                "number": 1,
+                "documentNumber": "1234556677812"
+              }
+            ]
+          },
+          {
+            "id": "1234556677567",
+            "documentType": "EMD",
+            "primaryDocumentNumber": "1234556677567",
+            "conjunctiveDocumentNumbers": [
+              "1234556677567"
+            ],
+            "airCoupons": [
+              {
+                "id": "1",
+                "number": 1,
+                "documentNumber": "1234556677567"
+              }
+            ],
+            "status": "CHECKED_IN",
+            "associatedDocuments": [
+              {
+                "id": "1234556677812",
+                "documentType": "EMD",
+                "primaryDocumentNumber": "1234556677812",
+                "conjunctiveDocumentNumbers": [
+                  "1234556677812"
+                ],
+                "airCoupons": [
+                  {
+                    "id": "1",
+                    "number": 1,
+                    "documentNumber": "1234556677812"
+                  }
+                ]
+              }
+            ],
+            "reasonForIssuance": {
+              "code": "C",
+              "subCode": "99Y",
+              "rfiscDescription": "BAG- EXCESS PC ALLOWANCE"
+            }
+          }
+        ],
+        "previousTicket": {
+          "id": "1234556677568",
+          "documentType": "ETICKET",
+          "primaryDocumentNumber": "1234556677568"
+        },
+        "services": [
+          {
+            "code": "DOCA",
+            "address": {
+              "category": "DESTINATION",
+              "lines": [
+                "101, JENYA"
+              ],
+              "postalCode": "560068",
+              "countryCode": "IN",
+              "cityName": "BLR",
+              "stateCode": "KAR"
+            }
+          },
+          {
+            "id": "1000000000BC2107",
+            "chargeableServiceId": "10000007896346C1",
+            "code": "BIKE",
+            "subType": "SSR",
+            "priceCategory": {
+              "code": "C",
+              "subCode": "99Y"
+            },
+            "status": "MCF",
+            "NIP": 1,
+            "isSubjectToQuota": true,
+            "quotaCode": "SSRQ123",
+            "chargeableServiceDocument": {
+              "documentType": "EMD",
+              "number": "1728200002469",
+              "status": "REFUNDED"
+            },
+            "paymentStatus": "WAIVED",
+            "isIssuanceRequired": true,
+            "waiver": {
+              "authoriser": "Check-in agent",
+              "reasonCode": "Technical",
+              "reasonText": "A technical issue occurred at check-in. Agent had to waive the chargeable service"
+            }
+          }
+        ],
+        "contacts": [
+          {
+            "id": "762636429911",
+            "addresseeName": {
+              "firstName": "John",
+              "lastName": "SMITH"
+            },
+            "phone": {
+              "text": "001461415588511"
+            },
+            "purpose": [
+              "EMERGENCY"
+            ],
+            "isDeclined": false
+          }
+        ],
+        "regulatoryDocuments": [
+          {
+            "id": "100000001AFC111A",
+            "document": {
+              "documentType": "PASSPORT",
+              "number": "GB12345",
+              "issuanceDate": "2018-08-15",
+              "expiryDate": "2025-08-15",
+              "effectiveDate": "2018-09-15",
+              "issuanceCountry": "GB",
+              "issuanceLocation": "LONDON",
+              "gender": "MALE",
+              "name": {
+                "firstName": "John",
+                "lastName": "SMITH",
+                "title": "Mr"
+              },
+              "validToDate": "2019-08-14",
+              "validity": {
+                "numberOfDays": 100,
+                "numberOfDaysUsed": 15,
+                "numberOfDaysPerEntry": 60,
+                "numberOfEntriesPermitted": 10,
+                "numberOfEntriesUsed": 9
+              }
+            },
+            "recordedDocumentType": "VVV",
+            "countryOfRegistration": "USA",
+            "countryOfPortOfEntry": "PRI",
+            "presentedAtPort": "SJU",
+            "isCarried": false,
+            "isBearer": true,
+            "inputSource": {
+              "entryMethod": "SWIPED",
+              "isSwipeOverriden": false,
+              "isOCR": false,
+              "isHistorical": false,
+              "scannedMethod": "MACHINE_READABLE"
+            },
+            "usedFor": "ARRIVAL"
+          }
+        ],
+        "segmentLinks": [
+          {
+            "id": "127317712391918",
+            "collection": [
+              {
+                "id": "2112C1E05536001D",
+                "type": "segment-delivery"
+              }
+            ]
+          }
+        ],
+        "revenueIntegrity": {
+          "checks": [
+            {
+              "id": "6521372834902",
+              "checkType": "CUSTOMER_TYPE_CHECK",
+              "status": "PASSED"
+            }
+          ],
+          "comments": [
+            {
+              "id": "1255477819",
+              "commentType": "PASSED_CUSTOMER_TYPES",
+              "description": "STUDENT1"
+            }
+          ]
+        },
+        "passengerDisruption": {
+          "originalDestination": "LHR",
+          "productState": {
+            "status": "DISRUPTED",
+            "reason": "Disrupted From Flight"
+          }
+        },
+        "nationality": "GRC",
+        "volunteerDowngrade": "NOT_ASKED",
+        "volunteerDeniedBoarding": "VOLUNTEERED"
+      }
+    ],
+    "passenger": {
+      "name": {
+        "firstName": "John",
+        "lastName": "Smith",
+        "title": "Mr"
+      },
+      "age": "45",
+      "dateOfBirth": "1980-01-30",
+      "gender": "MALE",
+      "flightPassengerType": "ADULT",
+      "contacts": [
+        {
+          "id": "762636429911",
+          "email": {
+            "address": "contact@contactstandard.xyz"
+          },
+          "language": "EN",
+          "purpose": [
+            "STANDARD"
+          ],
+          "carrierCode": "6X"
+        },
+        {
+          "id": "126511237759",
+          "phone": {
+            "text": "00446716216622"
+          },
+          "language": "FR",
+          "purpose": [
+            "STANDARD"
+          ],
+          "carrierCode": "6X"
+        },
+        {
+          "id": "992873466222",
+          "addresseeName": {
+            "firstName": "John",
+            "lastName": "SMITH"
+          },
+          "phone": {
+            "text": "001461415588511"
+          },
+          "purpose": [
+            "EMERGENCY"
+          ],
+          "carrierCode": "6X",
+          "isDeclined": false
+        }
+      ]
+    },
+    "recordLocator": "PXT607",
+    "cprFeedType": "MARKETING_SBR",
+    "isSamePhysicalCustomer": false,
+    "isSystemMarkedSPC": false,
+    "isMasterRecord": true,
+    "groupName": "Star Travels",
+    "staff": {
+      "id": "ST0793",
+      "companyCode": "WT",
+      "companyName": "World Travellers",
+      "relationshipType": "Self",
+      "category": "BOOKABLE",
+      "joiningDate": "2011-02-28",
+      "retirementDate": "2011-02-28"
+    },
+    "flightTransfers": [
+      {
+        "id": 12385310,
+        "subType": "TRAVEL_READY_REACCOMODATION",
+        "disruptionTransferReason": "FLIGHT_DIVERTED",
+        "dcsTransferStatus": "COMPLETED",
+        "dataTransferStatus": "SUCCESS",
+        "fromSegments": {
+          "departure": {
+            "iataCode": "LHR",
+            "at": "2018-01-11"
+          },
+          "arrival": {
+            "iataCode": "SIN"
+          },
+          "number": "1567",
+          "carrierCode": "7X",
+          "suffix": "B",
+          "operating": {
+            "carrierCode": "6X",
+            "number": "17"
+          }
+        },
+        "toSegments": {
+          "departure": {
+            "iataCode": "LHR",
+            "at": "2018-01-11"
+          },
+          "arrival": {
+            "iataCode": "SIN"
+          },
+          "number": "3234",
+          "carrierCode": "7X",
+          "suffix": "B",
+          "operating": {
+            "carrierCode": "6X",
+            "number": "18"
+          }
+        }
+      }
+    ],
+    "frequentFlyer": [
+      {
+        "id": "FF0001",
+        "frequentFlyerNumber": "6X090807061234",
+        "serviceCode": "FQTU",
+        "applicableAirlineCode": "6X",
+        "confirmationStatus": "K",
+        "airlineLevel": {
+          "name": "Gold",
+          "code": "G",
+          "priorityCode": 1,
+          "companyCode": "6X"
+        },
+        "allianceLevel": {
+          "name": "Gold",
+          "code": "G",
+          "priorityCode": 1,
+          "companyCode": "6X"
+        },
+        "isValidationOverriden": false
+      }
+    ],
+    "services": [
+      {
+        "code": "DOCA",
+        "address": {
+          "category": "DESTINATION",
+          "lines": [
+            "203, LAA APARTMENTS"
+          ],
+          "postalCode": "560068",
+          "countryCode": "IN",
+          "cityName": "BLR",
+          "stateCode": "KAR"
+        },
+        "serviceProvider": {
+          "code": "6X"
+        }
+      }
+    ],
+    "passengerLinks": [
+      {
+        "id": "176126316661283",
+        "collection": [
+          {
+            "id": "2002CAE00036002D",
+            "type": "dcs-passenger",
+            "href": "https://airlines.api.amadeus.com/v2/departure-control/processed-dcs-passengers/2721234567890726",
+            "methods": [
+              "GET"
+            ]
+          }
+        ]
+      }
+    ],
+    "regulatoryDocuments": [
+      {
+        "id": "100000001AFC111B",
+        "document": {
+          "documentType": "PASSPORT",
+          "number": "GB12345",
+          "issuanceDate": "2018-08-15",
+          "expiryDate": "2025-08-15",
+          "effectiveDate": "2018-09-15",
+          "issuanceCountry": "GB",
+          "issuanceLocation": "GBR",
+          "gender": "MALE",
+          "name": {
+            "firstName": "John",
+            "lastName": "SMITH",
+            "title": "Mr"
+          },
+          "validToDate": "2019-08-14",
+          "validity": {
+            "numberOfDays": 100,
+            "numberOfDaysUsed": 15,
+            "numberOfDaysPerEntry": 60,
+            "numberOfEntriesPermitted": 10,
+            "numberOfEntriesUsed": 9
+          }
+        },
+        "recordedDocumentType": "VVV",
+        "countryOfRegistration": "USA",
+        "countryOfPortOfEntry": "PRI",
+        "presentedAtPort": "SJU",
+        "isCarried": false,
+        "isBearer": true,
+        "inputSource": {
+          "entryMethod": "SWIPED",
+          "isSwipeOverriden": false,
+          "isOCR": false,
+          "isHistorical": false,
+          "scannedMethod": "MACHINE_READABLE"
+        },
+        "validForCarrier": "6X",
+        "usedFor": "ARRIVAL"
+      }
+    ]
+  },
+  "previousRecord": [
+    {
+      "op": "replace",
+      "path": "/segmentDeliveries/0/dcsProductType",
+      "value": "ACTIVE_NOT_SYNCHRONISED"
+    }
+  ],
+  "events": {
+    "recordDomain": "DCSPASSENGER",
+    "recordId": "2501ADE000000001",
+    "originFeedTimeStamp": "2018-10-24T14:19:00Z",
+    "events": [
+      {
+        "origin": "COMPARISON",
+        "eventType": "UPDATED",
+        "currentPath": "/segmentDeliveries/0/dcsProductType",
+        "previousPath": "/segmentDeliveries/0/dcsProductType"
+      }
+    ]
+  }
+}
